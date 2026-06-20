@@ -124,6 +124,11 @@ jobs:
           path: release-artifacts
           merge-multiple: true
 
+      - name: Generate checksums
+        run: |
+          cd release-artifacts
+          python3 -c "import hashlib, pathlib; files=sorted(p for p in pathlib.Path('.').iterdir() if p.is_file() and p.name != 'SHA256SUMS.txt'); pathlib.Path('SHA256SUMS.txt').write_text(''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}\n' for p in files), encoding='utf-8')"
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:

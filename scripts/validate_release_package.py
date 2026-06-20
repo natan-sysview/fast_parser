@@ -63,6 +63,23 @@ def require_directory(path: Path) -> None:
         raise AssertionError(f"missing directory: {path}")
 
 
+def validate_manifest(package_dir: Path, *, platform_name: str, library_path: Path) -> None:
+    manifest = json.loads((package_dir / "manifest.json").read_text(encoding="utf-8"))
+    expected_library = library_path.relative_to(package_dir).as_posix()
+    expected = {
+        "name": "fastparse",
+        "platform": platform_name,
+        "library": expected_library,
+        "c_api": "fastparse-c-api/0.3.0",
+    }
+    for key, value in expected.items():
+        if manifest.get(key) != value:
+            raise AssertionError(f"manifest {key!r} expected {value!r}, found {manifest.get(key)!r}")
+    for key in ("version", "arch", "formats", "bindings", "headers", "docs"):
+        if key not in manifest:
+            raise AssertionError(f"manifest missing key: {key}")
+
+
 def validate_layout(package_dir: Path, platform_name: str) -> Path:
     print("Validating package layout...", flush=True)
     library_path = package_dir / library_relative_path(platform_name)
@@ -70,6 +87,8 @@ def validate_layout(package_dir: Path, platform_name: str) -> Path:
         package_dir / "README.md",
         package_dir / "LICENSE",
         package_dir / "RELEASE.md",
+        package_dir / "manifest.json",
+        package_dir / "smoke_test.py",
         package_dir / "include" / "fastparse.h",
         package_dir / "include" / "tsmp.h",
         package_dir / "bindings" / "python" / "tsmp" / "native.py",
@@ -86,6 +105,7 @@ def validate_layout(package_dir: Path, platform_name: str) -> Path:
         package_dir / "include",
     ]:
         require_directory(path)
+    validate_manifest(package_dir, platform_name=platform_name, library_path=library_path)
     return library_path
 
 
@@ -158,6 +178,26 @@ def validate_python_example(package_dir: Path, library_path: Path) -> None:
         raise AssertionError(f"example output did not include method_declaration:\n{completed.stdout}")
 
 
+def validate_smoke_test(package_dir: Path, library_path: Path) -> None:
+    print("Validating packaged smoke test...", flush=True)
+    smoke_test = package_dir / "smoke_test.py"
+    env = os.environ.copy()
+    env["FASTPARSE_LIBRARY_PATH"] = str(library_path)
+    env["PYTHONPATH"] = str(package_dir / "bindings" / "python")
+    env.pop("TSMP_LIBRARY_PATH", None)
+    completed = subprocess.run(
+        [sys.executable, str(smoke_test), "--lib", str(library_path)],
+        env=env,
+        cwd=package_dir,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=True,
+    )
+    if "FastParse smoke test OK" not in completed.stdout:
+        raise AssertionError(f"smoke test did not report success:\n{completed.stdout}")
+
+
 def main() -> int:
     args = parse_args()
     archive = args.archive.resolve()
@@ -169,6 +209,7 @@ def main() -> int:
         package_dir = extract_archive(archive, temp_dir)
         library_path = validate_layout(package_dir, args.platform)
         validate_python_binding(package_dir, library_path)
+        validate_smoke_test(package_dir, library_path)
         if not args.skip_example:
             validate_python_example(package_dir, library_path)
         print(f"Validated package: {archive.name}")

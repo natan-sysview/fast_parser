@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import platform
 import shutil
 import subprocess
@@ -14,6 +15,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+C_API_VERSION = "fastparse-c-api/0.3.0"
 
 
 def parse_args() -> argparse.Namespace:
@@ -122,21 +124,102 @@ def find_built_library(lib_name: str) -> Path | None:
 
 
 def write_manifest(package_dir: Path, *, version: str, target_platform: str, arch: str) -> None:
+    library = f"{'bin' if target_platform == 'windows' else 'lib'}/{library_name(target_platform)}"
+    manifest_json = {
+        "name": "fastparse",
+        "version": version,
+        "platform": target_platform,
+        "arch": arch,
+        "library": library,
+        "c_api": C_API_VERSION,
+        "headers": ["include/fastparse.h", "include/tsmp.h"],
+        "formats": ["json", "csv", "stats", "binary"],
+        "bindings": ["python", "csharp"],
+        "docs": ["README.md", "docs/contracts.md", "docs/c_api.md", "docs/output_formats.md"],
+    }
+    (package_dir / "manifest.json").write_text(
+        json.dumps(manifest_json, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
     manifest = f"""# FastParse Release
 
 version: {version}
 platform: {target_platform}
 arch: {arch}
+c_api: {C_API_VERSION}
 
 Native library:
 
 ```text
-{('bin' if target_platform == 'windows' else 'lib')}/{library_name(target_platform)}
+{library}
 ```
 
 Set `FASTPARSE_LIBRARY_PATH` to this library when using bindings from outside this package layout.
+
+Quick smoke test:
+
+```bash
+python smoke_test.py
+```
 """
     (package_dir / "RELEASE.md").write_text(manifest, encoding="utf-8")
+
+
+def write_smoke_test(package_dir: Path) -> None:
+    smoke_test = r'''#!/usr/bin/env python3
+"""End-user smoke test for an unpacked FastParse package."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT / "bindings" / "python"))
+
+from tsmp import Tsmp, default_library_path  # noqa: E402
+
+
+SAMPLE_SOURCE = b"class Demo { void run() { System.out.println(\"fastparse\"); } }"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run a FastParse package smoke test.")
+    parser.add_argument("--lib", type=Path, default=default_library_path())
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    parser = Tsmp(args.lib.resolve())
+    result = parser.parse_bytes(
+        SAMPLE_SOURCE,
+        language="java",
+        output_format="json",
+        include_rules=["method_declaration"],
+        fields=["rule", "text", "byte_range"],
+    )
+    document = json.loads(result.data)
+    nodes = document.get("nodes", [])
+    if len(nodes) != 1 or nodes[0].get("rule") != "method_declaration":
+        raise RuntimeError(f"unexpected parse result: {document}")
+    print("FastParse smoke test OK")
+    print(f"Library : {parser.version}")
+    print(f"Nodes   : {result.node_count}")
+    print(f"Rule    : {nodes[0]['rule']}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+'''
+    path = package_dir / "smoke_test.py"
+    path.write_text(smoke_test, encoding="utf-8")
+    path.chmod(0o755)
 
 
 def make_archive(package_dir: Path, dist_dir: Path, target_platform: str) -> Path:
@@ -173,6 +256,7 @@ def main() -> int:
 
     copy_files(package_dir, target_platform)
     write_manifest(package_dir, version=args.version, target_platform=target_platform, arch=arch)
+    write_smoke_test(package_dir)
     archive = make_archive(package_dir, args.dist_dir.resolve(), target_platform)
 
     print(f"Package directory: {package_dir}")
