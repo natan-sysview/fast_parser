@@ -63,6 +63,7 @@ def require_directory(path: Path) -> None:
 
 
 def validate_layout(package_dir: Path, platform_name: str) -> Path:
+    print("Validating package layout...", flush=True)
     library_path = package_dir / library_relative_path(platform_name)
     for path in [
         package_dir / "README.md",
@@ -95,6 +96,7 @@ def import_binding(package_dir: Path) -> Any:
 
 
 def validate_python_binding(package_dir: Path, library_path: Path) -> None:
+    print("Validating Python binding parse contracts...", flush=True)
     Tsmp = import_binding(package_dir)
     parser = Tsmp(library_path)
 
@@ -123,15 +125,19 @@ def validate_python_binding(package_dir: Path, library_path: Path) -> None:
         raise AssertionError("stats parse contract failed")
 
 
-def validate_python_example(package_dir: Path) -> None:
+def validate_python_example(package_dir: Path, library_path: Path) -> None:
+    print("Validating packaged Python example...", flush=True)
     example = package_dir / "examples" / "python" / "01_parse_string" / "parse_string.py"
     env = os.environ.copy()
-    env.pop("FASTPARSE_LIBRARY_PATH", None)
+    env["FASTPARSE_LIBRARY_PATH"] = str(library_path)
+    env["PYTHONPATH"] = str(package_dir / "bindings" / "python")
     env.pop("TSMP_LIBRARY_PATH", None)
     completed = subprocess.run(
         [
             sys.executable,
             str(example),
+            "--lib",
+            str(library_path),
             "--format",
             "json",
             "--rules",
@@ -162,7 +168,7 @@ def main() -> int:
         package_dir = extract_archive(archive, temp_dir)
         library_path = validate_layout(package_dir, args.platform)
         validate_python_binding(package_dir, library_path)
-        validate_python_example(package_dir)
+        validate_python_example(package_dir, library_path)
         print(f"Validated package: {archive.name}")
         print(f"Package root     : {package_dir.name}")
         print(f"Native library   : {library_path.relative_to(package_dir)}")
