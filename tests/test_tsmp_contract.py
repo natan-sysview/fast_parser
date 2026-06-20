@@ -195,13 +195,15 @@ class TsmpContractTests(unittest.TestCase):
     def test_default_library_path_honors_environment(self) -> None:
         old_value = os.environ.get("TSMP_LIBRARY_PATH")
         old_fastparse_value = os.environ.get("FASTPARSE_LIBRARY_PATH")
+        custom_tsmp = ROOT / "custom" / "libtsmp.test"
+        custom_fastparse = ROOT / "custom" / "libfastparse.test"
         try:
             os.environ.pop("FASTPARSE_LIBRARY_PATH", None)
-            os.environ["TSMP_LIBRARY_PATH"] = "/tmp/custom/libtsmp.dylib"
-            self.assertEqual(str(default_library_path()), "/tmp/custom/libtsmp.dylib")
+            os.environ["TSMP_LIBRARY_PATH"] = str(custom_tsmp)
+            self.assertEqual(default_library_path(), custom_tsmp)
 
-            os.environ["FASTPARSE_LIBRARY_PATH"] = "/tmp/custom/libfastparse.dylib"
-            self.assertEqual(str(default_library_path()), "/tmp/custom/libfastparse.dylib")
+            os.environ["FASTPARSE_LIBRARY_PATH"] = str(custom_fastparse)
+            self.assertEqual(default_library_path(), custom_fastparse)
         finally:
             if old_value is None:
                 os.environ.pop("TSMP_LIBRARY_PATH", None)
