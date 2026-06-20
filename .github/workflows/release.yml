@@ -23,18 +23,22 @@ jobs:
           - runner: ubuntu-latest
             platform: linux
             arch: x64
+            archive_ext: tar.gz
             archive_glob: dist/*.tar.gz
           - runner: macos-15-intel
             platform: macos
             arch: x64
+            archive_ext: tar.gz
             archive_glob: dist/*.tar.gz
           - runner: macos-14
             platform: macos
             arch: arm64
+            archive_ext: tar.gz
             archive_glob: dist/*.tar.gz
           - runner: windows-latest
             platform: windows
             arch: x64
+            archive_ext: zip
             archive_glob: dist/*.zip
 
     steps:
@@ -83,6 +87,12 @@ jobs:
           --platform ${{ matrix.platform }}
           --arch ${{ matrix.arch }}
           --skip-build
+
+      - name: Validate package
+        run: >
+          python scripts/validate_release_package.py
+          "dist/fastparse-${{ steps.version.outputs.value }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.archive_ext }}"
+          --platform ${{ matrix.platform }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

@@ -110,11 +110,12 @@ def default_library_path() -> Path:
     else:
         candidates = ("libfastparse.so", "libtsmp.so", "libts_multi_parser.so")
 
-    for name in candidates:
-        candidate = project_root / "bin" / name
-        if candidate.exists():
-            return candidate
-    return project_root / "bin" / candidates[0]
+    for directory in ("bin", "lib"):
+        for name in candidates:
+            candidate = project_root / directory / name
+            if candidate.exists():
+                return candidate
+    return project_root / ("bin" if sys.platform == "win32" else "lib") / candidates[0]
 
 
 def parse_field_mask(fields: int | str | Iterable[str] | None) -> int:

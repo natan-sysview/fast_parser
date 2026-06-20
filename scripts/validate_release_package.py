@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+"""Validate a FastParse release archive as an end user would use it."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import tarfile
+import tempfile
+import zipfile
+from pathlib import Path
+from typing import Any
+
+
+SAMPLE_SOURCE = b"class Demo { void run() { System.out.println(\"fastparse\"); } }"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Validate a FastParse release package.")
+    parser.add_argument("archive", type=Path)
+    parser.add_argument("--platform", choices=("linux", "macos", "windows"), required=True)
+    return parser.parse_args()
+
+
+def library_relative_path(platform_name: str) -> Path:
+    if platform_name == "windows":
+        return Path("bin") / "fastparse.dll"
+    if platform_name == "macos":
+        return Path("lib") / "libfastparse.dylib"
+    return Path("lib") / "libfastparse.so"
+
+
+def extract_archive(archive: Path, destination: Path) -> Path:
+    if archive.suffix == ".zip":
+        with zipfile.ZipFile(archive) as zf:
+            zf.extractall(destination)
+    elif archive.name.endswith(".tar.gz"):
+        with tarfile.open(archive, "r:gz") as tf:
+            try:
+                tf.extractall(destination, filter="data")
+            except TypeError:
+                tf.extractall(destination)
+    else:
+        raise ValueError(f"unsupported archive type: {archive}")
+
+    package_roots = [path for path in destination.iterdir() if path.is_dir()]
+    if len(package_roots) != 1:
+        raise AssertionError(f"expected one package root, found {len(package_roots)}")
+    return package_roots[0]
+
+
+def require_file(path: Path) -> None:
+    if not path.is_file():
+        raise AssertionError(f"missing file: {path}")
+
+
+def require_directory(path: Path) -> None:
+    if not path.is_dir():
+        raise AssertionError(f"missing directory: {path}")
+
+
+def validate_layout(package_dir: Path, platform_name: str) -> Path:
+    library_path = package_dir / library_relative_path(platform_name)
+    for path in [
+        package_dir / "README.md",
+        package_dir / "LICENSE",
+        package_dir / "RELEASE.md",
+        package_dir / "include" / "fastparse.h",
+        package_dir / "include" / "tsmp.h",
+        package_dir / "bindings" / "python" / "tsmp" / "native.py",
+        package_dir / "examples" / "python" / "01_parse_string" / "parse_string.py",
+        package_dir / "docs" / "contracts.md",
+        library_path,
+    ]:
+        require_file(path)
+
+    for path in [
+        package_dir / "bindings",
+        package_dir / "docs",
+        package_dir / "examples",
+        package_dir / "include",
+    ]:
+        require_directory(path)
+    return library_path
+
+
+def import_binding(package_dir: Path) -> Any:
+    sys.path.insert(0, str(package_dir / "bindings" / "python"))
+    from tsmp import Tsmp  # noqa: WPS433
+
+    return Tsmp
+
+
+def validate_python_binding(package_dir: Path, library_path: Path) -> None:
+    Tsmp = import_binding(package_dir)
+    parser = Tsmp(library_path)
+
+    json_result = parser.parse_bytes(
+        SAMPLE_SOURCE,
+        output_format="json",
+        include_rules=["class_declaration", "method_declaration"],
+        fields=["rule", "text", "byte_range"],
+    )
+    document = json.loads(json_result.data)
+    rules = [node["rule"] for node in document["nodes"]]
+    if rules != ["class_declaration", "method_declaration"]:
+        raise AssertionError(f"unexpected JSON rules: {rules}")
+
+    binary_result = parser.parse_bytes(
+        SAMPLE_SOURCE,
+        output_format="binary",
+        include_rules=["method_declaration"],
+        fields=["rule", "text"],
+    )
+    if binary_result.node_count != 1 or len(binary_result.data) == 0:
+        raise AssertionError("binary parse did not return one populated method node")
+
+    stats_result = parser.parse_bytes(SAMPLE_SOURCE, output_format="stats")
+    if stats_result.node_count <= 0 or stats_result.data != b"":
+        raise AssertionError("stats parse contract failed")
+
+
+def validate_python_example(package_dir: Path) -> None:
+    example = package_dir / "examples" / "python" / "01_parse_string" / "parse_string.py"
+    env = os.environ.copy()
+    env.pop("FASTPARSE_LIBRARY_PATH", None)
+    env.pop("TSMP_LIBRARY_PATH", None)
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(example),
+            "--format",
+            "json",
+            "--rules",
+            "method_declaration",
+            "--fields",
+            "rule,text",
+            "--summary",
+        ],
+        env=env,
+        cwd=package_dir,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=True,
+    )
+    if "method_declaration" not in completed.stdout:
+        raise AssertionError(f"example output did not include method_declaration:\n{completed.stdout}")
+
+
+def main() -> int:
+    args = parse_args()
+    archive = args.archive.resolve()
+    if not archive.is_file():
+        raise FileNotFoundError(archive)
+
+    with tempfile.TemporaryDirectory(prefix="fastparse-package-") as temp:
+        temp_dir = Path(temp)
+        package_dir = extract_archive(archive, temp_dir)
+        library_path = validate_layout(package_dir, args.platform)
+        validate_python_binding(package_dir, library_path)
+        validate_python_example(package_dir)
+        print(f"Validated package: {archive.name}")
+        print(f"Package root     : {package_dir.name}")
+        print(f"Native library   : {library_path.relative_to(package_dir)}")
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

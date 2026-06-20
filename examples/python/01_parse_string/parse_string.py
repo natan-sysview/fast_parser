@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT / "bindings" / "python"))
 from tsmp import Tsmp, default_library_path, parse_field_mask  # noqa: E402
 
 DEFAULT_SOURCE = ROOT / "file_test" / "java" / "HelloWorld.java"
+INLINE_SOURCE = b"class Demo { void run() { System.out.println(\"fastparse\"); } }"
 DEFAULT_LIB = default_library_path()
 
 
@@ -28,7 +29,7 @@ def parse_args() -> argparse.Namespace:
         description="Parse Java source through the FastParse native library."
     )
     parser.add_argument("--lib", type=Path, default=DEFAULT_LIB)
-    parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
+    parser.add_argument("--source", type=Path)
     parser.add_argument("--lang", default="java")
     parser.add_argument("--format", choices=("json", "csv", "stats", "binary", "msgpack"), default="json")
     parser.add_argument("--rules", default="", help='Pipe-separated rules, e.g. "class_declaration|method_declaration".')
@@ -40,10 +41,15 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def default_source() -> bytes:
+    if DEFAULT_SOURCE.exists():
+        return DEFAULT_SOURCE.read_bytes()
+    return INLINE_SOURCE
+
+
 def main() -> int:
     args = parse_args()
-    source_path = args.source.resolve()
-    source = source_path.read_bytes()
+    source = args.source.resolve().read_bytes() if args.source else default_source()
     tsmp = Tsmp(args.lib.resolve())
     fields = parse_field_mask(args.fields)
 

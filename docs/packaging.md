@@ -188,6 +188,14 @@ GitHub-hosted runners can build native artifacts on their target operating syste
 | `macos-14` | `fastparse-<version>-macos-arm64.tar.gz` |
 | `windows-latest` | `fastparse-<version>-windows-x64.zip` |
 
+Each package job also validates the generated archive:
+
+```bash
+python scripts/validate_release_package.py <archive> --platform <platform>
+```
+
+That validation extracts the archive, checks the public layout, loads the native library through the Python binding, parses Java source as JSON, binary MessagePack, and stats, and runs the packaged Python example. This catches packaging errors that normal source-tree tests can miss.
+
 This avoids many cross-compiling edge cases around platform linkers, dynamic library naming, exported symbols, and runtime testing.
 
 The workflow lives at:
