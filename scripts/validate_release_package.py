@@ -66,10 +66,12 @@ def require_directory(path: Path) -> None:
 def validate_manifest(package_dir: Path, *, platform_name: str, library_path: Path) -> None:
     manifest = json.loads((package_dir / "manifest.json").read_text(encoding="utf-8"))
     expected_library = library_path.relative_to(package_dir).as_posix()
+    expected_link_library = "bin/fastparse.lib" if platform_name == "windows" else None
     expected = {
         "name": "fastparse",
         "platform": platform_name,
         "library": expected_library,
+        "link_library": expected_link_library,
         "c_api": "fastparse-c-api/0.3.0",
     }
     for key, value in expected.items():
@@ -83,7 +85,7 @@ def validate_manifest(package_dir: Path, *, platform_name: str, library_path: Pa
 def validate_layout(package_dir: Path, platform_name: str) -> Path:
     print("Validating package layout...", flush=True)
     library_path = package_dir / library_relative_path(platform_name)
-    for path in [
+    required_files = [
         package_dir / "README.md",
         package_dir / "LICENSE",
         package_dir / "RELEASE.md",
@@ -92,10 +94,15 @@ def validate_layout(package_dir: Path, platform_name: str) -> Path:
         package_dir / "include" / "fastparse.h",
         package_dir / "include" / "tsmp.h",
         package_dir / "bindings" / "python" / "tsmp" / "native.py",
+        package_dir / "examples" / "c" / "parse_string.c",
         package_dir / "examples" / "python" / "01_parse_string" / "parse_string.py",
         package_dir / "docs" / "contracts.md",
         library_path,
-    ]:
+    ]
+    if platform_name == "windows":
+        required_files.append(package_dir / "bin" / "fastparse.lib")
+
+    for path in required_files:
         require_file(path)
 
     for path in [
@@ -198,6 +205,78 @@ def validate_smoke_test(package_dir: Path, library_path: Path) -> None:
         raise AssertionError(f"smoke test did not report success:\n{completed.stdout}")
 
 
+def validate_c_example(package_dir: Path, platform_name: str, library_path: Path) -> None:
+    print("Validating packaged C example...", flush=True)
+    source = package_dir / "examples" / "c" / "parse_string.c"
+    include_dir = package_dir / "include"
+    build_dir = package_dir / ".fastparse-c-smoke-build"
+    link_library = package_dir / "bin" / "fastparse.lib"
+
+    imported_properties = [
+        f'IMPORTED_LOCATION "{library_path.as_posix()}"',
+        f'INTERFACE_INCLUDE_DIRECTORIES "{include_dir.as_posix()}"',
+    ]
+    if platform_name == "windows":
+        imported_properties.append(f'IMPORTED_IMPLIB "{link_library.as_posix()}"')
+
+    cmake_lists = f"""cmake_minimum_required(VERSION 3.20)
+project(fastparse_package_c_smoke C)
+
+add_executable(fastparse_c_smoke "{source.as_posix()}")
+add_library(fastparse_native SHARED IMPORTED GLOBAL)
+set_target_properties(fastparse_native PROPERTIES
+    {' '.join(imported_properties)}
+)
+target_link_libraries(fastparse_c_smoke PRIVATE fastparse_native)
+if(APPLE OR UNIX)
+    set_target_properties(fastparse_c_smoke PROPERTIES BUILD_RPATH "{library_path.parent.as_posix()}")
+endif()
+"""
+    build_dir.mkdir(exist_ok=True)
+
+    (package_dir / "CMakeLists.txt").write_text(cmake_lists, encoding="utf-8")
+    subprocess.run(
+        ["cmake", "-S", str(package_dir), "-B", str(build_dir), "-DCMAKE_BUILD_TYPE=Release"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        check=True,
+    )
+    subprocess.run(
+        ["cmake", "--build", str(build_dir), "--config", "Release"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        check=True,
+    )
+
+    exe_name = "fastparse_c_smoke.exe" if platform_name == "windows" else "fastparse_c_smoke"
+    candidates = list(build_dir.rglob(exe_name))
+    if not candidates:
+        raise AssertionError(f"C smoke executable not found under {build_dir}")
+    executable = candidates[0]
+
+    env = os.environ.copy()
+    if platform_name == "windows":
+        env["PATH"] = f"{library_path.parent}{os.pathsep}{env.get('PATH', '')}"
+    elif platform_name == "macos":
+        env["DYLD_LIBRARY_PATH"] = f"{library_path.parent}{os.pathsep}{env.get('DYLD_LIBRARY_PATH', '')}"
+    else:
+        env["LD_LIBRARY_PATH"] = f"{library_path.parent}{os.pathsep}{env.get('LD_LIBRARY_PATH', '')}"
+
+    completed = subprocess.run(
+        [str(executable)],
+        env=env,
+        cwd=package_dir,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=True,
+    )
+    if "FastParse C smoke test OK" not in completed.stdout:
+        raise AssertionError(f"C smoke test did not report success:\n{completed.stdout}")
+
+
 def main() -> int:
     args = parse_args()
     archive = args.archive.resolve()
@@ -209,6 +288,7 @@ def main() -> int:
         package_dir = extract_archive(archive, temp_dir)
         library_path = validate_layout(package_dir, args.platform)
         validate_python_binding(package_dir, library_path)
+        validate_c_example(package_dir, args.platform, library_path)
         validate_smoke_test(package_dir, library_path)
         if not args.skip_example:
             validate_python_example(package_dir, library_path)

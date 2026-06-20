@@ -57,6 +57,12 @@ def library_name(target_platform: str) -> str:
     return "libfastparse.so"
 
 
+def link_library_name(target_platform: str) -> str | None:
+    if target_platform == "windows":
+        return "fastparse.lib"
+    return None
+
+
 def run(command: list[str]) -> None:
     print("+", " ".join(command))
     subprocess.run(command, cwd=ROOT, check=True)
@@ -90,6 +96,13 @@ def copy_files(package_dir: Path, target_platform: str) -> None:
     binary_dir = package_dir / ("bin" if target_platform == "windows" else "lib")
     binary_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(built_library, binary_dir / lib_name)
+
+    link_lib_name = link_library_name(target_platform)
+    if link_lib_name:
+        built_link_library = find_built_library(link_lib_name)
+        if built_link_library is None:
+            raise FileNotFoundError(f"Built link library not found: {link_lib_name}")
+        shutil.copy2(built_link_library, binary_dir / link_lib_name)
 
     copy_tree(ROOT / "include", package_dir / "include")
     copy_tree(ROOT / "bindings", package_dir / "bindings")
@@ -125,12 +138,15 @@ def find_built_library(lib_name: str) -> Path | None:
 
 def write_manifest(package_dir: Path, *, version: str, target_platform: str, arch: str) -> None:
     library = f"{'bin' if target_platform == 'windows' else 'lib'}/{library_name(target_platform)}"
+    link_lib_name = link_library_name(target_platform)
+    link_library = f"bin/{link_lib_name}" if link_lib_name else None
     manifest_json = {
         "name": "fastparse",
         "version": version,
         "platform": target_platform,
         "arch": arch,
         "library": library,
+        "link_library": link_library,
         "c_api": C_API_VERSION,
         "headers": ["include/fastparse.h", "include/tsmp.h"],
         "formats": ["json", "csv", "stats", "binary"],
@@ -154,6 +170,17 @@ Native library:
 ```text
 {library}
 ```
+"""
+    if link_library:
+        manifest += f"""
+Native link library:
+
+```text
+{link_library}
+```
+"""
+
+    manifest += """
 
 Set `FASTPARSE_LIBRARY_PATH` to this library when using bindings from outside this package layout.
 

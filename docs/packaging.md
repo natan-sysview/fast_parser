@@ -194,7 +194,7 @@ Each package job also validates the generated archive:
 python scripts/validate_release_package.py <archive> --platform <platform>
 ```
 
-That validation extracts the archive, checks the public layout, validates `manifest.json`, loads the native library through the Python binding, parses Java source as JSON, binary MessagePack, and stats, and runs the packaged `smoke_test.py`. macOS and Linux also run the packaged Python example. This catches packaging errors that normal source-tree tests can miss.
+That validation extracts the archive, checks the public layout, validates `manifest.json`, loads the native library through the Python binding, parses Java source as JSON, binary MessagePack, and stats, compiles and runs the packaged C example, and runs the packaged `smoke_test.py`. macOS and Linux also run the packaged Python example. This catches packaging errors that normal source-tree tests can miss.
 
 Each archive includes:
 
@@ -202,6 +202,7 @@ Each archive includes:
 manifest.json    Machine-readable package metadata.
 smoke_test.py    End-user smoke test for the unpacked package.
 RELEASE.md       Human-readable package summary.
+examples/c/      Minimal C example compiled during package validation.
 ```
 
 Tagged releases also attach `SHA256SUMS.txt`, generated from the final archives in the release job.
