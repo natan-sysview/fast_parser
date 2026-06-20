@@ -184,6 +184,9 @@ def _native_function(lib: ctypes.CDLL, preferred: str, fallback: str) -> Any:
 class Tsmp:
     def __init__(self, library_path: str | Path | None = None) -> None:
         self.library_path = Path(library_path) if library_path else default_library_path()
+        self._dll_directory = None
+        if sys.platform == "win32" and hasattr(os, "add_dll_directory"):
+            self._dll_directory = os.add_dll_directory(str(self.library_path.parent))
         self._lib = ctypes.CDLL(str(self.library_path))
 
         self._version_fn = _native_function(self._lib, "fastparse_version", "tsmp_version")
