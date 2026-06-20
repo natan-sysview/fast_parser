@@ -24,7 +24,7 @@ jobs:
             platform: linux
             arch: x64
             archive_glob: dist/*.tar.gz
-          - runner: macos-13
+          - runner: macos-15-intel
             platform: macos
             arch: x64
             archive_glob: dist/*.tar.gz

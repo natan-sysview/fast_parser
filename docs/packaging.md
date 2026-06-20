@@ -184,7 +184,7 @@ GitHub-hosted runners can build native artifacts on their target operating syste
 | Runner | Artifact |
 |---|---|
 | `ubuntu-latest` | `fastparse-<version>-linux-x64.tar.gz` |
-| `macos-13` | `fastparse-<version>-macos-x64.tar.gz` |
+| `macos-15-intel` | `fastparse-<version>-macos-x64.tar.gz` |
 | `macos-14` | `fastparse-<version>-macos-arm64.tar.gz` |
 | `windows-latest` | `fastparse-<version>-windows-x64.zip` |
 
