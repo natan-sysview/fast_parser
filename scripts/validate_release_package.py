@@ -164,7 +164,7 @@ def main() -> int:
     if not archive.is_file():
         raise FileNotFoundError(archive)
 
-    with tempfile.TemporaryDirectory(prefix="fastparse-package-") as temp:
+    with tempfile.TemporaryDirectory(prefix="fastparse-package-", ignore_cleanup_errors=True) as temp:
         temp_dir = Path(temp)
         package_dir = extract_archive(archive, temp_dir)
         library_path = validate_layout(package_dir, args.platform)
