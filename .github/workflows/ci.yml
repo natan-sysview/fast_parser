@@ -31,7 +31,7 @@ jobs:
         run: cmake --build build --config Release --verbose
 
       - name: Run C tests
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build -C Release --output-on-failure
 
       - name: Run Python contract tests
         run: python3 -m unittest discover -s tests -v

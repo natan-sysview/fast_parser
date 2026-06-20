@@ -63,7 +63,7 @@ jobs:
         run: cmake --build build --config Release
 
       - name: Test native
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build -C Release --output-on-failure
 
       - name: Test Python binding
         run: python3 -m unittest discover -s tests -v
