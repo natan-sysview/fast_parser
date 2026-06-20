@@ -93,6 +93,15 @@ jobs:
           python scripts/validate_release_package.py
           "dist/fastparse-${{ steps.version.outputs.value }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.archive_ext }}"
           --platform ${{ matrix.platform }}
+        if: runner.os != 'Windows'
+
+      - name: Validate package
+        run: >
+          python scripts/validate_release_package.py
+          "dist/fastparse-${{ steps.version.outputs.value }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.archive_ext }}"
+          --platform ${{ matrix.platform }}
+          --skip-example
+        if: runner.os == 'Windows'
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

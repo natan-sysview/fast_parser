@@ -194,7 +194,7 @@ Each package job also validates the generated archive:
 python scripts/validate_release_package.py <archive> --platform <platform>
 ```
 
-That validation extracts the archive, checks the public layout, loads the native library through the Python binding, parses Java source as JSON, binary MessagePack, and stats, and runs the packaged Python example. This catches packaging errors that normal source-tree tests can miss.
+That validation extracts the archive, checks the public layout, loads the native library through the Python binding, and parses Java source as JSON, binary MessagePack, and stats. macOS and Linux also run the packaged Python example. This catches packaging errors that normal source-tree tests can miss.
 
 This avoids many cross-compiling edge cases around platform linkers, dynamic library naming, exported symbols, and runtime testing.
 

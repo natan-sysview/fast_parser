@@ -22,6 +22,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a FastParse release package.")
     parser.add_argument("archive", type=Path)
     parser.add_argument("--platform", choices=("linux", "macos", "windows"), required=True)
+    parser.add_argument("--skip-example", action="store_true")
     return parser.parse_args()
 
 
@@ -168,7 +169,8 @@ def main() -> int:
         package_dir = extract_archive(archive, temp_dir)
         library_path = validate_layout(package_dir, args.platform)
         validate_python_binding(package_dir, library_path)
-        validate_python_example(package_dir, library_path)
+        if not args.skip_example:
+            validate_python_example(package_dir, library_path)
         print(f"Validated package: {archive.name}")
         print(f"Package root     : {package_dir.name}")
         print(f"Native library   : {library_path.relative_to(package_dir)}")
