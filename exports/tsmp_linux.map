@@ -1,0 +1,11 @@
+TSMP_1.0 {
+    global:
+        tsmp_version;
+        tsmp_parse;
+        tsmp_result_free;
+        fastparse_version;
+        fastparse_parse;
+        fastparse_result_free;
+    local:
+        *;
+};
