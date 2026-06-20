@@ -121,5 +121,11 @@ if(BUILD_TESTING)
     set_target_properties(tsmp_c_smoke PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/tests"
         BUILD_RPATH "$<TARGET_FILE_DIR:tsmp>")
+    if(WIN32 AND TSMP_BUILD_SHARED)
+        add_custom_command(TARGET tsmp_c_smoke POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:tsmp>"
+                "$<TARGET_FILE_DIR:tsmp_c_smoke>")
+    endif()
     add_test(NAME tsmp_c_smoke COMMAND tsmp_c_smoke)
 endif()
