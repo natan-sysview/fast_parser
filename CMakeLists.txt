@@ -72,6 +72,10 @@ target_compile_definitions(tsmp
         TSMP_BUILD_SHARED
         TREE_SITTER_HIDE_SYMBOLS)
 
+if(UNIX AND NOT APPLE)
+    target_compile_definitions(tsmp PRIVATE _DEFAULT_SOURCE)
+endif()
+
 if(MSVC)
     target_compile_options(tsmp PRIVATE /W4)
 else()
