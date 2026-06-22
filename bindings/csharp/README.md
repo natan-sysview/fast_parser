@@ -24,7 +24,7 @@ dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExampl
 From a NuGet package:
 
 ```bash
-dotnet add package FastParse
+dotnet add package FastParser
 ```
 
 ```csharp

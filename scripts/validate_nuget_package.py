@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate FastParse.nupkg from a clean consumer project."""
+"""Validate FastParser.nupkg from a clean consumer project."""
 
 from __future__ import annotations
 
@@ -11,7 +11,8 @@ import tempfile
 from pathlib import Path
 
 
-PACKAGE_RE = re.compile(r"^FastParse\.(?P<version>.+)\.nupkg$")
+PACKAGE_ID = "FastParser"
+PACKAGE_RE = re.compile(rf"^{PACKAGE_ID}\.(?P<version>.+)\.nupkg$")
 
 
 PROGRAM = r'''using FastParse;
@@ -79,7 +80,7 @@ def main() -> int:
                 "add",
                 str(project_dir / "consumer.csproj"),
                 "package",
-                "FastParse",
+                PACKAGE_ID,
                 "--version",
                 version,
                 "--source",

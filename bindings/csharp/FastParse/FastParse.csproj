@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PackageId>FastParse</PackageId>
+    <PackageId>FastParser</PackageId>
     <Authors>natan-sysview</Authors>
     <Company>natan-sysview</Company>
     <Description>Fast native AST extraction library over Tree-sitter with JSON, CSV, binary MessagePack, and stats outputs.</Description>

@@ -216,7 +216,7 @@ This avoids many cross-compiling edge cases around platform linkers, dynamic lib
 The release workflow also builds a C# NuGet package artifact:
 
 ```text
-FastParse.<version>.nupkg
+FastParser.<version>.nupkg
 ```
 
 The package contains the managed C# binding plus the native libraries from the release archives:
@@ -240,18 +240,18 @@ python3 scripts/package_nuget.py \
 Validate it from a clean consumer project:
 
 ```bash
-python3 scripts/validate_nuget_package.py dist/nuget/FastParse.0.1.0-preview.nupkg
+python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.nupkg
 ```
 
 Install from the local package directory:
 
 ```bash
-dotnet add package FastParse \
+dotnet add package FastParser \
   --version 0.1.0-preview \
   --source dist/nuget
 ```
 
-Publishing to nuget.org should use NuGet Trusted Publishing from GitHub Actions once the package ID and owner account are ready.
+Publishing to nuget.org uses NuGet Trusted Publishing from GitHub Actions. The public NuGet package ID is `FastParser`; the C# namespace remains `FastParse`.
 
 The workflow lives at:
 

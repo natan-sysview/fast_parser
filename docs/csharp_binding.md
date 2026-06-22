@@ -19,19 +19,19 @@ dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExampl
 The release workflow builds a local/package artifact:
 
 ```text
-FastParse.<version>.nupkg
+FastParser.<version>.nupkg
 ```
 
 Install it from a local package directory:
 
 ```bash
-dotnet add package FastParse --version 0.1.0-preview --source /path/to/package-dir
+dotnet add package FastParser --version 0.1.0-preview --source /path/to/package-dir
 ```
 
 Once the package is published to nuget.org, the command becomes:
 
 ```bash
-dotnet add package FastParse
+dotnet add package FastParser
 ```
 
 The NuGet package carries native libraries using standard RID folders:

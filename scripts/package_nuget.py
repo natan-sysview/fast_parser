@@ -22,7 +22,7 @@ ARCHIVE_RE = re.compile(r"^fastparse-(?P<version>.+)-(?P<platform>linux|macos|wi
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Build FastParse.nupkg with RID-specific native libraries.")
+    parser = argparse.ArgumentParser(description="Build FastParser.nupkg with RID-specific native libraries.")
     parser.add_argument("--version", required=True, help="NuGet package version, for example 0.1.0-preview")
     parser.add_argument("--archive", action="append", type=Path, default=[], help="FastParse release archive. May be passed multiple times.")
     parser.add_argument("--release-tag", help="Download native archives from a GitHub release tag before packing.")
@@ -140,7 +140,7 @@ def build_package(version: str, native_root: Path, output_dir: Path) -> Path:
         check=True,
     )
 
-    package = output_dir / f"FastParse.{version}.nupkg"
+    package = output_dir / f"FastParser.{version}.nupkg"
     if not package.is_file():
         raise AssertionError(f"expected NuGet package was not created: {package}")
     return package
