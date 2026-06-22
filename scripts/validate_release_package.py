@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -23,6 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("archive", type=Path)
     parser.add_argument("--platform", choices=("linux", "macos", "windows"), required=True)
     parser.add_argument("--skip-example", action="store_true")
+    parser.add_argument("--skip-csharp-example", action="store_true")
     return parser.parse_args()
 
 
@@ -278,6 +280,40 @@ endif()
         raise AssertionError(f"C smoke test did not report success:\n{completed.stdout}")
 
 
+def validate_csharp_example(package_dir: Path, library_path: Path) -> None:
+    print("Validating packaged C# example...", flush=True)
+    if shutil.which("dotnet") is None:
+        raise AssertionError("dotnet was not found; pass --skip-csharp-example to skip this optional check")
+
+    project = package_dir / "examples" / "csharp" / "01_parse_string" / "FastParse.ParseStringExample.csproj"
+    require_file(project)
+
+    env = os.environ.copy()
+    env["FASTPARSE_LIBRARY_PATH"] = str(library_path)
+    env.pop("TSMP_LIBRARY_PATH", None)
+
+    subprocess.run(
+        ["dotnet", "build", str(project), "--nologo"],
+        env=env,
+        cwd=package_dir,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=True,
+    )
+    completed = subprocess.run(
+        ["dotnet", "run", "--no-build", "--project", str(project)],
+        env=env,
+        cwd=package_dir,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=True,
+    )
+    if "C# smoke OK" not in completed.stdout:
+        raise AssertionError(f"C# smoke test did not report success:\n{completed.stdout}")
+
+
 def main() -> int:
     args = parse_args()
     archive = args.archive.resolve()
@@ -290,6 +326,8 @@ def main() -> int:
         library_path = validate_layout(package_dir, args.platform)
         validate_python_binding(package_dir, library_path)
         validate_c_example(package_dir, args.platform, library_path)
+        if not args.skip_csharp_example:
+            validate_csharp_example(package_dir, library_path)
         validate_smoke_test(package_dir, library_path)
         if not args.skip_example:
             validate_python_example(package_dir, library_path)
