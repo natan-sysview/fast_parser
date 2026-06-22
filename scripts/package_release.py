@@ -249,6 +249,97 @@ if __name__ == "__main__":
     path.chmod(0o755)
 
 
+def write_getting_started(package_dir: Path, *, target_platform: str) -> None:
+    library = f"{'bin' if target_platform == 'windows' else 'lib'}/{library_name(target_platform)}"
+    link_lib_name = link_library_name(target_platform)
+    if target_platform == "windows":
+        shell_export = f'$env:FASTPARSE_LIBRARY_PATH = "$PWD\\{library.replace("/", "\\\\")}"'
+        python_cmd = "python"
+        c_note = f"Use `include/` plus `{library}` and `bin/{link_lib_name}` when compiling C/C++ callers."
+    else:
+        shell_export = f"export FASTPARSE_LIBRARY_PATH=\"$PWD/{library}\""
+        python_cmd = "python3"
+        c_note = f"Use `include/` plus `{library}` when compiling C/C++ callers."
+    run_smoke = f"{python_cmd} smoke_test.py"
+
+    guide = f"""# Getting Started With FastParse
+
+This package is ready to use after extraction. The parent application owns file I/O; FastParse receives source bytes in memory and returns JSON, CSV, stats, or binary MessagePack.
+
+## 1. Run The Smoke Test
+
+```bash
+{run_smoke}
+```
+
+Expected output includes:
+
+```text
+FastParse smoke test OK
+Rule    : method_declaration
+```
+
+## 2. Native Library Path
+
+Native library:
+
+```text
+{library}
+```
+
+Set this environment variable when using bindings from outside this package layout:
+
+```bash
+{shell_export}
+```
+
+## 3. Python
+
+```bash
+{run_smoke}
+{python_cmd} examples/python/01_parse_string/parse_string.py --format json --rules method_declaration --fields rule,text --summary
+```
+
+The Python binding is in:
+
+```text
+bindings/python
+```
+
+## 4. C
+
+The public C headers are in:
+
+```text
+include/fastparse.h
+include/tsmp.h
+```
+
+Minimal C example:
+
+```text
+examples/c/parse_string.c
+```
+
+{c_note}
+
+## 5. Package Metadata
+
+Machine-readable metadata:
+
+```text
+manifest.json
+```
+
+Human-readable package summary:
+
+```text
+RELEASE.md
+```
+"""
+    (package_dir / "GETTING_STARTED.md").write_text(guide, encoding="utf-8")
+
+
 def make_archive(package_dir: Path, dist_dir: Path, target_platform: str) -> Path:
     if target_platform == "windows":
         archive = dist_dir / f"{package_dir.name}.zip"
@@ -284,6 +375,7 @@ def main() -> int:
     copy_files(package_dir, target_platform)
     write_manifest(package_dir, version=args.version, target_platform=target_platform, arch=arch)
     write_smoke_test(package_dir)
+    write_getting_started(package_dir, target_platform=target_platform)
     archive = make_archive(package_dir, args.dist_dir.resolve(), target_platform)
 
     print(f"Package directory: {package_dir}")

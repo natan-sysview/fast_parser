@@ -87,6 +87,7 @@ def validate_layout(package_dir: Path, platform_name: str) -> Path:
     library_path = package_dir / library_relative_path(platform_name)
     required_files = [
         package_dir / "README.md",
+        package_dir / "GETTING_STARTED.md",
         package_dir / "LICENSE",
         package_dir / "RELEASE.md",
         package_dir / "manifest.json",

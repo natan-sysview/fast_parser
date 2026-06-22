@@ -200,6 +200,7 @@ Each archive includes:
 
 ```text
 manifest.json    Machine-readable package metadata.
+GETTING_STARTED.md Quick start for humans and AI agents.
 smoke_test.py    End-user smoke test for the unpacked package.
 RELEASE.md       Human-readable package summary.
 examples/c/      Minimal C example compiled during package validation.
