@@ -4,5 +4,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageId>FastParse</PackageId>
+    <Authors>natan-sysview</Authors>
+    <Company>natan-sysview</Company>
+    <Description>Fast native AST extraction library over Tree-sitter with JSON, CSV, binary MessagePack, and stats outputs.</Description>
+    <PackageTags>tree-sitter;ast;parser;java;native;analysis</PackageTags>
+    <PackageProjectUrl>https://github.com/natan-sysview/fast_parser</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/natan-sysview/fast_parser</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(NativeAssetsRoot)' != ''">
+    <None Include="$(NativeAssetsRoot)/runtimes/**" Pack="true" PackagePath="runtimes/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>

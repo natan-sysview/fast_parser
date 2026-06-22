@@ -14,7 +14,10 @@ public sealed unsafe class FastParseClient : IDisposable
     public FastParseClient(string? libraryPath = null)
     {
         LibraryPath = libraryPath ?? DefaultLibraryPath();
-        _library = NativeLibrary.Load(LibraryPath);
+        _library = NativeLibrary.Load(
+            LibraryPath,
+            typeof(FastParseClient).Assembly,
+            DllImportSearchPath.SafeDirectories);
         _version = LoadFunction<VersionDelegate>("fastparse_version", "tsmp_version");
         _parse = LoadFunction<ParseDelegate>("fastparse_parse", "tsmp_parse");
         _resultFree = LoadFunction<ResultFreeDelegate>("fastparse_result_free", "tsmp_result_free");
@@ -179,6 +182,12 @@ public sealed unsafe class FastParseClient : IDisposable
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
+            var directCandidate = Path.Combine(directory.FullName, fileName);
+            if (File.Exists(directCandidate))
+            {
+                return directCandidate;
+            }
+
             var candidate = Path.Combine(directory.FullName, "bin", fileName);
             if (File.Exists(candidate))
             {

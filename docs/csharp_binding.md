@@ -14,6 +14,35 @@ bindings/csharp/FastParse
 dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
 ```
 
+## NuGet Use
+
+The release workflow builds a local/package artifact:
+
+```text
+FastParse.<version>.nupkg
+```
+
+Install it from a local package directory:
+
+```bash
+dotnet add package FastParse --version 0.1.0-preview --source /path/to/package-dir
+```
+
+Once the package is published to nuget.org, the command becomes:
+
+```bash
+dotnet add package FastParse
+```
+
+The NuGet package carries native libraries using standard RID folders:
+
+```text
+runtimes/linux-x64/native/libfastparse.so
+runtimes/osx-arm64/native/libfastparse.dylib
+runtimes/osx-x64/native/libfastparse.dylib
+runtimes/win-x64/native/fastparse.dll
+```
+
 ## Basic Use
 
 ```csharp
@@ -69,10 +98,15 @@ For production, applications may also decode MessagePack with a dedicated packag
 The binding searches upward from `AppContext.BaseDirectory` for:
 
 ```text
+libfastparse.dylib
+libfastparse.so
+fastparse.dll
 bin/libfastparse.dylib
 bin/libfastparse.so
 bin/fastparse.dll
 ```
+
+If the native library is supplied by NuGet, the binding also allows .NET's native library resolution to load the RID-specific asset.
 
 Override explicitly:
 

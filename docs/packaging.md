@@ -211,6 +211,48 @@ Tagged releases also attach `SHA256SUMS.txt`, generated from the final archives 
 
 This avoids many cross-compiling edge cases around platform linkers, dynamic library naming, exported symbols, and runtime testing.
 
+## NuGet Package
+
+The release workflow also builds a C# NuGet package artifact:
+
+```text
+FastParse.<version>.nupkg
+```
+
+The package contains the managed C# binding plus the native libraries from the release archives:
+
+```text
+lib/net9.0/FastParse.dll
+runtimes/linux-x64/native/libfastparse.so
+runtimes/osx-arm64/native/libfastparse.dylib
+runtimes/osx-x64/native/libfastparse.dylib
+runtimes/win-x64/native/fastparse.dll
+```
+
+Build it locally from an existing GitHub release:
+
+```bash
+python3 scripts/package_nuget.py \
+  --version 0.1.0-preview \
+  --release-tag v0.1.0-preview
+```
+
+Validate it from a clean consumer project:
+
+```bash
+python3 scripts/validate_nuget_package.py dist/nuget/FastParse.0.1.0-preview.nupkg
+```
+
+Install from the local package directory:
+
+```bash
+dotnet add package FastParse \
+  --version 0.1.0-preview \
+  --source dist/nuget
+```
+
+Publishing to nuget.org should use NuGet Trusted Publishing from GitHub Actions once the package ID and owner account are ready.
+
 The workflow lives at:
 
 ```text

@@ -10,6 +10,7 @@ Current status:
 - Supports JSON, CSV, Binary MessagePack, and Stats.
 - Copies native output into managed `byte[]`.
 - Always releases native memory through `fastparse_result_free`.
+- NuGet packages can carry RID-specific native libraries under `runtimes/{rid}/native/`.
 
 ## Example
 
@@ -18,6 +19,20 @@ From the lab root:
 ```bash
 ./compila_lib.sh
 dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
+```
+
+From a NuGet package:
+
+```bash
+dotnet add package FastParse
+```
+
+```csharp
+using FastParse;
+
+using var parser = new FastParseClient();
+var result = parser.ParseText("class Demo { void run() {} }");
+Console.WriteLine(result.Text);
 ```
 
 Override native library path:
