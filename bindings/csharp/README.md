@@ -1,45 +1,22 @@
-# FastParse C# Binding
+# FastParser for .NET
 
-Thin C# binding over the FastParse C ABI.
+FastParser is a thin C# binding over the FastParse native C ABI.
 
-Current status:
+It parses source bytes in memory and returns AST data as JSON, CSV, binary MessagePack, or stats. The current native package includes the Java Tree-sitter grammar.
 
-- Loads `libfastparse.dylib`, `libfastparse.so`, or `fastparse.dll`.
-- Prefers `fastparse_*` native symbols.
-- Falls back to `tsmp_*` compatibility symbols.
-- Supports JSON, CSV, Binary MessagePack, and Stats.
-- Copies native output into managed `byte[]`.
-- Always releases native memory through `fastparse_result_free`.
-- NuGet packages can carry RID-specific native libraries under `runtimes/{rid}/native/`.
-
-## Example
-
-From the lab root:
+## Install
 
 ```bash
-./compila_lib.sh
-dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
+dotnet add package FastParser --version 0.1.0-preview.1
 ```
 
-From a NuGet package:
+The package includes RID-specific native libraries:
 
-```bash
-dotnet add package FastParser
-```
-
-```csharp
-using FastParse;
-
-using var parser = new FastParseClient();
-var result = parser.ParseText("class Demo { void run() {} }");
-Console.WriteLine(result.Text);
-```
-
-Override native library path:
-
-```bash
-FASTPARSE_LIBRARY_PATH=/path/to/libfastparse.dylib \
-dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
+```text
+runtimes/linux-x64/native/libfastparse.so
+runtimes/osx-arm64/native/libfastparse.dylib
+runtimes/osx-x64/native/libfastparse.dylib
+runtimes/win-x64/native/fastparse.dll
 ```
 
 ## Basic Use
@@ -55,27 +32,70 @@ var result = parser.ParseText(
     {
         Format = FastParseFormat.Json,
         IncludeRules = "method_declaration",
-        Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+        Fields = FastParseField.Rule |
+                 FastParseField.Text |
+                 FastParseField.ByteRange
     });
 
 Console.WriteLine(result.NodeCount);
 Console.WriteLine(result.Text);
 ```
 
-## Binary
+## Binary Output
 
-For `FastParseFormat.Binary`, `ParseResult.Data` contains MessagePack bytes.
-
-This binding includes a small schema-specific decoder:
+For `FastParseFormat.Binary`, `ParseResult.Data` contains MessagePack bytes. The package includes a small schema-specific decoder:
 
 ```csharp
-var document = FastParseMessagePack.Decode(result.Data);
+var binary = parser.ParseText(source, new ParseOptions
+{
+    Format = FastParseFormat.Binary,
+    IncludeRules = "method_declaration",
+    Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+});
 
+var document = FastParseMessagePack.Decode(binary.Data);
 Console.WriteLine(document.SchemaVersion);
 Console.WriteLine(document.Nodes[0].Rule);
-Console.WriteLine(document.Nodes[0].Text); // byte[]
 ```
 
-It intentionally does not depend on MessagePack-CSharp. A future optional package can add MessagePack-CSharp support for broader MessagePack tooling.
+## Stats Without Output Copy
 
-Larger runnable applications live under `examples/csharp/`; the binding folder intentionally contains only reusable C# binding code.
+```csharp
+var summary = parser.ParseTextSummary(source, new ParseOptions
+{
+    Format = FastParseFormat.Stats
+});
+
+Console.WriteLine(summary.NodeCount);
+Console.WriteLine(summary.OutputLength); // 0 for stats
+```
+
+## Native Library Loading
+
+Normal NuGet use does not require `FASTPARSE_LIBRARY_PATH`; .NET resolves the bundled native asset for the current RID.
+
+For advanced/manual loading, pass a path explicitly:
+
+```csharp
+using var parser = new FastParseClient("/path/to/libfastparse.dylib");
+```
+
+Or set:
+
+```bash
+FASTPARSE_LIBRARY_PATH=/path/to/libfastparse.dylib
+```
+
+## Threading
+
+Use one `FastParseClient` per worker thread for simple high-throughput code. Parent applications still own thread pools, queues, and database coordination.
+
+## Package Name vs Namespace
+
+The public NuGet package ID is `FastParser`.
+
+The C# namespace is `FastParse`:
+
+```csharp
+using FastParse;
+```

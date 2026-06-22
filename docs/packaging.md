@@ -222,6 +222,7 @@ FastParser.<version>.nupkg
 The package contains the managed C# binding plus the native libraries from the release archives:
 
 ```text
+lib/net8.0/FastParse.dll
 lib/net9.0/FastParse.dll
 runtimes/linux-x64/native/libfastparse.so
 runtimes/osx-arm64/native/libfastparse.dylib
@@ -233,21 +234,21 @@ Build it locally from an existing GitHub release:
 
 ```bash
 python3 scripts/package_nuget.py \
-  --version 0.1.0-preview \
-  --release-tag v0.1.0-preview
+  --version 0.1.0-preview.1 \
+  --release-tag v0.1.0-preview.1
 ```
 
 Validate it from a clean consumer project:
 
 ```bash
-python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.nupkg
+python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.1.nupkg
 ```
 
 Install from the local package directory:
 
 ```bash
 dotnet add package FastParser \
-  --version 0.1.0-preview \
+  --version 0.1.0-preview.1 \
   --source dist/nuget
 ```
 
@@ -262,14 +263,14 @@ The workflow lives at:
 It can run manually with a version:
 
 ```text
-workflow_dispatch -> version = 0.1.0-preview
+workflow_dispatch -> version = 0.1.0-preview.1
 ```
 
 Or automatically on tags:
 
 ```bash
-git tag v0.1.0-preview
-git push origin v0.1.0-preview
+git tag v0.1.0-preview.1
+git push origin v0.1.0-preview.1
 ```
 
 For tags, the workflow attaches generated archives to the GitHub Release.
@@ -279,7 +280,7 @@ For tags, the workflow attaches generated archives to the GitHub Release.
 Create a local package for the current platform:
 
 ```bash
-python3 scripts/package_release.py --version 0.1.0-preview
+python3 scripts/package_release.py --version 0.1.0-preview.1
 ```
 
 After building, the package appears under:

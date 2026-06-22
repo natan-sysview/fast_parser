@@ -23,7 +23,7 @@ ARCHIVE_RE = re.compile(r"^fastparse-(?P<version>.+)-(?P<platform>linux|macos|wi
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build FastParser.nupkg with RID-specific native libraries.")
-    parser.add_argument("--version", required=True, help="NuGet package version, for example 0.1.0-preview")
+    parser.add_argument("--version", required=True, help="NuGet package version, for example 0.1.0-preview.1")
     parser.add_argument("--archive", action="append", type=Path, default=[], help="FastParse release archive. May be passed multiple times.")
     parser.add_argument("--release-tag", help="Download native archives from a GitHub release tag before packing.")
     parser.add_argument("--repository", default="natan-sysview/fast_parser", help="GitHub repository used with --release-tag.")
@@ -148,6 +148,7 @@ def build_package(version: str, native_root: Path, output_dir: Path) -> Path:
 
 def validate_package(package: Path) -> None:
     required = {
+        "lib/net8.0/FastParse.dll",
         "lib/net9.0/FastParse.dll",
         "runtimes/linux-x64/native/libfastparse.so",
         "runtimes/osx-arm64/native/libfastparse.dylib",

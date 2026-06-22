@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackageId>FastParser</PackageId>
     <Authors>natan-sysview</Authors>
     <Company>natan-sysview</Company>
-    <Description>Fast native AST extraction library over Tree-sitter with JSON, CSV, binary MessagePack, and stats outputs.</Description>
+    <Description>Native Tree-sitter AST extraction for .NET with JSON, CSV, binary MessagePack, and stats outputs.</Description>
     <PackageTags>tree-sitter;ast;parser;java;native;analysis</PackageTags>
     <PackageProjectUrl>https://github.com/natan-sysview/fast_parser</PackageProjectUrl>
     <RepositoryUrl>https://github.com/natan-sysview/fast_parser</RepositoryUrl>
@@ -19,6 +19,9 @@
 
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../../NOTICE" Pack="true" PackagePath="/" />
+    <None Include="../../../THIRD_PARTY_NOTICES.md" Pack="true" PackagePath="/" />
+    <None Include="../../../CHANGELOG.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(NativeAssetsRoot)' != ''">

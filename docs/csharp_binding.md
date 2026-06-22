@@ -25,7 +25,7 @@ FastParser.<version>.nupkg
 Install it from a local package directory:
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview --source /path/to/package-dir
+dotnet add package FastParser --version 0.1.0-preview.1 --source /path/to/package-dir
 ```
 
 Once the package is published to nuget.org, the command becomes:
@@ -37,6 +37,8 @@ dotnet add package FastParser
 The NuGet package carries native libraries using standard RID folders:
 
 ```text
+lib/net8.0/FastParse.dll
+lib/net9.0/FastParse.dll
 runtimes/linux-x64/native/libfastparse.so
 runtimes/osx-arm64/native/libfastparse.dylib
 runtimes/osx-x64/native/libfastparse.dylib

@@ -6,7 +6,7 @@ on:
       version:
         description: Release version
         required: true
-        default: 0.1.0-preview
+        default: 0.1.0-preview.1
   push:
     tags:
       - "v*"
@@ -48,7 +48,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: |
+            8.0.x
+            9.0.x
 
       - name: Resolve version
         id: version
@@ -124,7 +126,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: |
+            8.0.x
+            9.0.x
 
       - name: Resolve version
         id: version
@@ -168,6 +172,10 @@ jobs:
           --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
+        if: startsWith(github.ref, 'refs/tags/')
+
+      - name: Validate published NuGet package
+        run: python scripts/validate_published_nuget.py --version "${{ steps.version.outputs.value }}"
         if: startsWith(github.ref, 'refs/tags/')
 
       - name: Upload NuGet artifact
