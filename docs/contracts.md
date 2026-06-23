@@ -1,30 +1,43 @@
-# FastParse Contracts
+# FastParse Public Contracts
 
-This document defines the public behavior expected by applications and bindings.
+This document defines the behavior that applications, bindings, and AI coding agents can rely on when integrating FastParse.
+
+Contract status labels:
+
+- `Stable`: intended to remain compatible within the `0.1.x` release line.
+- `Preview`: usable, but may change before the first stable `0.1.0` contract is finalized.
+- `Internal`: implementation detail; callers must not depend on it.
 
 ## Core Boundary
 
-FastParse is memory-only.
+Status: `Stable`
+
+FastParse is a memory-only parsing library.
 
 The parent application owns:
 
-- Reading files.
-- Walking directories.
-- Choosing threads.
-- Creating databases.
+- Reading files, streams, databases, or network sources.
+- Walking directories and projects.
+- Choosing worker/thread counts.
+- Creating queues, pools, and schedulers.
+- Creating databases or writing files.
 - Persisting results.
-- Logging and progress reporting.
-- Mapping AST rows into domain objects.
+- Logging, progress reporting, retries, and cancellation policy.
+- Mapping AST nodes into domain objects.
 
 FastParse owns:
 
-- Parsing one source buffer.
+- Parsing one source buffer already present in memory.
 - Traversing the Tree-sitter AST.
-- Filtering nodes by rule name.
-- Filtering fields by bit mask.
+- Filtering nodes by grammar rule name.
+- Filtering node fields by bit mask.
 - Serializing the requested output into memory.
 
+FastParse must not read source files from disk, write outputs to disk, create databases, or own application-level thread pools.
+
 ## Input Contract
+
+Status: `Stable`
 
 Native input:
 
@@ -32,62 +45,65 @@ Native input:
 source: const unsigned char *
 source_len: size_t
 language: string
+options: parse options
 ```
 
 Rules:
 
 - `source` points to immutable bytes.
-- The source buffer must stay valid until `fastparse_parse` returns.
-- FastParse does not assume the source is UTF-8.
+- `source_len` is the exact byte length of `source`.
+- The source buffer must remain valid until `fastparse_parse` returns.
+- FastParse does not mutate `source`.
+- FastParse does not retain `source` after `fastparse_parse` returns.
+- FastParse does not require UTF-8 input to parse.
 - Byte offsets are based on the exact input bytes.
 - Text fields are slices of the original source bytes serialized according to the chosen output format.
 
-Current language names:
+The parent language decides how to decode filenames, file contents, streams, or database values before passing bytes to FastParse.
+
+## Language Contract
+
+Status: `Stable` for `java`; `Preview` for future languages.
+
+Current supported language name:
 
 ```text
 java
 ```
 
-## Output Contract
-
-Every parse returns a `TsmpResult`.
-
-```c
-typedef struct {
-    int status;
-    unsigned char *data;
-    size_t length;
-    size_t node_count;
-    char *error_message;
-} TsmpResult;
-```
-
 Rules:
 
-- `data` is owned by FastParse until `fastparse_result_free`.
-- `error_message` is owned by FastParse until `fastparse_result_free`.
-- Bindings should copy `data` into runtime-owned memory before freeing the result.
-- `node_count` is populated for every successful format.
-- `TSMP_FORMAT_STATS` returns `data = NULL` and `length = 0`.
+- `NULL`, empty, or omitted language means `java` in the current preview line.
+- Language names are lowercase.
+- Unsupported language names return a controlled error.
+- Future languages must use stable lowercase names, for example `csharp`, `rust`, `python`, or `javascript`.
 
 ## Rule Filter Contract
 
-`include_rules` is a pipe-separated exact-match list:
+Status: `Stable`
+
+`include_rules` is a pipe-separated exact-match list of Tree-sitter grammar rule names:
 
 ```text
 class_declaration|method_declaration|field_declaration
 ```
 
-Behavior:
+Rules:
 
 - `NULL` means all named AST nodes.
 - Empty string means all named AST nodes.
 - Matching is exact and case-sensitive.
+- Output order is AST traversal/source order.
+- No matches is a valid successful result with `node_count = 0`.
 - Anonymous tokens are not included as top-level nodes.
+
+Production callers should request only the rules they need once they know the target grammar.
 
 ## Field Filter Contract
 
-`fields = 0` means all fields.
+Status: `Stable` for field names and meanings; `Preview` for detailed `children` shape.
+
+`fields = 0` means the exploratory/default field set.
 
 Available field flags:
 
@@ -103,36 +119,184 @@ TSMP_FIELD_CHILDREN
 TSMP_FIELD_ALL
 ```
 
-Production callers should request only fields they need.
+Stable logical fields:
 
-## Threading Contract
+```text
+id
+parentId
+rule
+text
+startLine
+startColumn
+endLine
+endColumn
+startByte
+endByte
+childCount
+children
+```
 
-`fastparse_parse` is thread-safe per call.
+Rules:
 
-Safe:
+- If a field is not requested, it should not appear in JSON/Binary output.
+- CSV includes only flat requested fields.
+- `text` is the original source slice for the node.
+- `rule` is the Tree-sitter grammar rule name.
+- `id` is unique inside one parse result.
+- `parentId` points to the parent node id when available, otherwise it is null/empty according to format.
+- `childCount` is the number of direct Tree-sitter children.
+- `children` is intended for exploration and may be refined before stable `0.1.0`.
 
-- Many threads parsing different immutable source buffers.
-- Many threads parsing the same immutable source buffer.
-- One result object per active call.
+Production callers should request only fields they need. Development and exploration tools may request all fields.
 
-Not safe:
+## Position Contract
 
-- Mutating a source buffer while parsing it.
-- Sharing one mutable `TsmpResult` across active calls.
-- Freeing one result more than once.
+Status: `Stable`
 
-FastParse does not create worker threads.
+Line, column, and byte positions are part of the public contract because they are required for UI highlighting, reports, IDE navigation, database inventories, and automated findings.
 
-## Stability Contract
+Position fields:
 
-Publicly documented behavior should be treated as stable within a release line:
+```text
+startLine
+startColumn
+endLine
+endColumn
+startByte
+endByte
+```
 
-- C struct layout.
-- Native function names.
-- Format constants.
-- Field constants.
-- Binary `schemaVersion`.
-- Error codes.
+Rules:
+
+- `startLine` and `endLine` are 1-based.
+- `startColumn` and `endColumn` are 0-based.
+- `startByte` and `endByte` are 0-based byte offsets.
+- `endByte` is exclusive.
+- Byte offsets are measured over the original input bytes.
+- Line and column values are reported from Tree-sitter points.
+- Columns are byte-oriented Tree-sitter columns, not Unicode grapheme counts.
+
+Example:
+
+```json
+{
+  "rule": "method_declaration",
+  "text": "void run() {}",
+  "startLine": 2,
+  "startColumn": 2,
+  "endLine": 2,
+  "endColumn": 15,
+  "startByte": 15,
+  "endByte": 28
+}
+```
+
+## Output Format Contract
+
+Status: `Stable` for format names and high-level behavior.
+
+Supported formats:
+
+```text
+JSON
+CSV
+Binary
+Stats
+```
+
+### JSON
+
+Status: `Stable`
+
+JSON is intended for exploration, debugging, tools, and AI-assisted integrations.
+
+Rules:
+
+- Output is valid UTF-8 JSON.
+- Output contains document metadata and a `nodes` array.
+- Requested fields control node object contents.
+- Text is escaped so the JSON document remains valid.
+- Non-UTF-8 source bytes are represented safely according to the JSON renderer.
+
+### CSV
+
+Status: `Stable`
+
+CSV is intended for inventories, spreadsheets, and tabular pipelines.
+
+Rules:
+
+- Output includes a header row.
+- Output includes one row per matched node.
+- Output is flat.
+- Complex nested `children` data is not a CSV contract.
+
+### Binary
+
+Status: `Stable` for MessagePack container and `schemaVersion`; `Preview` for adding optional fields.
+
+Binary is intended for high-performance bindings and applications.
+
+Rules:
+
+- Output is MessagePack bytes.
+- Output includes a binary schema version.
+- Output does not convert the full result into JSON text.
+- Parent languages decode the MessagePack payload into their own native structures.
+- New optional fields may be added in future schema-compatible releases.
+- Breaking binary schema changes require a schema version change.
+
+### Stats
+
+Status: `Stable`
+
+Stats is intended for counting, probing, and benchmarks.
+
+Rules:
+
+- Stats does not return an output payload.
+- `data = NULL`.
+- `length = 0`.
+- `node_count` is populated.
+
+## Result Memory Contract
+
+Status: `Stable`
+
+Native result shape:
+
+```c
+typedef struct {
+    int status;
+    unsigned char *data;
+    size_t length;
+    size_t node_count;
+    char *error_message;
+} TsmpResult;
+```
+
+Rules:
+
+- FastParse allocates result memory.
+- The caller/binding must call `fastparse_result_free`.
+- Each result must be freed exactly once.
+- `data` is owned by FastParse until `fastparse_result_free`.
+- `error_message` is owned by FastParse until `fastparse_result_free`.
+- Bindings should copy `data` into runtime-owned memory before freeing the result.
+- `source` memory remains owned by the caller.
+- FastParse does not retain pointers to `source`, `options`, or `result` after returning.
+
+## C ABI Contract
+
+Status: `Stable`
+
+New integrations should use:
+
+```text
+fastparse_version
+fastparse_parse
+fastparse_result_free
+```
 
 Compatibility aliases:
 
@@ -142,10 +306,101 @@ tsmp_parse
 tsmp_result_free
 ```
 
-These exist for older internal users. New integrations should call:
+Rules:
+
+- Compatibility aliases exist for older internal users.
+- New bindings should prefer `fastparse_*` symbols.
+- Struct layout, function names, and format/field constants are part of the public ABI contract.
+
+## Concurrency Contract
+
+Status: `Stable`
+
+FastParse is thread-safe per parse call.
+
+The core promise:
 
 ```text
-fastparse_version
-fastparse_parse
-fastparse_result_free
+Multiple threads may call fastparse_parse at the same time.
 ```
+
+Safe:
+
+- Many threads parsing different immutable source buffers.
+- Many threads parsing the same immutable source buffer.
+- One independent result object per active call.
+- Freeing independent results in parallel.
+- Parent runtimes using their own thread pools, queues, and worker scheduling.
+
+Not safe:
+
+- Mutating a source buffer while FastParse is parsing it.
+- Reusing one mutable `TsmpResult` for multiple active calls.
+- Reading a result while another thread frees the same result.
+- Freeing the same result more than once.
+- Sharing mutable binding state without synchronization.
+
+Rules:
+
+- `fastparse_parse` must not rely on per-call mutable global state.
+- Each parse call owns its parser/context/result memory for that call.
+- FastParse does not create application worker threads.
+- FastParse does not own caller locks, queues, pools, or database coordination.
+- Completion order across threads is unspecified.
+
+Binding guidance:
+
+- C callers should allocate one result object per call.
+- C# callers should prefer one `FastParseClient` per worker for simple high-throughput code.
+- Python callers may use threads, but should keep SQLite/file writes coordinated by the parent application.
+- Rust and Java bindings should expose thread-safe call patterns without hiding application-level scheduling.
+
+Example parent-application flow:
+
+```text
+read source bytes -> enqueue work -> worker calls FastParse -> copy result -> free result -> parent stores/uses data
+```
+
+## Error Contract
+
+Status: `Preview`
+
+Rules:
+
+- Non-zero native status means the parse failed.
+- `error_message` should describe the failure when available.
+- Unsupported language names return a controlled error.
+- Bindings should surface native errors as language-native exceptions or error values.
+
+Detailed numeric error codes are still preview and may be refined before stable `0.1.0`.
+
+## Stability Summary
+
+Stable for the `0.1.x` line:
+
+- Memory-only input/output boundary.
+- Java language name: `java`.
+- Exact-match `include_rules`.
+- Field bitmask model.
+- Position fields and base rules.
+- JSON, CSV, Binary, and Stats format names.
+- MessagePack binary format with schema versioning.
+- Result memory ownership and `fastparse_result_free`.
+- C ABI function names and struct shape.
+- Thread-safe per-call concurrency model.
+
+Preview:
+
+- Exact shape of `children`.
+- Detailed numeric error codes.
+- Future language names and grammar coverage.
+- Additional optional fields in Binary output.
+- `pretty` formatting behavior.
+
+Internal:
+
+- Tree-sitter parser allocation strategy.
+- Internal buffers.
+- Traversal implementation details.
+- Build system layout.
+- Benchmark numbers.
