@@ -4,7 +4,7 @@ All notable changes to FastParse will be documented here.
 
 This project follows semantic versioning once the first stable release is published.
 
-## 0.1.0-preview.6
+## 0.1.0-preview.7
 
 ### Added
 

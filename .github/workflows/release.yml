@@ -6,7 +6,7 @@ on:
       version:
         description: Release version
         required: true
-        default: 0.1.0-preview.6
+        default: 0.1.0-preview.7
   push:
     tags:
       - "v*"

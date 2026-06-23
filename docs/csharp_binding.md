@@ -26,7 +26,7 @@ FastParser.<version>.snupkg
 Install it from a local package directory:
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.6 --source /path/to/package-dir
+dotnet add package FastParser --version 0.1.0-preview.7 --source /path/to/package-dir
 ```
 
 Once the package is published to nuget.org, the command becomes:

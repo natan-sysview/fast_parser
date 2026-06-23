@@ -12,7 +12,7 @@ It parses source bytes in memory and returns AST data as JSON, CSV, binary Messa
 ## Install
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.6
+dotnet add package FastParser --version 0.1.0-preview.7
 ```
 
 The package includes RID-specific native libraries:
