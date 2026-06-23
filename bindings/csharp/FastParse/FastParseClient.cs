@@ -27,7 +27,7 @@ public sealed unsafe class FastParseClient : IDisposable
         _library = NativeLibrary.Load(
             LibraryPath,
             typeof(FastParseClient).Assembly,
-            DllImportSearchPath.SafeDirectories);
+            DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories);
         _version = LoadFunction<VersionDelegate>("fastparse_version", "tsmp_version");
         _parse = LoadFunction<ParseDelegate>("fastparse_parse", "tsmp_parse");
         _resultFree = LoadFunction<ResultFreeDelegate>("fastparse_result_free", "tsmp_result_free");
@@ -214,11 +214,8 @@ public sealed unsafe class FastParseClient : IDisposable
             return explicitPath;
         }
 
-        var fileName = OperatingSystem.IsMacOS()
-            ? "libfastparse.dylib"
-            : OperatingSystem.IsWindows()
-                ? "fastparse.dll"
-                : "libfastparse.so";
+        var fileName = NativeFileName();
+        var rid = RuntimeIdentifier();
 
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
@@ -235,10 +232,41 @@ public sealed unsafe class FastParseClient : IDisposable
                 return candidate;
             }
 
+            var ridCandidate = Path.Combine(directory.FullName, "runtimes", rid, "native", fileName);
+            if (File.Exists(ridCandidate))
+            {
+                return ridCandidate;
+            }
+
             directory = directory.Parent;
         }
 
         return fileName;
+    }
+
+    private static string NativeFileName()
+    {
+        return OperatingSystem.IsMacOS()
+            ? "libfastparse.dylib"
+            : OperatingSystem.IsWindows()
+                ? "fastparse.dll"
+                : "libfastparse.so";
+    }
+
+    private static string RuntimeIdentifier()
+    {
+        var platform = OperatingSystem.IsMacOS()
+            ? "osx"
+            : OperatingSystem.IsWindows()
+                ? "win"
+                : "linux";
+        var arch = RuntimeInformation.ProcessArchitecture switch
+        {
+            Architecture.Arm64 => "arm64",
+            Architecture.X64 => "x64",
+            _ => RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()
+        };
+        return $"{platform}-{arch}";
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

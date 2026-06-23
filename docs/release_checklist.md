@@ -44,7 +44,7 @@ dotnet build examples/csharp/03_inventory_to_sqlite/FastParse.InventoryToSqliteE
 Build release archives locally:
 
 ```bash
-python3 scripts/package_release.py --version 0.1.0-preview.3
+python3 scripts/package_release.py --version 0.1.0-preview.4
 ```
 
 GitHub Actions release artifacts:

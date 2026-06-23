@@ -57,6 +57,19 @@ Console.WriteLine(parser.LibraryPath);
 '''
 
 
+def run_command(command: list[str], *, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
+    completed = subprocess.run(
+        command,
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(f"command failed ({completed.returncode}): {' '.join(command)}\n{completed.stdout}")
+    return completed
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate FastParser from nuget.org.")
     parser.add_argument("--version", required=True)
@@ -99,15 +112,11 @@ def main() -> int:
         env.pop("FASTPARSE_LIBRARY_PATH", None)
         env.pop("TSMP_LIBRARY_PATH", None)
 
-        subprocess.run(
+        run_command(
             ["dotnet", "new", "console", "--framework", "net9.0", "--output", str(project_dir)],
             env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            check=True,
         )
-        subprocess.run(
+        run_command(
             [
                 "dotnet",
                 "add",
@@ -120,20 +129,12 @@ def main() -> int:
                 SOURCE,
             ],
             env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            check=True,
         )
         (project_dir / "Program.cs").write_text(PROGRAM, encoding="utf-8")
 
-        completed = subprocess.run(
+        completed = run_command(
             ["dotnet", "run", "--project", str(project_dir / "consumer.csproj")],
             env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            check=True,
         )
         if "FastParser published NuGet smoke OK" not in completed.stdout:
             raise AssertionError(f"published NuGet smoke failed:\n{completed.stdout}")
