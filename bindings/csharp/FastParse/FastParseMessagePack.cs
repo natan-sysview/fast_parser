@@ -3,8 +3,16 @@ using System.Text;
 
 namespace FastParse;
 
+/// <summary>
+/// Minimal decoder for FastParse binary MessagePack output.
+/// </summary>
 public static class FastParseMessagePack
 {
+    /// <summary>
+    /// Decodes FastParse binary MessagePack output into schema-specific C# objects.
+    /// </summary>
+    /// <param name="data">MessagePack payload returned by <see cref="FastParseFormat.Binary"/>.</param>
+    /// <returns>A decoded FastParse binary document.</returns>
     public static FastParseBinaryDocument Decode(ReadOnlySpan<byte> data)
     {
         var reader = new Reader(data);

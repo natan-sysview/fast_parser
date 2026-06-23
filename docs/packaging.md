@@ -223,9 +223,12 @@ The package contains the managed C# binding plus the native libraries from the r
 
 ```text
 AI_AGENT_GUIDE.md
+fastparser-icon.png
 docs/
 examples/csharp/01_parse_string/
 examples/csharp/02_binary_decode/
+examples/csharp/nuget/01_parse_string/
+examples/csharp/nuget/02_binary_decode/
 lib/net8.0/FastParse.dll
 lib/net9.0/FastParse.dll
 runtimes/linux-x64/native/libfastparse.so
@@ -238,25 +241,27 @@ Build it locally from an existing GitHub release:
 
 ```bash
 python3 scripts/package_nuget.py \
-  --version 0.1.0-preview.2 \
-  --release-tag v0.1.0-preview.2
+  --version 0.1.0-preview.3 \
+  --release-tag v0.1.0-preview.3
 ```
 
 Validate it from a clean consumer project:
 
 ```bash
-python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.2.nupkg
+python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.3.nupkg
 ```
 
 Install from the local package directory:
 
 ```bash
 dotnet add package FastParser \
-  --version 0.1.0-preview.2 \
+  --version 0.1.0-preview.3 \
   --source dist/nuget
 ```
 
 Publishing to nuget.org uses NuGet Trusted Publishing from GitHub Actions. The public NuGet package ID is `FastParser`; the C# namespace remains `FastParse`.
+
+Tagged NuGet releases also run a post-publish smoke test from nuget.org on Linux x64, Windows x64, macOS arm64, and macOS x64.
 
 The workflow lives at:
 
@@ -267,14 +272,14 @@ The workflow lives at:
 It can run manually with a version:
 
 ```text
-workflow_dispatch -> version = 0.1.0-preview.2
+workflow_dispatch -> version = 0.1.0-preview.3
 ```
 
 Or automatically on tags:
 
 ```bash
-git tag v0.1.0-preview.2
-git push origin v0.1.0-preview.2
+git tag v0.1.0-preview.3
+git push origin v0.1.0-preview.3
 ```
 
 For tags, the workflow attaches generated archives to the GitHub Release.
@@ -284,7 +289,7 @@ For tags, the workflow attaches generated archives to the GitHub Release.
 Create a local package for the current platform:
 
 ```bash
-python3 scripts/package_release.py --version 0.1.0-preview.2
+python3 scripts/package_release.py --version 0.1.0-preview.3
 ```
 
 After building, the package appears under:

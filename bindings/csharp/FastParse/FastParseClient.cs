@@ -3,6 +3,9 @@ using System.Text;
 
 namespace FastParse;
 
+/// <summary>
+/// Managed C# client for the native FastParse C ABI.
+/// </summary>
 public sealed unsafe class FastParseClient : IDisposable
 {
     private readonly nint _library;
@@ -11,6 +14,13 @@ public sealed unsafe class FastParseClient : IDisposable
     private readonly ResultFreeDelegate _resultFree;
     private bool _disposed;
 
+    /// <summary>
+    /// Loads the native FastParse library.
+    /// </summary>
+    /// <param name="libraryPath">
+    /// Optional explicit path to <c>libfastparse.dylib</c>, <c>libfastparse.so</c>, or <c>fastparse.dll</c>.
+    /// Normal NuGet use does not require this parameter.
+    /// </param>
     public FastParseClient(string? libraryPath = null)
     {
         LibraryPath = libraryPath ?? DefaultLibraryPath();
@@ -23,34 +33,65 @@ public sealed unsafe class FastParseClient : IDisposable
         _resultFree = LoadFunction<ResultFreeDelegate>("fastparse_result_free", "tsmp_result_free");
     }
 
+    /// <summary>Path or library name used to load the native FastParse library.</summary>
     public string LibraryPath { get; }
 
+    /// <summary>Native FastParse C API version string.</summary>
     public string Version => Marshal.PtrToStringUTF8((nint)_version()) ?? string.Empty;
 
+    /// <summary>
+    /// Parses source bytes and copies output bytes into managed memory.
+    /// </summary>
+    /// <param name="source">Source code bytes.</param>
+    /// <param name="options">Parse options. Defaults to full JSON AST output.</param>
+    /// <returns>A full parse result containing output bytes.</returns>
     public ParseResult ParseBytes(ReadOnlySpan<byte> source, ParseOptions? options = null)
     {
         var (data, nodeCount, format, _) = ParseNative(source, options ?? ParseOptions.JsonAll, copyData: true);
         return new ParseResult(data, nodeCount, format);
     }
 
+    /// <summary>
+    /// Parses source bytes and returns counts/lengths without copying output bytes.
+    /// </summary>
+    /// <param name="source">Source code bytes.</param>
+    /// <param name="options">Parse options. Defaults to full JSON AST output.</param>
+    /// <returns>A summary result without output bytes.</returns>
     public ParseSummary ParseBytesSummary(ReadOnlySpan<byte> source, ParseOptions? options = null)
     {
         var (_, nodeCount, format, outputLength) = ParseNative(source, options ?? ParseOptions.JsonAll, copyData: false);
         return new ParseSummary(outputLength, nodeCount, format);
     }
 
+    /// <summary>
+    /// Encodes source text and parses it.
+    /// </summary>
+    /// <param name="source">Source code text.</param>
+    /// <param name="options">Parse options. Defaults to full JSON AST output.</param>
+    /// <param name="encoding">Encoding used to convert text to bytes. Defaults to UTF-8.</param>
+    /// <returns>A full parse result containing output bytes.</returns>
     public ParseResult ParseText(string source, ParseOptions? options = null, Encoding? encoding = null)
     {
         encoding ??= Encoding.UTF8;
         return ParseBytes(encoding.GetBytes(source), options);
     }
 
+    /// <summary>
+    /// Encodes source text and returns counts/lengths without copying output bytes.
+    /// </summary>
+    /// <param name="source">Source code text.</param>
+    /// <param name="options">Parse options. Defaults to full JSON AST output.</param>
+    /// <param name="encoding">Encoding used to convert text to bytes. Defaults to UTF-8.</param>
+    /// <returns>A summary result without output bytes.</returns>
     public ParseSummary ParseTextSummary(string source, ParseOptions? options = null, Encoding? encoding = null)
     {
         encoding ??= Encoding.UTF8;
         return ParseBytesSummary(encoding.GetBytes(source), options);
     }
 
+    /// <summary>
+    /// Frees the loaded native library handle.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)

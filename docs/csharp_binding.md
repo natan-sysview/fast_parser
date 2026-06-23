@@ -25,7 +25,7 @@ FastParser.<version>.nupkg
 Install it from a local package directory:
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.2 --source /path/to/package-dir
+dotnet add package FastParser --version 0.1.0-preview.3 --source /path/to/package-dir
 ```
 
 Once the package is published to nuget.org, the command becomes:
@@ -41,6 +41,8 @@ AI_AGENT_GUIDE.md
 docs/
 examples/csharp/01_parse_string/
 examples/csharp/02_binary_decode/
+examples/csharp/nuget/01_parse_string/
+examples/csharp/nuget/02_binary_decode/
 lib/net8.0/FastParse.dll
 lib/net9.0/FastParse.dll
 runtimes/linux-x64/native/libfastparse.so

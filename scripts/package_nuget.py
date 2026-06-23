@@ -23,7 +23,7 @@ ARCHIVE_RE = re.compile(r"^fastparse-(?P<version>.+)-(?P<platform>linux|macos|wi
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build FastParser.nupkg with RID-specific native libraries.")
-    parser.add_argument("--version", required=True, help="NuGet package version, for example 0.1.0-preview.2")
+    parser.add_argument("--version", required=True, help="NuGet package version, for example 0.1.0-preview.3")
     parser.add_argument("--archive", action="append", type=Path, default=[], help="FastParse release archive. May be passed multiple times.")
     parser.add_argument("--release-tag", help="Download native archives from a GitHub release tag before packing.")
     parser.add_argument("--repository", default="natan-sysview/fast_parser", help="GitHub repository used with --release-tag.")
@@ -149,12 +149,15 @@ def build_package(version: str, native_root: Path, output_dir: Path) -> Path:
 def validate_package(package: Path) -> None:
     required = {
         "lib/net8.0/FastParse.dll",
+        "lib/net8.0/FastParse.xml",
         "lib/net9.0/FastParse.dll",
+        "lib/net9.0/FastParse.xml",
         "runtimes/linux-x64/native/libfastparse.so",
         "runtimes/osx-arm64/native/libfastparse.dylib",
         "runtimes/osx-x64/native/libfastparse.dylib",
         "runtimes/win-x64/native/fastparse.dll",
         "README.md",
+        "fastparser-icon.png",
         "NOTICE",
         "THIRD_PARTY_NOTICES.md",
         "CHANGELOG.md",
@@ -166,10 +169,15 @@ def validate_package(package: Path) -> None:
         "docs/csharp_binding.md",
         "docs/encoding.md",
         "docs/platforms.md",
+        "docs/versioning.md",
         "examples/csharp/01_parse_string/Program.cs",
         "examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj",
         "examples/csharp/02_binary_decode/Program.cs",
         "examples/csharp/02_binary_decode/FastParse.BinaryDecodeExample.csproj",
+        "examples/csharp/nuget/01_parse_string/Program.cs",
+        "examples/csharp/nuget/01_parse_string/FastParser.NuGetParseString.csproj",
+        "examples/csharp/nuget/02_binary_decode/Program.cs",
+        "examples/csharp/nuget/02_binary_decode/FastParser.NuGetBinaryDecode.csproj",
     }
     with zipfile.ZipFile(package) as zf:
         names = set(zf.namelist())

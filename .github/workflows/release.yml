@@ -6,7 +6,7 @@ on:
       version:
         description: Release version
         required: true
-        default: 0.1.0-preview.2
+        default: 0.1.0-preview.3
   push:
     tags:
       - "v*"
@@ -176,21 +176,58 @@ jobs:
           --skip-duplicate
         if: startsWith(github.ref, 'refs/tags/')
 
-      - name: Validate published NuGet package
-        run: python scripts/validate_published_nuget.py --version "${{ steps.version.outputs.value }}"
-        if: startsWith(github.ref, 'refs/tags/')
-
       - name: Upload NuGet artifact
         uses: actions/upload-artifact@v4
         with:
           name: fastparse-${{ steps.version.outputs.value }}-nuget
           path: dist/nuget/*.nupkg
 
+  published-nuget-smoke:
+    name: Published NuGet Smoke ${{ matrix.platform }}-${{ matrix.arch }}
+    needs: nuget-package
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate published NuGet package
+        run: python scripts/validate_published_nuget.py --version "${{ steps.version.outputs.value }}"
+
   github-release:
     name: Attach To GitHub Release
     needs:
       - package
       - nuget-package
+      - published-nuget-smoke
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:

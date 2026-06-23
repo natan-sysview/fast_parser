@@ -5,7 +5,7 @@ Use this guide when an AI agent needs to integrate FastParser into a .NET applic
 ## Install
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.2
+dotnet add package FastParser --version 0.1.0-preview.3
 ```
 
 Package ID:
@@ -144,6 +144,9 @@ docs/binary_schema.md
 docs/csharp_binding.md
 docs/encoding.md
 docs/platforms.md
+docs/versioning.md
 examples/csharp/01_parse_string/
 examples/csharp/02_binary_decode/
+examples/csharp/nuget/01_parse_string/
+examples/csharp/nuget/02_binary_decode/
 ```

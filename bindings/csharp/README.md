@@ -1,5 +1,10 @@
 # FastParser for .NET
 
+[![NuGet](https://img.shields.io/nuget/vpre/FastParser.svg)](https://www.nuget.org/packages/FastParser)
+[![Release](https://img.shields.io/github/v/release/natan-sysview/fast_parser?include_prereleases)](https://github.com/natan-sysview/fast_parser/releases)
+[![CI](https://github.com/natan-sysview/fast_parser/actions/workflows/ci.yml/badge.svg)](https://github.com/natan-sysview/fast_parser/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/natan-sysview/fast_parser.svg)](https://github.com/natan-sysview/fast_parser/blob/main/LICENSE)
+
 FastParser is a thin C# binding over the FastParse native C ABI.
 
 It parses source bytes in memory and returns AST data as JSON, CSV, binary MessagePack, or stats. The current native package includes the Java Tree-sitter grammar.
@@ -7,7 +12,7 @@ It parses source bytes in memory and returns AST data as JSON, CSV, binary Messa
 ## Install
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.2
+dotnet add package FastParser --version 0.1.0-preview.3
 ```
 
 The package includes RID-specific native libraries:
@@ -112,8 +117,11 @@ docs/binary_schema.md
 docs/csharp_binding.md
 docs/encoding.md
 docs/platforms.md
+docs/versioning.md
 examples/csharp/01_parse_string/
 examples/csharp/02_binary_decode/
+examples/csharp/nuget/01_parse_string/
+examples/csharp/nuget/02_binary_decode/
 ```
 
 Start with `AI_AGENT_GUIDE.md` when generating an integration with an AI coding agent.

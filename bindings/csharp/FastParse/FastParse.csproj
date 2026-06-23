@@ -14,11 +14,14 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>fastparser-icon.png</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../../assets/fastparser-icon.png" Pack="true" PackagePath="/" />
     <None Include="../../../NOTICE" Pack="true" PackagePath="/" />
     <None Include="../../../THIRD_PARTY_NOTICES.md" Pack="true" PackagePath="/" />
     <None Include="../../../CHANGELOG.md" Pack="true" PackagePath="/" />
@@ -30,10 +33,15 @@
     <None Include="../../../docs/csharp_binding.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/encoding.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/platforms.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/versioning.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../examples/csharp/01_parse_string/Program.cs" Pack="true" PackagePath="examples/csharp/01_parse_string/" />
     <None Include="../../../examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj" Pack="true" PackagePath="examples/csharp/01_parse_string/" />
     <None Include="../../../examples/csharp/02_binary_decode/Program.cs" Pack="true" PackagePath="examples/csharp/02_binary_decode/" />
     <None Include="../../../examples/csharp/02_binary_decode/FastParse.BinaryDecodeExample.csproj" Pack="true" PackagePath="examples/csharp/02_binary_decode/" />
+    <None Include="../../../examples/csharp/nuget/01_parse_string/Program.cs" Pack="true" PackagePath="examples/csharp/nuget/01_parse_string/" />
+    <None Include="../../../examples/csharp/nuget/01_parse_string/FastParser.NuGetParseString.csproj" Pack="true" PackagePath="examples/csharp/nuget/01_parse_string/" />
+    <None Include="../../../examples/csharp/nuget/02_binary_decode/Program.cs" Pack="true" PackagePath="examples/csharp/nuget/02_binary_decode/" />
+    <None Include="../../../examples/csharp/nuget/02_binary_decode/FastParser.NuGetBinaryDecode.csproj" Pack="true" PackagePath="examples/csharp/nuget/02_binary_decode/" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(NativeAssetsRoot)' != ''">
