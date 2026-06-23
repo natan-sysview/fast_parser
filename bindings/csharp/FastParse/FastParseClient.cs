@@ -23,11 +23,7 @@ public sealed unsafe class FastParseClient : IDisposable
     /// </param>
     public FastParseClient(string? libraryPath = null)
     {
-        LibraryPath = libraryPath ?? DefaultLibraryPath();
-        _library = NativeLibrary.Load(
-            LibraryPath,
-            typeof(FastParseClient).Assembly,
-            DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories);
+        (_library, LibraryPath) = LoadNativeLibrary(libraryPath);
         _version = LoadFunction<VersionDelegate>("fastparse_version", "tsmp_version");
         _parse = LoadFunction<ParseDelegate>("fastparse_parse", "tsmp_parse");
         _resultFree = LoadFunction<ResultFreeDelegate>("fastparse_result_free", "tsmp_result_free");
@@ -204,18 +200,60 @@ public sealed unsafe class FastParseClient : IDisposable
         return value == null ? string.Empty : Marshal.PtrToStringUTF8((nint)value) ?? string.Empty;
     }
 
-    private static string DefaultLibraryPath()
+    private static (nint Handle, string LoadedFrom) LoadNativeLibrary(string? libraryPath)
+    {
+        var candidates = libraryPath is null
+            ? DefaultLibraryCandidates()
+            : new[] { libraryPath };
+        var errors = new List<string>();
+
+        foreach (var candidate in candidates.Distinct())
+        {
+            if (string.IsNullOrWhiteSpace(candidate))
+            {
+                continue;
+            }
+
+            try
+            {
+                var handle = NativeLibrary.Load(
+                    candidate,
+                    typeof(FastParseClient).Assembly,
+                    DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories);
+                return (handle, candidate);
+            }
+            catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException)
+            {
+                errors.Add($"{candidate}: {ex.GetType().Name}: {ex.Message.Split('\n')[0]}");
+            }
+        }
+
+        var message = new StringBuilder()
+            .AppendLine("Unable to load the native FastParse library.")
+            .AppendLine($"OS: {RuntimeInformation.OSDescription}")
+            .AppendLine($"Architecture: {RuntimeInformation.ProcessArchitecture}")
+            .AppendLine($"AppContext.BaseDirectory: {AppContext.BaseDirectory}")
+            .AppendLine("Tried:")
+            .AppendLine(string.Join(Environment.NewLine, errors.Select(error => $"  - {error}")))
+            .ToString();
+        throw new DllNotFoundException(message);
+    }
+
+    private static IEnumerable<string> DefaultLibraryCandidates()
     {
         var explicitPath =
             Environment.GetEnvironmentVariable("FASTPARSE_LIBRARY_PATH") ??
             Environment.GetEnvironmentVariable("TSMP_LIBRARY_PATH");
         if (!string.IsNullOrWhiteSpace(explicitPath))
         {
-            return explicitPath;
+            yield return explicitPath;
+            yield break;
         }
 
         var fileName = NativeFileName();
         var rid = RuntimeIdentifier();
+        yield return "fastparse";
+        yield return fileName;
 
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
@@ -223,25 +261,23 @@ public sealed unsafe class FastParseClient : IDisposable
             var directCandidate = Path.Combine(directory.FullName, fileName);
             if (File.Exists(directCandidate))
             {
-                return directCandidate;
+                yield return directCandidate;
             }
 
             var candidate = Path.Combine(directory.FullName, "bin", fileName);
             if (File.Exists(candidate))
             {
-                return candidate;
+                yield return candidate;
             }
 
             var ridCandidate = Path.Combine(directory.FullName, "runtimes", rid, "native", fileName);
             if (File.Exists(ridCandidate))
             {
-                return ridCandidate;
+                yield return ridCandidate;
             }
 
             directory = directory.Parent;
         }
-
-        return fileName;
     }
 
     private static string NativeFileName()

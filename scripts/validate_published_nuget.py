@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import platform
 import subprocess
 import tempfile
 import time
@@ -104,6 +105,11 @@ def wait_for_version(version: str, timeout_seconds: int, interval_seconds: int) 
 def main() -> int:
     args = parse_args()
     wait_for_version(args.version.lower(), args.timeout_seconds, args.interval_seconds)
+    print("Published NuGet smoke environment", flush=True)
+    print(f"  Python        : {platform.python_version()} {platform.platform()}", flush=True)
+    print(f"  Machine       : {platform.machine()}", flush=True)
+    dotnet_info = run_command(["dotnet", "--info"], env=os.environ.copy())
+    print(dotnet_info.stdout, flush=True)
 
     with tempfile.TemporaryDirectory(prefix="fastparser-published-nuget-") as temp:
         project_dir = Path(temp) / "consumer"
@@ -131,6 +137,10 @@ def main() -> int:
             env=env,
         )
         (project_dir / "Program.cs").write_text(PROGRAM, encoding="utf-8")
+        print("Consumer project assets:", flush=True)
+        for path in sorted(project_dir.rglob("*")):
+            if path.is_file() and ("FastParse" in path.name or "fastparse" in path.name or path.suffix in {".json", ".csproj"}):
+                print(f"  {path.relative_to(project_dir)}", flush=True)
 
         completed = run_command(
             ["dotnet", "run", "--project", str(project_dir / "consumer.csproj")],
