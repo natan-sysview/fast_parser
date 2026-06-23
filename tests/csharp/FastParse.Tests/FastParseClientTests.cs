@@ -11,7 +11,7 @@ public sealed class FastParseClientTests
     [Fact]
     public void ParseTextDefaultReturnsFullJsonAst()
     {
-        using var parser = new FastParseClient();
+        using var parser = NewParser();
 
         var result = parser.ParseText(Source);
 
@@ -26,7 +26,7 @@ public sealed class FastParseClientTests
     [Fact]
     public void ParseTextFiltersRulesAndFields()
     {
-        using var parser = new FastParseClient();
+        using var parser = NewParser();
 
         var result = parser.ParseText(Source, new ParseOptions
         {
@@ -46,7 +46,7 @@ public sealed class FastParseClientTests
     [Fact]
     public void CsvOutputHonorsRequestedFields()
     {
-        using var parser = new FastParseClient();
+        using var parser = NewParser();
 
         var result = parser.ParseText(Source, new ParseOptions
         {
@@ -64,7 +64,7 @@ public sealed class FastParseClientTests
     [Fact]
     public void BinaryOutputDecodesToManagedObjects()
     {
-        using var parser = new FastParseClient();
+        using var parser = NewParser();
 
         var result = parser.ParseText(Source, new ParseOptions
         {
@@ -85,7 +85,7 @@ public sealed class FastParseClientTests
     [Fact]
     public void StatsSummaryAvoidsCopyingOutputBytes()
     {
-        using var parser = new FastParseClient();
+        using var parser = NewParser();
 
         var summary = parser.ParseTextSummary(Source, new ParseOptions
         {
@@ -111,7 +111,7 @@ public sealed class FastParseClientTests
     [Fact]
     public void InvalidLanguageThrowsFastParseException()
     {
-        using var parser = new FastParseClient();
+        using var parser = NewParser();
 
         var error = Assert.Throws<FastParseException>(() => parser.ParseText(Source, new ParseOptions
         {
@@ -132,15 +132,28 @@ public sealed class FastParseClientTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            var candidate = Path.Combine(directory.FullName, "bin", fileName);
-            if (File.Exists(candidate))
+            foreach (var relative in new[]
             {
-                return candidate;
+                Path.Combine("bin", fileName),
+                Path.Combine("bin", "Release", fileName),
+                Path.Combine("bin", "Debug", fileName)
+            })
+            {
+                var candidate = Path.Combine(directory.FullName, relative);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
             }
 
             directory = directory.Parent;
         }
 
         throw new FileNotFoundException($"Could not find native FastParse library {fileName}.");
+    }
+
+    private static FastParseClient NewParser()
+    {
+        return new FastParseClient(FindNativeLibrary());
     }
 }
