@@ -15,7 +15,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-C_API_VERSION = "fastparse-c-api/0.3.0"
+C_API_VERSION = "fastparse-c-api/0.4.0"
 
 
 def parse_args() -> argparse.Namespace:

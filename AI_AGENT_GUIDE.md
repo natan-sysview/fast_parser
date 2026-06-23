@@ -155,6 +155,21 @@ Use one `FastParseClient` per worker thread. Keep file IO, queues, and database 
 
 FastParser currently includes Java by default. Future parse languages should be installed as separate language extension packages.
 
+Current preview builds can also load an explicit native extension path:
+
+```csharp
+using var parser = new FastParseClient();
+parser.LoadLanguageExtension("/path/to/libfastparse_language_cobol.dylib");
+```
+
+After loading, set:
+
+```csharp
+Language = "cobol"
+```
+
+Load extensions before starting concurrent parse workers.
+
 Expected package-manager patterns:
 
 ```bash

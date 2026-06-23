@@ -21,6 +21,16 @@ from tsmp import NativeParseError, Tsmp, default_library_path, parse_field_mask 
 SOURCE_PATH = ROOT / "file_test" / "java" / "HelloWorld.java"
 
 
+def test_language_extension_path() -> Path:
+    if sys.platform == "darwin":
+        name = "libfastparse_language_test_java.dylib"
+    elif sys.platform == "win32":
+        name = "fastparse_language_test_java.dll"
+    else:
+        name = "libfastparse_language_test_java.so"
+    return ROOT / "bin" / name
+
+
 class MiniMsgpack:
     def __init__(self, data: bytes) -> None:
         self.data = data
@@ -331,6 +341,29 @@ class TsmpContractTests(unittest.TestCase):
     def test_invalid_language_returns_error(self) -> None:
         with self.assertRaises(NativeParseError):
             self.tsmp.parse_result(self.source, language="missing", output_format="stats")
+
+    def test_load_language_extension_by_path(self) -> None:
+        extension_path = test_language_extension_path()
+        self.assertTrue(extension_path.exists(), extension_path)
+
+        parser = Tsmp(default_library_path())
+        self.assertFalse(parser.language_available("java_extension"))
+        load_result = parser.load_language_extension(extension_path)
+        self.assertEqual(load_result.language, "java_extension")
+        self.assertEqual(load_result.display_name, "Java Test Extension")
+        self.assertTrue(parser.language_available("java_extension"))
+
+        result = parser.parse_text(
+            "class Demo { void run() {} }",
+            language="java_extension",
+            output_format="json",
+            include_rules=["method_declaration"],
+            fields=["rule", "text"],
+        )
+        document = result.json()
+        self.assertEqual(result.node_count, 1)
+        self.assertEqual(document["language"], "java_extension")
+        self.assertEqual(document["nodes"][0]["rule"], "method_declaration")
 
     def test_empty_source_is_valid(self) -> None:
         output, node_count = self.tsmp.parse_result(b"", language="java", output_format="json")

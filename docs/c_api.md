@@ -19,7 +19,7 @@ const char *fastparse_version(void);
 Returns a static UTF-8 string such as:
 
 ```text
-fastparse-c-api/0.3.0
+fastparse-c-api/0.4.0
 ```
 
 ```c
@@ -37,6 +37,27 @@ void fastparse_result_free(TsmpResult *result);
 ```
 
 Releases `result->data` and `result->error_message`, then clears result fields.
+
+```c
+int fastparse_load_language_extension(
+    const char *path,
+    FastParseLanguageLoadResult *out_result);
+```
+
+Loads a native language extension dynamic library and registers its language descriptor.
+
+```c
+int fastparse_language_available(const char *language);
+```
+
+Returns non-zero when a language is registered.
+
+```c
+void fastparse_language_load_result_free(
+    FastParseLanguageLoadResult *result);
+```
+
+Releases strings owned by a language load result.
 
 ## Options
 
@@ -123,6 +144,35 @@ TsmpOptions options = {
 
 The result data is MessagePack bytes. Bindings should copy the buffer before freeing the native result.
 
+## Example: Load COBOL Extension
+
+```c
+FastParseLanguageLoadResult load_result = {0};
+int status = fastparse_load_language_extension(
+    "/path/to/libfastparse_language_cobol.dylib",
+    &load_result);
+
+if (status != TSMP_OK || load_result.status != TSMP_OK) {
+    const char *message = load_result.error_message ? load_result.error_message : "unknown error";
+    /* log or propagate message */
+    fastparse_language_load_result_free(&load_result);
+    return status != TSMP_OK ? status : load_result.status;
+}
+
+fastparse_language_load_result_free(&load_result);
+
+TsmpOptions options = {
+    .language = "cobol",
+    .format = TSMP_FORMAT_JSON,
+    .include_rules = NULL,
+    .fields = TSMP_FIELD_RULE | TSMP_FIELD_DIAGNOSTICS,
+    .include_tokens = 0,
+    .pretty = 0
+};
+```
+
+Load extensions before starting concurrent parse workers.
+
 ## Status Codes
 
 ```text
@@ -133,6 +183,7 @@ TSMP_ERROR_PARSE_FAILED        3
 TSMP_ERROR_IO                  4
 TSMP_ERROR_UNSUPPORTED_FORMAT  5
 TSMP_ERROR_OUT_OF_MEMORY       6
+TSMP_ERROR_EXTENSION_LOAD      7
 ```
 
 `TSMP_ERROR_IO` is reserved for compatibility. The FastParse core does not perform file I/O.

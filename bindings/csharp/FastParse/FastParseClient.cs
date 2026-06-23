@@ -12,6 +12,9 @@ public sealed unsafe class FastParseClient : IDisposable
     private readonly VersionDelegate _version;
     private readonly ParseDelegate _parse;
     private readonly ResultFreeDelegate _resultFree;
+    private readonly LoadLanguageExtensionDelegate _loadLanguageExtension;
+    private readonly LanguageAvailableDelegate _languageAvailable;
+    private readonly LanguageLoadResultFreeDelegate _languageLoadResultFree;
     private bool _disposed;
 
     /// <summary>
@@ -27,6 +30,9 @@ public sealed unsafe class FastParseClient : IDisposable
         _version = LoadFunction<VersionDelegate>("fastparse_version", "tsmp_version");
         _parse = LoadFunction<ParseDelegate>("fastparse_parse", "tsmp_parse");
         _resultFree = LoadFunction<ResultFreeDelegate>("fastparse_result_free", "tsmp_result_free");
+        _loadLanguageExtension = LoadRequiredFunction<LoadLanguageExtensionDelegate>("fastparse_load_language_extension");
+        _languageAvailable = LoadRequiredFunction<LanguageAvailableDelegate>("fastparse_language_available");
+        _languageLoadResultFree = LoadRequiredFunction<LanguageLoadResultFreeDelegate>("fastparse_language_load_result_free");
     }
 
     /// <summary>Path or library name used to load the native FastParse library.</summary>
@@ -34,6 +40,57 @@ public sealed unsafe class FastParseClient : IDisposable
 
     /// <summary>Native FastParse C API version string.</summary>
     public string Version => Marshal.PtrToStringUTF8((nint)_version()) ?? string.Empty;
+
+    /// <summary>
+    /// Returns whether a parse language is currently available in the native registry.
+    /// </summary>
+    /// <param name="language">Canonical language name such as <c>java</c> or <c>cobol</c>.</param>
+    public bool LanguageAvailable(string language)
+    {
+        EnsureNotDisposed();
+        var nativeLanguage = StringToUtf8(language);
+        try
+        {
+            return _languageAvailable((byte*)nativeLanguage) != 0;
+        }
+        finally
+        {
+            FreeUtf8(nativeLanguage);
+        }
+    }
+
+    /// <summary>
+    /// Loads a native FastParse language extension from an explicit dynamic library path.
+    /// Load extensions before starting concurrent parse workers.
+    /// </summary>
+    /// <param name="path">Path to a FastParse language extension dynamic library.</param>
+    public LanguageExtensionLoadResult LoadLanguageExtension(string path)
+    {
+        EnsureNotDisposed();
+        var nativePath = StringToUtf8(path);
+        NativeLanguageLoadResult result = default;
+        int status;
+        try
+        {
+            status = _loadLanguageExtension((byte*)nativePath, &result);
+            if (status != 0 || result.Status != 0)
+            {
+                var message = NativeString(result.ErrorMessage);
+                throw new FastParseException(status, result.Status, string.IsNullOrWhiteSpace(message) ? "no error detail" : message);
+            }
+
+            return new LanguageExtensionLoadResult
+            {
+                Language = NativeString(result.Language),
+                DisplayName = NativeString(result.DisplayName)
+            };
+        }
+        finally
+        {
+            _languageLoadResultFree(&result);
+            FreeUtf8(nativePath);
+        }
+    }
 
     /// <summary>
     /// Parses source bytes and copies output bytes into managed memory.
@@ -169,6 +226,13 @@ public sealed unsafe class FastParseClient : IDisposable
             symbol = NativeLibrary.GetExport(_library, fallbackName);
         }
 
+        return Marshal.GetDelegateForFunctionPointer<T>(symbol);
+    }
+
+    private T LoadRequiredFunction<T>(string name)
+        where T : Delegate
+    {
+        var symbol = NativeLibrary.GetExport(_library, name);
         return Marshal.GetDelegateForFunctionPointer<T>(symbol);
     }
 
@@ -318,6 +382,15 @@ public sealed unsafe class FastParseClient : IDisposable
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void ResultFreeDelegate(NativeResult* result);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int LoadLanguageExtensionDelegate(byte* path, NativeLanguageLoadResult* result);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int LanguageAvailableDelegate(byte* language);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void LanguageLoadResultFreeDelegate(NativeLanguageLoadResult* result);
+
     [StructLayout(LayoutKind.Sequential)]
     private struct NativeOptions
     {
@@ -336,6 +409,15 @@ public sealed unsafe class FastParseClient : IDisposable
         public byte* Data;
         public nuint Length;
         public nuint NodeCount;
+        public byte* ErrorMessage;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeLanguageLoadResult
+    {
+        public int Status;
+        public byte* Language;
+        public byte* DisplayName;
         public byte* ErrorMessage;
     }
 }

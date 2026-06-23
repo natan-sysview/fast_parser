@@ -12,7 +12,7 @@ Current corpus:
 Java files : 1049
 Lines      : 400,007
 Source     : 13,384,187 bytes
-Library    : fastparse-c-api/0.3.0
+Library    : fastparse-c-api/0.4.0
 Platform   : macOS arm64
 ```
 

@@ -12,6 +12,7 @@ if [ "$1" = "clean" ]; then
     rm -f "$DIR/bin/libfastparse.dylib" "$DIR/bin/libfastparse.so" "$DIR/bin/fastparse.dll"
     rm -f "$DIR/bin/libtsmp.dylib" "$DIR/bin/libtsmp.so" "$DIR/bin/tsmp.dll"
     rm -f "$DIR/bin/libts_multi_parser.dylib" "$DIR/bin/libts_multi_parser.so"
+    rm -f "$DIR/bin/libfastparse_language_"*.dylib "$DIR/bin/libfastparse_language_"*.so "$DIR/bin/fastparse_language_"*.dll
     exit 0
 fi
 

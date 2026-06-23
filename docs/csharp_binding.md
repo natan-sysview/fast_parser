@@ -164,6 +164,8 @@ FastParseClient.Version
 FastParseClient.ParseBytes(...)
 FastParseClient.ParseText(...)
 FastParseClient.ParseBytesSummary(...)
+FastParseClient.LoadLanguageExtension(...)
+FastParseClient.LanguageAvailable(...)
 ParseOptions
 ParseResult
 ParseSummary
@@ -175,6 +177,27 @@ FastParseMessagePack.Decode(...)
 Use one `FastParseClient` per worker thread for simple high-throughput code.
 
 The native parser is thread-safe per call. Parent applications still own thread pools and SQLite/database coordination.
+
+## Language Extensions
+
+Load optional parse languages from a native extension path before parsing:
+
+```csharp
+using var parser = new FastParseClient();
+
+var load = parser.LoadLanguageExtension("/path/to/libfastparse_language_cobol.dylib");
+Console.WriteLine(load.Language);     // cobol
+Console.WriteLine(load.DisplayName);  // COBOL
+
+var result = parser.ParseText(cobolSource, new ParseOptions
+{
+    Language = "cobol",
+    Format = FastParseFormat.Json,
+    Fields = FastParseField.Rule | FastParseField.Diagnostics
+});
+```
+
+Load extensions before starting concurrent parse workers.
 
 ## Debugging And Symbols
 

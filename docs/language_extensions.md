@@ -125,6 +125,8 @@ For advanced tooling, local builds, enterprise deployments, or tests:
 load_language_extension(path)
 ```
 
+This mode is implemented in the native C API, Python binding, and C# binding.
+
 Example C# shape:
 
 ```csharp
@@ -221,7 +223,7 @@ Example:
   "displayName": "COBOL",
   "version": "0.1.0",
   "abi": "fastparse-language-extension/1",
-  "coreAbi": "fastparse-c-api/0.3.0",
+  "coreAbi": "fastparse-c-api/0.4.0",
   "grammar": {
     "name": "tree-sitter-cobol",
     "source": "https://github.com/example/tree-sitter-cobol",
@@ -292,24 +294,25 @@ Rules:
 
 Status: `Preview`
 
-The core should eventually expose these functions:
+The core currently exposes explicit path loading and language availability:
 
 ```c
 int fastparse_load_language_extension(
     const char *path,
     FastParseLanguageLoadResult *out_result);
 
-int fastparse_register_language(
-    const FastParseLanguageDescriptor *descriptor);
-
 int fastparse_language_available(
     const char *language);
 
-int fastparse_list_languages(
-    FastParseLanguageList *out_languages);
+void fastparse_language_load_result_free(
+    FastParseLanguageLoadResult *result);
+```
 
-void fastparse_language_list_free(
-    FastParseLanguageList *languages);
+Future registry APIs may add:
+
+```c
+int fastparse_list_languages(...);
+int fastparse_register_language(...);
 ```
 
 Possible binding-level names:
@@ -317,9 +320,54 @@ Possible binding-level names:
 ```text
 load_language_extension(path)
 load_bundled_language(language)
-list_languages()
 language_available(language)
+list_languages()
 ```
+
+Current implementation status:
+
+```text
+load_language_extension(path)  implemented
+language_available(language)   implemented
+load_bundled_language(language) planned
+list_languages()               planned
+```
+
+Extension loading is a setup step. Applications should load extensions before starting concurrent parse workers.
+
+## Experimental COBOL Extension
+
+Status: `Preview`
+
+The repository contains a first experimental COBOL extension host:
+
+```text
+extensions/cobol/fastparse_language_cobol.c
+```
+
+To build it locally, point CMake at a `tree-sitter-cobol` checkout:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+  -DFASTPARSE_COBOL_GRAMMAR_DIR=/path/to/tree-sitter-cobol
+cmake --build build --config Release
+```
+
+Expected output on macOS:
+
+```text
+bin/libfastparse_language_cobol.dylib
+```
+
+Use it from Python:
+
+```python
+parser = FastParser()
+parser.load_language_extension("bin/libfastparse_language_cobol.dylib")
+result = parser.parse_bytes(source, language="cobol", fields=["rule", "diagnostics"])
+```
+
+This is not packaged as `FastParser.Language.Cobol` yet. The first goal is to evaluate grammar quality against real COBOL corpora using diagnostics.
 
 ## NuGet Discovery
 

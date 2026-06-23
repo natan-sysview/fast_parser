@@ -80,6 +80,8 @@ FastParse(...)
 parse_bytes(...)
 parse_text(...)
 parse_bytes_summary(...)
+load_language_extension(...)
+language_available(...)
 version
 ParseResult.data
 ParseResult.text
@@ -87,6 +89,30 @@ ParseResult.json()
 ParseSummary.output_length
 ParseSummary.node_count
 ```
+
+## Language Extensions
+
+Load optional parse languages by path before parsing:
+
+```python
+from pathlib import Path
+from fastparse import FastParse
+
+parser = FastParse()
+load = parser.load_language_extension(Path("bin/libfastparse_language_cobol.dylib"))
+
+assert load.language == "cobol"
+assert parser.language_available("cobol")
+
+result = parser.parse_bytes(
+    cobol_source_bytes,
+    language="cobol",
+    output_format="json",
+    fields=["rule", "diagnostics"],
+)
+```
+
+Extension loading is setup work. Do it before starting worker threads.
 
 ## Threading
 

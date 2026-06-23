@@ -6,6 +6,9 @@ TSMP_1.0 {
         fastparse_version;
         fastparse_parse;
         fastparse_result_free;
+        fastparse_load_language_extension;
+        fastparse_language_available;
+        fastparse_language_load_result_free;
     local:
         *;
 };

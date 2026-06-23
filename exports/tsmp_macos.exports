@@ -4,3 +4,6 @@ _tsmp_result_free
 _fastparse_version
 _fastparse_parse
 _fastparse_result_free
+_fastparse_load_language_extension
+_fastparse_language_available
+_fastparse_language_load_result_free

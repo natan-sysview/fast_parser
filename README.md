@@ -11,6 +11,7 @@ The first public version ships with Java support. Parent applications own file I
 - Lets callers choose which node fields are returned.
 - Returns JSON, CSV, MessagePack binary, or stats.
 - Exposes a small C ABI designed for Python, C#, Rust, Java, and other bindings.
+- Can load optional language extensions by native library path.
 - Is thread-safe per parse call.
 
 FastParse does not read files, write files, walk directories, create databases, or own thread pools.
@@ -19,13 +20,16 @@ FastParse does not read files, write files, walk directories, create databases, 
 
 ```text
 Project version      : 0.1.0-preview
-C API version        : fastparse-c-api/0.3.0
+C API version        : fastparse-c-api/0.4.0
 Binary schema        : 1
 Supported languages  : java
+Extension preview    : explicit path loading for optional languages
 License              : Apache-2.0
 ```
 
 The `fastparse_*` symbols are the public names. The older `tsmp_*` symbols remain available as compatibility aliases.
+
+Java is built into the core package. Other parse languages should be delivered as optional language extensions so the default package stays small.
 
 ## Quick Start
 
@@ -88,6 +92,24 @@ fastparse_result_free(&result);
 ```
 
 Every successful or failed parse call that receives a `TsmpResult` must be followed by exactly one `fastparse_result_free(&result)`.
+
+## Language Extensions
+
+FastParse can load a native language extension before parsing:
+
+```c
+FastParseLanguageLoadResult load = {0};
+int status = fastparse_load_language_extension("/path/to/libfastparse_language_cobol.dylib", &load);
+fastparse_language_load_result_free(&load);
+```
+
+After loading, use the registered language name in normal parse options:
+
+```c
+.language = "cobol"
+```
+
+Extension loading is a setup step. Load extensions before starting concurrent parse workers.
 
 ## Output Formats
 
@@ -155,6 +177,7 @@ Bindings are reusable code intended for application developers. Runnable demos a
 include/        Public C headers.
 src/            Native C implementation.
 grammars/       Vendored Tree-sitter grammars.
+extensions/     Experimental optional language extensions.
 vendor/         Vendored Tree-sitter runtime pieces.
 bindings/       Reusable language bindings.
 examples/       Runnable examples and lab apps.

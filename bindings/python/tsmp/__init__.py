@@ -15,6 +15,7 @@ from .native import (
     TSMP_FORMAT_STATS,
     TSMP_FORMAT_BINARY,
     NativeParseError,
+    LanguageLoadResult,
     ParseResult,
     ParseSummary,
     FastParse,
@@ -28,6 +29,7 @@ from .native import (
 __all__ = [
     "FIELD_NAMES",
     "NativeParseError",
+    "LanguageLoadResult",
     "ParseResult",
     "ParseSummary",
     "FastParse",

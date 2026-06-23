@@ -78,6 +78,12 @@ class ParseSummary:
     output_format: str
 
 
+@dataclass(frozen=True)
+class LanguageLoadResult:
+    language: str
+    display_name: str
+
+
 class _TsmpOptions(ctypes.Structure):
     _fields_ = [
         ("language", ctypes.c_char_p),
@@ -95,6 +101,15 @@ class _TsmpResult(ctypes.Structure):
         ("data", ctypes.c_void_p),
         ("length", ctypes.c_size_t),
         ("node_count", ctypes.c_size_t),
+        ("error_message", ctypes.c_void_p),
+    ]
+
+
+class _LanguageLoadResult(ctypes.Structure):
+    _fields_ = [
+        ("status", ctypes.c_int),
+        ("language", ctypes.c_void_p),
+        ("display_name", ctypes.c_void_p),
         ("error_message", ctypes.c_void_p),
     ]
 
@@ -195,6 +210,9 @@ class Tsmp:
         self._version_fn = _native_function(self._lib, "fastparse_version", "tsmp_version")
         self._parse_fn = _native_function(self._lib, "fastparse_parse", "tsmp_parse")
         self._free_fn = _native_function(self._lib, "fastparse_result_free", "tsmp_result_free")
+        self._load_language_extension_fn = getattr(self._lib, "fastparse_load_language_extension")
+        self._language_available_fn = getattr(self._lib, "fastparse_language_available")
+        self._language_load_result_free_fn = getattr(self._lib, "fastparse_language_load_result_free")
 
         self._version_fn.argtypes = []
         self._version_fn.restype = ctypes.c_char_p
@@ -210,9 +228,38 @@ class Tsmp:
         self._free_fn.argtypes = [ctypes.POINTER(_TsmpResult)]
         self._free_fn.restype = None
 
+        self._load_language_extension_fn.argtypes = [ctypes.c_char_p, ctypes.POINTER(_LanguageLoadResult)]
+        self._load_language_extension_fn.restype = ctypes.c_int
+
+        self._language_available_fn.argtypes = [ctypes.c_char_p]
+        self._language_available_fn.restype = ctypes.c_int
+
+        self._language_load_result_free_fn.argtypes = [ctypes.POINTER(_LanguageLoadResult)]
+        self._language_load_result_free_fn.restype = None
+
     @property
     def version(self) -> str:
         return self._version_fn().decode("utf-8")
+
+    def language_available(self, language: str) -> bool:
+        return bool(self._language_available_fn(language.encode("utf-8")))
+
+    def load_language_extension(self, path: str | Path) -> LanguageLoadResult:
+        result = _LanguageLoadResult()
+        status = self._load_language_extension_fn(str(path).encode("utf-8"), ctypes.byref(result))
+        try:
+            if status != 0 or result.status != 0:
+                message = _native_string(result.error_message)
+                raise NativeParseError(
+                    f"fastparse_load_language_extension failed with status {status}/{result.status}: "
+                    f"{message or 'no error detail'}"
+                )
+            return LanguageLoadResult(
+                language=_native_string(result.language),
+                display_name=_native_string(result.display_name),
+            )
+        finally:
+            self._language_load_result_free_fn(ctypes.byref(result))
 
     def parse_bytes(
         self,

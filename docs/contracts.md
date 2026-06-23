@@ -78,6 +78,38 @@ Rules:
 - Unsupported language names return a controlled error.
 - Future languages must use stable lowercase names, for example `csharp`, `rust`, `python`, or `javascript`.
 
+## Language Extension Loading Contract
+
+Status: `Preview`
+
+The core can load optional parse languages from native language extension libraries.
+
+Native functions:
+
+```text
+fastparse_load_language_extension
+fastparse_language_available
+fastparse_language_load_result_free
+```
+
+Rules:
+
+- Java remains built into the core package.
+- Extensions are native dynamic libraries with a `fastparse_language_extension_descriptor` symbol.
+- A successfully loaded extension registers one canonical language name, for example `cobol`.
+- Parent applications should load extensions during setup, before starting concurrent parse workers.
+- Loading an extension does not parse source code and does not read application source files.
+- Unsupported or unloaded language names return `TSMP_ERROR_UNSUPPORTED_LANGUAGE` from parse calls.
+- Failed extension loads return `TSMP_ERROR_EXTENSION_LOAD` with a diagnostic message when available.
+
+The current preview supports explicit path loading. Package-manager bundled discovery is planned separately.
+
+Example flow:
+
+```text
+load extension path -> verify language_available("cobol") -> parse source bytes with language="cobol"
+```
+
 ## Rule Filter Contract
 
 Status: `Stable`
@@ -396,6 +428,7 @@ Safe:
 - One independent result object per active call.
 - Freeing independent results in parallel.
 - Parent runtimes using their own thread pools, queues, and worker scheduling.
+- Loading all required language extensions before worker threads begin.
 
 Not safe:
 
@@ -404,6 +437,7 @@ Not safe:
 - Reading a result while another thread frees the same result.
 - Freeing the same result more than once.
 - Sharing mutable binding state without synchronization.
+- Loading new language extensions while other threads are actively parsing.
 
 Rules:
 

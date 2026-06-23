@@ -176,6 +176,30 @@ public sealed class FastParseClientTests
         Assert.Contains("language", error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public void LoadLanguageExtensionByPath()
+    {
+        using var parser = NewParser();
+        var extensionPath = FindTestLanguageExtension();
+
+        Assert.False(parser.LanguageAvailable("java_extension"));
+        var loadResult = parser.LoadLanguageExtension(extensionPath);
+
+        Assert.Equal("java_extension", loadResult.Language);
+        Assert.Equal("Java Test Extension", loadResult.DisplayName);
+        Assert.True(parser.LanguageAvailable("java_extension"));
+
+        var result = parser.ParseText(Source, new ParseOptions
+        {
+            Language = "java_extension",
+            IncludeRules = "method_declaration",
+            Fields = FastParseField.Rule | FastParseField.Text
+        });
+
+        Assert.Equal(1UL, result.NodeCount);
+        Assert.Contains("method_declaration", result.Text, StringComparison.Ordinal);
+    }
+
     private static string FindNativeLibrary()
     {
         var fileName = OperatingSystem.IsWindows()
@@ -205,6 +229,37 @@ public sealed class FastParseClientTests
         }
 
         throw new FileNotFoundException($"Could not find native FastParse library {fileName}.");
+    }
+
+    private static string FindTestLanguageExtension()
+    {
+        var fileName = OperatingSystem.IsWindows()
+            ? "fastparse_language_test_java.dll"
+            : OperatingSystem.IsMacOS()
+                ? "libfastparse_language_test_java.dylib"
+                : "libfastparse_language_test_java.so";
+
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            foreach (var relative in new[]
+            {
+                Path.Combine("bin", fileName),
+                Path.Combine("bin", "Release", fileName),
+                Path.Combine("bin", "Debug", fileName)
+            })
+            {
+                var candidate = Path.Combine(directory.FullName, relative);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            directory = directory.Parent;
+        }
+
+        throw new FileNotFoundException($"Could not find native FastParse test language extension {fileName}.");
     }
 
     private static FastParseClient NewParser()

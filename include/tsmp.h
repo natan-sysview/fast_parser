@@ -24,6 +24,25 @@ extern "C" {
 #define TSMP_ERROR_IO 4
 #define TSMP_ERROR_UNSUPPORTED_FORMAT 5
 #define TSMP_ERROR_OUT_OF_MEMORY 6
+#define TSMP_ERROR_EXTENSION_LOAD 7
+
+typedef struct TSLanguage TSLanguage;
+typedef const TSLanguage *(*FastParseLanguageFn)(void);
+
+typedef struct {
+    unsigned int abi_version;
+    const char *language;
+    const char *display_name;
+    const char *tree_sitter_symbol;
+    FastParseLanguageFn language_fn;
+} FastParseLanguageDescriptor;
+
+typedef struct {
+    int status;
+    char *language;
+    char *display_name;
+    char *error_message;
+} FastParseLanguageLoadResult;
 
 typedef enum {
     TSMP_FORMAT_JSON = 1,
@@ -82,6 +101,16 @@ TSMP_API int fastparse_parse(
     TsmpResult *out_result);
 
 TSMP_API void fastparse_result_free(TsmpResult *result);
+
+TSMP_API int fastparse_load_language_extension(
+    const char *path,
+    FastParseLanguageLoadResult *out_result);
+
+TSMP_API int fastparse_language_available(
+    const char *language);
+
+TSMP_API void fastparse_language_load_result_free(
+    FastParseLanguageLoadResult *result);
 
 #ifdef __cplusplus
 }

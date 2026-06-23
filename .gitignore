@@ -1,4 +1,5 @@
 build/
+build_*/
 dist/
 .DS_Store
 CMakeUserPresets.json
@@ -21,6 +22,9 @@ bin/tsmp.dll
 bin/libfastparse.dylib
 bin/libfastparse.so
 bin/fastparse.dll
+bin/libfastparse_language_*.dylib
+bin/libfastparse_language_*.so
+bin/fastparse_language_*.dll
 bin/libts_multi_parser.dylib
 bin/libts_multi_parser.so
 

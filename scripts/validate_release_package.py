@@ -74,7 +74,7 @@ def validate_manifest(package_dir: Path, *, platform_name: str, library_path: Pa
         "platform": platform_name,
         "library": expected_library,
         "link_library": expected_link_library,
-        "c_api": "fastparse-c-api/0.3.0",
+        "c_api": "fastparse-c-api/0.4.0",
     }
     for key, value in expected.items():
         if manifest.get(key) != value:

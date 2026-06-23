@@ -6,7 +6,7 @@ namespace FastParse;
 public sealed class ParseOptions
 {
     /// <summary>
-    /// Language grammar to use. The current preview package supports <c>java</c>.
+    /// Language grammar to use. The default package supports <c>java</c>; loaded extensions can add more languages.
     /// </summary>
     public string Language { get; init; } = "java";
 
