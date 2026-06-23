@@ -39,4 +39,6 @@ jobs:
         run: python3 -m unittest discover -s tests -v
 
       - name: Build C# binding example
-        run: dotnet build examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
+        run: |
+          dotnet build examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
+          dotnet build examples/csharp/02_binary_decode/FastParse.BinaryDecodeExample.csproj

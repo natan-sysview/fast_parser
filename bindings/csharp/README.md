@@ -7,7 +7,7 @@ It parses source bytes in memory and returns AST data as JSON, CSV, binary Messa
 ## Install
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.1
+dotnet add package FastParser --version 0.1.0-preview.2
 ```
 
 The package includes RID-specific native libraries:
@@ -99,3 +99,21 @@ The C# namespace is `FastParse`:
 ```csharp
 using FastParse;
 ```
+
+## Included Agent Resources
+
+The NuGet package includes integration docs and examples for humans and AI agents:
+
+```text
+AI_AGENT_GUIDE.md
+docs/contracts.md
+docs/output_formats.md
+docs/binary_schema.md
+docs/csharp_binding.md
+docs/encoding.md
+docs/platforms.md
+examples/csharp/01_parse_string/
+examples/csharp/02_binary_decode/
+```
+
+Start with `AI_AGENT_GUIDE.md` when generating an integration with an AI coding agent.

@@ -6,7 +6,7 @@ on:
       version:
         description: Release version
         required: true
-        default: 0.1.0-preview.1
+        default: 0.1.0-preview.2
   push:
     tags:
       - "v*"
@@ -80,7 +80,9 @@ jobs:
         if: runner.os == 'Windows'
 
       - name: Build C# example
-        run: dotnet build examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
+        run: |
+          dotnet build examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
+          dotnet build examples/csharp/02_binary_decode/FastParse.BinaryDecodeExample.csproj
 
       - name: Package
         run: >

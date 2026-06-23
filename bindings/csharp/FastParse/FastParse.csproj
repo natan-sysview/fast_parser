@@ -22,6 +22,18 @@
     <None Include="../../../NOTICE" Pack="true" PackagePath="/" />
     <None Include="../../../THIRD_PARTY_NOTICES.md" Pack="true" PackagePath="/" />
     <None Include="../../../CHANGELOG.md" Pack="true" PackagePath="/" />
+    <None Include="../../../AI_AGENT_GUIDE.md" Pack="true" PackagePath="/" />
+    <None Include="../../../docs/ai_agent_integration.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/contracts.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/output_formats.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/binary_schema.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/csharp_binding.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/encoding.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/platforms.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../examples/csharp/01_parse_string/Program.cs" Pack="true" PackagePath="examples/csharp/01_parse_string/" />
+    <None Include="../../../examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj" Pack="true" PackagePath="examples/csharp/01_parse_string/" />
+    <None Include="../../../examples/csharp/02_binary_decode/Program.cs" Pack="true" PackagePath="examples/csharp/02_binary_decode/" />
+    <None Include="../../../examples/csharp/02_binary_decode/FastParse.BinaryDecodeExample.csproj" Pack="true" PackagePath="examples/csharp/02_binary_decode/" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(NativeAssetsRoot)' != ''">
