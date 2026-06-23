@@ -42,3 +42,6 @@ jobs:
         run: |
           dotnet build examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
           dotnet build examples/csharp/02_binary_decode/FastParse.BinaryDecodeExample.csproj
+
+      - name: Run C# binding tests
+        run: dotnet test tests/csharp/FastParse.Tests/FastParse.Tests.csproj --configuration Release --verbosity normal

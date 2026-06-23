@@ -8,6 +8,7 @@ import os
 import re
 import subprocess
 import tempfile
+import zipfile
 from pathlib import Path
 
 
@@ -57,6 +58,38 @@ def main() -> int:
     package = args.package.resolve()
     if not package.is_file():
         raise FileNotFoundError(package)
+    symbols = package.with_suffix(".snupkg")
+    if not symbols.is_file():
+        raise FileNotFoundError(symbols)
+
+    with zipfile.ZipFile(package) as zf:
+        names = set(zf.namelist())
+    required = {
+        "lib/net8.0/FastParse.dll",
+        "lib/net8.0/FastParse.xml",
+        "lib/net9.0/FastParse.dll",
+        "lib/net9.0/FastParse.xml",
+        "runtimes/linux-x64/native/libfastparse.so",
+        "runtimes/osx-arm64/native/libfastparse.dylib",
+        "runtimes/osx-x64/native/libfastparse.dylib",
+        "runtimes/win-x64/native/fastparse.dll",
+        "AI_AGENT_GUIDE.md",
+        "docs/csharp_binding.md",
+        "docs/versioning.md",
+    }
+    missing = sorted(required - names)
+    if missing:
+        raise AssertionError(f"NuGet package missing entries: {', '.join(missing)}")
+
+    with zipfile.ZipFile(symbols) as zf:
+        symbol_names = set(zf.namelist())
+    required_symbols = {
+        "lib/net8.0/FastParse.pdb",
+        "lib/net9.0/FastParse.pdb",
+    }
+    missing_symbols = sorted(required_symbols - symbol_names)
+    if missing_symbols:
+        raise AssertionError(f"NuGet symbols package missing entries: {', '.join(missing_symbols)}")
 
     version = package_version(package)
     with tempfile.TemporaryDirectory(prefix="fastparse-nuget-smoke-") as temp:

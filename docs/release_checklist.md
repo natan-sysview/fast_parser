@@ -16,6 +16,7 @@ Use this checklist before publishing a GitHub release.
 - [ ] Build native library with `./compila_lib.sh`.
 - [ ] Confirm expected library exists under `bin/`.
 - [ ] Build C# binding/examples.
+- [ ] Run C# binding contract tests.
 - [ ] Run Python tests.
 - [ ] Run C smoke tests.
 
@@ -27,6 +28,7 @@ python3 -m unittest discover -s tests -v
 ctest --test-dir build --output-on-failure
 dotnet build examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
 dotnet build examples/csharp/03_inventory_to_sqlite/FastParse.InventoryToSqliteExample.csproj
+dotnet test tests/csharp/FastParse.Tests/FastParse.Tests.csproj --configuration Release
 ```
 
 ## Docs
@@ -44,7 +46,7 @@ dotnet build examples/csharp/03_inventory_to_sqlite/FastParse.InventoryToSqliteE
 Build release archives locally:
 
 ```bash
-python3 scripts/package_release.py --version 0.1.0-preview.4
+python3 scripts/package_release.py --version 0.1.0-preview.6
 ```
 
 GitHub Actions release artifacts:
@@ -60,6 +62,9 @@ fastparse-<version>-linux-x64.tar.gz
 fastparse-<version>-macos-x64.tar.gz
 fastparse-<version>-macos-arm64.tar.gz
 fastparse-<version>-windows-x64.zip
+FastParser.<version>.nupkg
+FastParser.<version>.snupkg
+SHA256SUMS.txt
 ```
 
 Release source package should include:
@@ -110,6 +115,7 @@ dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExampl
 - [ ] Create tag.
 - [ ] Attach source archive.
 - [ ] Attach native binaries when available.
+- [ ] Attach NuGet package and symbols package.
 - [ ] Include supported platforms in release notes.
 - [ ] Include known limitations.
 
@@ -118,4 +124,3 @@ dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExampl
 - Java grammar only.
 - Binary schema is version 1.
 - `pretty` option is reserved.
-- Prebuilt cross-platform binaries are not yet automated.

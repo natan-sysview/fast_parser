@@ -143,6 +143,9 @@ def build_package(version: str, native_root: Path, output_dir: Path) -> Path:
     package = output_dir / f"FastParser.{version}.nupkg"
     if not package.is_file():
         raise AssertionError(f"expected NuGet package was not created: {package}")
+    symbols = output_dir / f"FastParser.{version}.snupkg"
+    if not symbols.is_file():
+        raise AssertionError(f"expected NuGet symbols package was not created: {symbols}")
     return package
 
 
@@ -184,6 +187,18 @@ def validate_package(package: Path) -> None:
     missing = sorted(required - names)
     if missing:
         raise AssertionError(f"NuGet package missing entries: {', '.join(missing)}")
+    symbols = package.with_suffix(".snupkg")
+    if not symbols.is_file():
+        raise AssertionError(f"NuGet symbols package missing: {symbols}")
+    with zipfile.ZipFile(symbols) as zf:
+        symbol_names = set(zf.namelist())
+    required_symbols = {
+        "lib/net8.0/FastParse.pdb",
+        "lib/net9.0/FastParse.pdb",
+    }
+    missing_symbols = sorted(required_symbols - symbol_names)
+    if missing_symbols:
+        raise AssertionError(f"NuGet symbols package missing entries: {', '.join(missing_symbols)}")
 
 
 def main() -> int:

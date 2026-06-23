@@ -4,6 +4,20 @@ All notable changes to FastParse will be documented here.
 
 This project follows semantic versioning once the first stable release is published.
 
+## 0.1.0-preview.6
+
+### Added
+
+- SourceLink metadata for the C# NuGet package.
+- Portable PDBs and NuGet symbols package (`.snupkg`) for C# debugging.
+- C# binding contract tests for JSON, CSV, binary, stats, explicit native loading, and error handling.
+- NuGet package validation for XML docs, PDBs, native RID assets, AI docs, and symbols package contents.
+
+### Changed
+
+- Release workflow now publishes the symbols package alongside the main NuGet package.
+- Release workflow runs C# binding tests before packaging artifacts.
+
 ## 0.1.0-preview
 
 Initial public preview.

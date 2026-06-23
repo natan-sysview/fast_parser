@@ -12,7 +12,7 @@ It parses source bytes in memory and returns AST data as JSON, CSV, binary Messa
 ## Install
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.4
+dotnet add package FastParser --version 0.1.0-preview.6
 ```
 
 The package includes RID-specific native libraries:
@@ -125,3 +125,7 @@ examples/csharp/nuget/02_binary_decode/
 ```
 
 Start with `AI_AGENT_GUIDE.md` when generating an integration with an AI coding agent.
+
+## Debugging
+
+The NuGet release includes portable PDBs, SourceLink metadata, XML documentation, and a `.snupkg` symbols package. Debuggers that support NuGet symbols can step from the package into the matching GitHub source revision.

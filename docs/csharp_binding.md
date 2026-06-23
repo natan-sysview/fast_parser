@@ -20,12 +20,13 @@ The release workflow builds a local/package artifact:
 
 ```text
 FastParser.<version>.nupkg
+FastParser.<version>.snupkg
 ```
 
 Install it from a local package directory:
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.4 --source /path/to/package-dir
+dotnet add package FastParser --version 0.1.0-preview.6 --source /path/to/package-dir
 ```
 
 Once the package is published to nuget.org, the command becomes:
@@ -44,7 +45,11 @@ examples/csharp/02_binary_decode/
 examples/csharp/nuget/01_parse_string/
 examples/csharp/nuget/02_binary_decode/
 lib/net8.0/FastParse.dll
+lib/net8.0/FastParse.pdb
+lib/net8.0/FastParse.xml
 lib/net9.0/FastParse.dll
+lib/net9.0/FastParse.pdb
+lib/net9.0/FastParse.xml
 runtimes/linux-x64/native/libfastparse.so
 runtimes/osx-arm64/native/libfastparse.dylib
 runtimes/osx-x64/native/libfastparse.dylib
@@ -147,3 +152,7 @@ FastParseMessagePack.Decode(...)
 Use one `FastParseClient` per worker thread for simple high-throughput code.
 
 The native parser is thread-safe per call. Parent applications still own thread pools and SQLite/database coordination.
+
+## Debugging And Symbols
+
+The NuGet package is built with portable PDBs and SourceLink. The release workflow also publishes a `.snupkg` symbols package to nuget.org, so IDEs/debuggers can map package code back to the exact GitHub source revision.

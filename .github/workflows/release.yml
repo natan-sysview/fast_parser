@@ -6,7 +6,7 @@ on:
       version:
         description: Release version
         required: true
-        default: 0.1.0-preview.5
+        default: 0.1.0-preview.6
   push:
     tags:
       - "v*"
@@ -83,6 +83,9 @@ jobs:
         run: |
           dotnet build examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
           dotnet build examples/csharp/02_binary_decode/FastParse.BinaryDecodeExample.csproj
+
+      - name: Test C# binding
+        run: dotnet test tests/csharp/FastParse.Tests/FastParse.Tests.csproj --configuration Release --verbosity normal
 
       - name: Package
         run: >
@@ -176,11 +179,22 @@ jobs:
           --skip-duplicate
         if: startsWith(github.ref, 'refs/tags/')
 
+      - name: Publish NuGet symbols
+        run: >
+          dotnet nuget push
+          "dist/nuget/FastParser.${{ steps.version.outputs.value }}.snupkg"
+          --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+        if: startsWith(github.ref, 'refs/tags/')
+
       - name: Upload NuGet artifact
         uses: actions/upload-artifact@v4
         with:
           name: fastparse-${{ steps.version.outputs.value }}-nuget
-          path: dist/nuget/*.nupkg
+          path: |
+            dist/nuget/*.nupkg
+            dist/nuget/*.snupkg
 
   published-nuget-smoke:
     name: Published NuGet Smoke ${{ matrix.platform }}-${{ matrix.arch }}
