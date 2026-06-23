@@ -38,6 +38,15 @@ public sealed class FastParseBinaryNode
     /// <summary>Child count when requested.</summary>
     public ulong? ChildCount { get; init; }
 
+    /// <summary>Whether this node is a Tree-sitter ERROR node when diagnostics were requested.</summary>
+    public bool? IsError { get; init; }
+
+    /// <summary>Whether this node is a Tree-sitter MISSING node when diagnostics were requested.</summary>
+    public bool? IsMissing { get; init; }
+
+    /// <summary>Whether this node or any descendant contains a Tree-sitter parse error when diagnostics were requested.</summary>
+    public bool? HasError { get; init; }
+
     /// <summary>Child summaries when requested.</summary>
     public IReadOnlyList<FastParseBinaryChild> Children { get; init; } = Array.Empty<FastParseBinaryChild>();
 }

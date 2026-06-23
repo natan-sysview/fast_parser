@@ -83,6 +83,61 @@ public sealed class FastParseClientTests
     }
 
     [Fact]
+    public void JsonDiagnosticsReportsTreeSitterErrors()
+    {
+        using var parser = NewParser();
+
+        var result = parser.ParseText("class Demo { void broken( { }", new ParseOptions
+        {
+            Fields = FastParseField.Rule |
+                     FastParseField.Diagnostics |
+                     FastParseField.Range |
+                     FastParseField.ByteRange
+        });
+
+        using var document = result.JsonDocument();
+        Assert.True(document.RootElement.GetProperty("hasErrors").GetBoolean());
+        Assert.True(document.RootElement.GetProperty("errorNodeCount").GetUInt64() > 0);
+        Assert.True(document.RootElement.TryGetProperty("missingNodeCount", out _));
+        Assert.True(document.RootElement.TryGetProperty("errorByteCount", out _));
+
+        var sawDiagnosticNode = false;
+        foreach (var node in document.RootElement.GetProperty("nodes").EnumerateArray())
+        {
+            if (node.GetProperty("hasError").GetBoolean())
+            {
+                sawDiagnosticNode = true;
+                Assert.True(node.TryGetProperty("isError", out _));
+                Assert.True(node.TryGetProperty("isMissing", out _));
+                Assert.True(node.TryGetProperty("startLine", out _));
+                Assert.True(node.TryGetProperty("startByte", out _));
+                break;
+            }
+        }
+
+        Assert.True(sawDiagnosticNode);
+    }
+
+    [Fact]
+    public void BinaryDiagnosticsDecodeToManagedObjects()
+    {
+        using var parser = NewParser();
+
+        var result = parser.ParseText("class Demo { void broken( { }", new ParseOptions
+        {
+            Format = FastParseFormat.Binary,
+            Fields = FastParseField.Rule | FastParseField.Diagnostics
+        });
+        var document = FastParseMessagePack.Decode(result.Data);
+
+        Assert.True(document.HasErrors);
+        Assert.True(document.ErrorNodeCount > 0);
+        Assert.NotNull(document.MissingNodeCount);
+        Assert.NotNull(document.ErrorByteCount);
+        Assert.Contains(document.Nodes, node => node.HasError == true && node.IsError is not null && node.IsMissing is not null);
+    }
+
+    [Fact]
     public void StatsSummaryAvoidsCopyingOutputBytes()
     {
         using var parser = NewParser();

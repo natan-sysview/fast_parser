@@ -44,6 +44,10 @@ public static class FastParseMessagePack
             var format = string.Empty;
             var schemaVersion = 0UL;
             var language = string.Empty;
+            bool? hasErrors = null;
+            ulong? errorNodeCount = null;
+            ulong? missingNodeCount = null;
+            ulong? errorByteCount = null;
             IReadOnlyList<FastParseBinaryNode> nodes = Array.Empty<FastParseBinaryNode>();
             var nodeCount = 0UL;
 
@@ -60,6 +64,18 @@ public static class FastParseMessagePack
                         break;
                     case "language":
                         language = ReadString();
+                        break;
+                    case "hasErrors":
+                        hasErrors = ReadBool();
+                        break;
+                    case "errorNodeCount":
+                        errorNodeCount = ReadUInt();
+                        break;
+                    case "missingNodeCount":
+                        missingNodeCount = ReadUInt();
+                        break;
+                    case "errorByteCount":
+                        errorByteCount = ReadUInt();
                         break;
                     case "nodes":
                         nodes = ReadNodes();
@@ -78,6 +94,10 @@ public static class FastParseMessagePack
                 Format = format,
                 SchemaVersion = schemaVersion,
                 Language = language,
+                HasErrors = hasErrors,
+                ErrorNodeCount = errorNodeCount,
+                MissingNodeCount = missingNodeCount,
+                ErrorByteCount = errorByteCount,
                 Nodes = nodes,
                 NodeCount = nodeCount
             };
@@ -109,6 +129,9 @@ public static class FastParseMessagePack
             ulong? startByte = null;
             ulong? endByte = null;
             ulong? childCount = null;
+            bool? isError = null;
+            bool? isMissing = null;
+            bool? hasError = null;
             IReadOnlyList<FastParseBinaryChild> children = Array.Empty<FastParseBinaryChild>();
 
             for (var i = 0; i < count; i++)
@@ -149,6 +172,15 @@ public static class FastParseMessagePack
                     case "childCount":
                         childCount = ReadUInt();
                         break;
+                    case "isError":
+                        isError = ReadBool();
+                        break;
+                    case "isMissing":
+                        isMissing = ReadBool();
+                        break;
+                    case "hasError":
+                        hasError = ReadBool();
+                        break;
                     case "children":
                         children = ReadChildren();
                         break;
@@ -171,6 +203,9 @@ public static class FastParseMessagePack
                 StartByte = startByte,
                 EndByte = endByte,
                 ChildCount = childCount,
+                IsError = isError,
+                IsMissing = isMissing,
+                HasError = hasError,
                 Children = children
             };
         }
@@ -231,6 +266,17 @@ public static class FastParseMessagePack
         private ulong ReadUIntAfterPeek()
         {
             return ReadUInt();
+        }
+
+        private bool ReadBool()
+        {
+            var code = ReadByte();
+            return code switch
+            {
+                0xC2 => false,
+                0xC3 => true,
+                _ => throw new FormatException($"Expected bool, got 0x{code:X2}.")
+            };
         }
 
         private ulong ReadUInt()

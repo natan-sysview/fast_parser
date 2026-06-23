@@ -49,6 +49,11 @@ static int mp_nil(TsmpBuffer *buffer)
     return mp_u8(buffer, 0xC0u);
 }
 
+static int mp_bool(TsmpBuffer *buffer, int value)
+{
+    return mp_u8(buffer, value ? 0xC3u : 0xC2u);
+}
+
 static int mp_uint(TsmpBuffer *buffer, uint64_t value)
 {
     if (value <= 0x7Fu) {
@@ -145,6 +150,7 @@ static uint32_t node_property_count(const TsmpRenderCtx *ctx)
     if (tsmp_has_field(ctx, TSMP_FIELD_RANGE)) count += 4;
     if (tsmp_has_field(ctx, TSMP_FIELD_BYTE_RANGE)) count += 2;
     if (tsmp_has_field(ctx, TSMP_FIELD_CHILD_COUNT)) count++;
+    if (tsmp_has_field(ctx, TSMP_FIELD_DIAGNOSTICS)) count += 3;
     if (tsmp_has_field(ctx, TSMP_FIELD_CHILDREN)) count++;
     return count;
 }
@@ -195,10 +201,17 @@ static int mp_children(TsmpBuffer *buffer, const TsmpRenderCtx *ctx, TSNode node
 int tsmp_binary_begin(TsmpRenderCtx *ctx, size_t total_nodes)
 {
     TsmpBuffer *buffer = &ctx->buffer;
-    if (!mp_map(buffer, 5)) return 0;
+    uint32_t top_level_count = tsmp_has_field(ctx, TSMP_FIELD_DIAGNOSTICS) ? 9u : 5u;
+    if (!mp_map(buffer, top_level_count)) return 0;
     if (!mp_key(buffer, "format") || !mp_str(buffer, "tsmp-binary")) return 0;
     if (!mp_key(buffer, "schemaVersion") || !mp_uint(buffer, TSMP_BINARY_SCHEMA_VERSION)) return 0;
     if (!mp_key(buffer, "language") || !mp_str(buffer, ctx->options->language)) return 0;
+    if (tsmp_has_field(ctx, TSMP_FIELD_DIAGNOSTICS)) {
+        if (!mp_key(buffer, "hasErrors") || !mp_bool(buffer, ctx->diagnostics.has_errors)) return 0;
+        if (!mp_key(buffer, "errorNodeCount") || !mp_uint(buffer, ctx->diagnostics.error_node_count)) return 0;
+        if (!mp_key(buffer, "missingNodeCount") || !mp_uint(buffer, ctx->diagnostics.missing_node_count)) return 0;
+        if (!mp_key(buffer, "errorByteCount") || !mp_uint(buffer, ctx->diagnostics.error_byte_count)) return 0;
+    }
     if (!mp_key(buffer, "nodes") || !mp_array(buffer, (uint32_t)total_nodes)) return 0;
     return 1;
 }
@@ -248,6 +261,11 @@ int tsmp_binary_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t par
     }
     if (tsmp_has_field(ctx, TSMP_FIELD_CHILD_COUNT)) {
         if (!mp_key(buffer, "childCount") || !mp_uint(buffer, ts_node_child_count(node))) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_DIAGNOSTICS)) {
+        if (!mp_key(buffer, "isError") || !mp_bool(buffer, ts_node_is_error(node))) return 0;
+        if (!mp_key(buffer, "isMissing") || !mp_bool(buffer, ts_node_is_missing(node))) return 0;
+        if (!mp_key(buffer, "hasError") || !mp_bool(buffer, ts_node_has_error(node))) return 0;
     }
     if (tsmp_has_field(ctx, TSMP_FIELD_CHILDREN)) {
         if (!mp_key(buffer, "children") || !mp_children(buffer, ctx, node)) return 0;

@@ -33,6 +33,9 @@ public enum FastParseField : uint
     /// <summary>Include child rule/text summaries when supported by the output format.</summary>
     Children = 1u << 7,
 
+    /// <summary>Include Tree-sitter parse diagnostic fields such as isError, isMissing, and hasError.</summary>
+    Diagnostics = 1u << 8,
+
     /// <summary>Request all supported fields.</summary>
     All = 0xFFFFFFFFu
 }

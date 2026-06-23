@@ -75,6 +75,7 @@ FastParseField.Text
 FastParseField.Range
 FastParseField.ByteRange
 FastParseField.Children
+FastParseField.Diagnostics
 ```
 
 ## Rule Selection
@@ -86,6 +87,28 @@ IncludeRules = "class_declaration|method_declaration"
 ```
 
 Leave it empty to include the full AST.
+
+## Parse Diagnostics
+
+When code may contain unsupported, incomplete, or newer syntax, request diagnostics:
+
+```csharp
+Fields = FastParseField.Rule |
+         FastParseField.ByteRange |
+         FastParseField.Diagnostics
+```
+
+Diagnostics expose Tree-sitter recovery data:
+
+```text
+document.HasErrors
+document.ErrorNodeCount
+node.IsError
+node.IsMissing
+node.HasError
+```
+
+Do not treat `HasErrors = true` as a native exception. Store it as parse quality metadata and decide in the parent application whether to reject, retry, or continue.
 
 ## Binary Decoding
 

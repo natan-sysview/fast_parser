@@ -41,6 +41,7 @@ typedef enum {
     TSMP_FIELD_BYTE_RANGE  = 1u << 5,
     TSMP_FIELD_CHILD_COUNT = 1u << 6,
     TSMP_FIELD_CHILDREN    = 1u << 7,
+    TSMP_FIELD_DIAGNOSTICS = 1u << 8,
     TSMP_FIELD_ALL         = 0xFFFFFFFFu
 } TsmpFieldMask;
 

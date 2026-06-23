@@ -63,6 +63,25 @@ Console.WriteLine(document.SchemaVersion);
 Console.WriteLine(document.Nodes[0].Rule);
 ```
 
+## Diagnostics
+
+Request `FastParseField.Diagnostics` to see Tree-sitter recovery signals:
+
+```csharp
+var binary = parser.ParseText(source, new ParseOptions
+{
+    Format = FastParseFormat.Binary,
+    Fields = FastParseField.Rule | FastParseField.Diagnostics
+});
+
+var document = FastParseMessagePack.Decode(binary.Data);
+Console.WriteLine(document.HasErrors);
+Console.WriteLine(document.ErrorNodeCount);
+Console.WriteLine(document.Nodes[0].HasError);
+```
+
+Diagnostics are normal output data. A parse can succeed while `HasErrors` is true.
+
 ## Stats Without Output Copy
 
 ```csharp

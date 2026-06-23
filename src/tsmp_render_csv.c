@@ -34,6 +34,10 @@ int tsmp_csv_begin(TsmpRenderCtx *ctx)
     }
 
     if (!append_header_field(ctx, &first, TSMP_FIELD_CHILD_COUNT, "child_count")) return 0;
+    if (tsmp_has_field(ctx, TSMP_FIELD_DIAGNOSTICS)) {
+        if (!append_separator(&ctx->buffer, &first)) return 0;
+        if (!tsmp_buffer_append(&ctx->buffer, "is_error,is_missing,has_error")) return 0;
+    }
     if (!append_header_field(ctx, &first, TSMP_FIELD_CHILDREN, "children")) return 0;
     return tsmp_buffer_append(&ctx->buffer, "\n");
 }
@@ -96,6 +100,14 @@ int tsmp_csv_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t parent
     if (tsmp_has_field(ctx, TSMP_FIELD_CHILD_COUNT)) {
         if (!append_separator(buffer, &first)) return 0;
         if (!tsmp_buffer_append_u32(buffer, ts_node_child_count(node))) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_DIAGNOSTICS)) {
+        if (!append_separator(buffer, &first)) return 0;
+        if (!tsmp_buffer_append(buffer, ts_node_is_error(node) ? "1" : "0")) return 0;
+        if (!tsmp_buffer_append(buffer, ",")) return 0;
+        if (!tsmp_buffer_append(buffer, ts_node_is_missing(node) ? "1" : "0")) return 0;
+        if (!tsmp_buffer_append(buffer, ",")) return 0;
+        if (!tsmp_buffer_append(buffer, ts_node_has_error(node) ? "1" : "0")) return 0;
     }
     if (tsmp_has_field(ctx, TSMP_FIELD_CHILDREN)) {
         if (!append_separator(buffer, &first)) return 0;

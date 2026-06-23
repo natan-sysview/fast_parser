@@ -71,6 +71,7 @@ var result = parser.ParseBytes(source, new ParseOptions
     IncludeRules = "method_declaration",
     Fields = FastParseField.Rule |
              FastParseField.Text |
+             FastParseField.Diagnostics |
              FastParseField.ByteRange
 });
 
@@ -105,6 +106,28 @@ Console.WriteLine(document.Nodes[0].Rule);
 ```
 
 For production, applications may also decode MessagePack with a dedicated package such as MessagePack-CSharp.
+
+## Parse Diagnostics
+
+Use diagnostics when the parent application needs to know whether Tree-sitter recovered from invalid or unsupported syntax:
+
+```csharp
+var result = parser.ParseBytes(source, new ParseOptions
+{
+    Language = "java",
+    Format = FastParseFormat.Binary,
+    Fields = FastParseField.Rule |
+             FastParseField.ByteRange |
+             FastParseField.Diagnostics
+});
+
+var document = FastParseMessagePack.Decode(result.Data);
+Console.WriteLine(document.HasErrors);
+Console.WriteLine(document.ErrorNodeCount);
+Console.WriteLine(document.Nodes[0].HasError);
+```
+
+`HasErrors = true` is not a native failure. It means parsing succeeded but the grammar reported `ERROR` or `MISSING` nodes.
 
 ## Library Loading
 

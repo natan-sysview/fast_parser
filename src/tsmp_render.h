@@ -7,10 +7,18 @@
 #include <tree_sitter/api.h>
 
 typedef struct {
+    int has_errors;
+    size_t error_node_count;
+    size_t missing_node_count;
+    size_t error_byte_count;
+} TsmpDiagnostics;
+
+typedef struct {
     const unsigned char *source;
     size_t source_len;
     const TsmpOptions *options;
     unsigned int fields;
+    TsmpDiagnostics diagnostics;
     TsmpBuffer buffer;
     size_t node_count;
     size_t next_id;
@@ -18,6 +26,7 @@ typedef struct {
 
 int tsmp_has_field(const TsmpRenderCtx *ctx, unsigned int field);
 int tsmp_rule_filter_matches(const char *filter, const char *rule);
+TsmpDiagnostics tsmp_collect_diagnostics(TSNode node);
 
 int tsmp_append_source_slice_json(TsmpBuffer *buffer, const TsmpRenderCtx *ctx, TSNode node);
 int tsmp_append_source_slice_csv(TsmpBuffer *buffer, const TsmpRenderCtx *ctx, TSNode node);

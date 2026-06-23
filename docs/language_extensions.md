@@ -460,6 +460,55 @@ Rules:
 
 This avoids returning to a monolithic package with many unused grammars.
 
+## Grammar Quality Diagnostics
+
+Status: `Stable` for diagnostic field names; `Preview` for extension quality scoring.
+
+Language extensions should be evaluated with FastParse diagnostics enabled.
+
+Recommended fields for grammar evaluation:
+
+```text
+TSMP_FIELD_RULE
+TSMP_FIELD_BYTE_RANGE
+TSMP_FIELD_RANGE
+TSMP_FIELD_DIAGNOSTICS
+```
+
+These fields expose:
+
+```text
+hasErrors
+errorNodeCount
+missingNodeCount
+errorByteCount
+isError
+isMissing
+hasError
+```
+
+Rules:
+
+- A language extension can parse successfully and still report grammar errors.
+- `hasErrors = true` means Tree-sitter recovered from unsupported, invalid, or incomplete syntax.
+- Grammar quality tests should store diagnostics per source file.
+- Extension maintainers should track diagnostic rates over real corpora before promoting a grammar.
+- Multiple grammar implementations for the same parse language may be compared by their diagnostic rates.
+
+Recommended corpus metrics:
+
+```text
+files_parsed
+files_with_errors
+error_node_count
+missing_node_count
+error_byte_count
+error_bytes_per_kloc
+most_common_error_parent_rules
+```
+
+For COBOL, this lets FastParse compare candidate grammars against large enterprise corpora and choose the most robust implementation before publishing a stable extension.
+
 ## Versioning Strategy
 
 Status: `Preview`

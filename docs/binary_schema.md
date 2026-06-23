@@ -16,7 +16,7 @@ Bindings should reject unknown future schema versions unless they explicitly sup
 
 ## Top-Level Object
 
-The top-level value is a MessagePack map with five keys:
+The top-level value is a MessagePack map with required keys and optional diagnostic keys.
 
 | Key | Type | Notes |
 |---|---|---|
@@ -25,6 +25,10 @@ The top-level value is a MessagePack map with five keys:
 | `language` | string | Public language name, for example `java`. |
 | `nodes` | array | Flat list of included AST nodes. |
 | `nodeCount` | unsigned integer | Same value as `TsmpResult.node_count`. |
+| `hasErrors` | bool | Optional when `TSMP_FIELD_DIAGNOSTICS` is requested. |
+| `errorNodeCount` | unsigned integer | Optional number of `ERROR` nodes in the full tree. |
+| `missingNodeCount` | unsigned integer | Optional number of `MISSING` nodes in the full tree. |
+| `errorByteCount` | unsigned integer | Optional total byte span covered by `ERROR` nodes. |
 
 Example shape:
 
@@ -33,6 +37,10 @@ Example shape:
   "format": "tsmp-binary",
   "schemaVersion": 1,
   "language": "java",
+  "hasErrors": false,
+  "errorNodeCount": 0,
+  "missingNodeCount": 0,
+  "errorByteCount": 0,
   "nodes": [...],
   "nodeCount": 100
 }
@@ -55,6 +63,9 @@ Each node is a MessagePack map. The keys present depend on `TsmpOptions.fields`.
 | `TSMP_FIELD_BYTE_RANGE` | `startByte` | unsigned integer |
 | `TSMP_FIELD_BYTE_RANGE` | `endByte` | unsigned integer |
 | `TSMP_FIELD_CHILD_COUNT` | `childCount` | unsigned integer |
+| `TSMP_FIELD_DIAGNOSTICS` | `isError` | bool |
+| `TSMP_FIELD_DIAGNOSTICS` | `isMissing` | bool |
+| `TSMP_FIELD_DIAGNOSTICS` | `hasError` | bool |
 | `TSMP_FIELD_CHILDREN` | `children` | array |
 
 Important:
@@ -107,6 +118,7 @@ Consumers that want a nested tree can reconstruct it from `id` and `parentId`.
 | `rule` | str |
 | `text` | bin |
 | IDs/counts/ranges | uint |
+| Diagnostics | bool |
 | Missing parent | nil |
 
 ## Compatibility Rules
@@ -114,8 +126,9 @@ Consumers that want a nested tree can reconstruct it from `id` and `parentId`.
 For schema version 1:
 
 - Existing keys keep their meaning.
-- New optional top-level keys may be added only in a future schema version.
-- New optional node keys may be added only in a future schema version.
+- Optional keys may appear when requested by field flags.
+- Consumers should skip unknown map keys to remain forward-compatible within the preview line.
+- Breaking shape or type changes require a future schema version.
 - Bindings should not rely on map key order.
 - Bindings should tolerate a field being absent when the caller did not request it.
 

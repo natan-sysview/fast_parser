@@ -11,10 +11,25 @@ static int append_json_key(TsmpBuffer *buffer, const char *key, int *first)
     return tsmp_buffer_append(buffer, "\":");
 }
 
+static int append_json_bool(TsmpBuffer *buffer, int value)
+{
+    return tsmp_buffer_append(buffer, value ? "true" : "false");
+}
+
 int tsmp_json_begin(TsmpRenderCtx *ctx)
 {
     if (!tsmp_buffer_append(&ctx->buffer, "{\"language\":")) return 0;
     if (!tsmp_buffer_append_json_string(&ctx->buffer, ctx->options->language)) return 0;
+    if (tsmp_has_field(ctx, TSMP_FIELD_DIAGNOSTICS)) {
+        if (!tsmp_buffer_append(&ctx->buffer, ",\"hasErrors\":")) return 0;
+        if (!append_json_bool(&ctx->buffer, ctx->diagnostics.has_errors)) return 0;
+        if (!tsmp_buffer_append(&ctx->buffer, ",\"errorNodeCount\":")) return 0;
+        if (!tsmp_buffer_append_size(&ctx->buffer, ctx->diagnostics.error_node_count)) return 0;
+        if (!tsmp_buffer_append(&ctx->buffer, ",\"missingNodeCount\":")) return 0;
+        if (!tsmp_buffer_append_size(&ctx->buffer, ctx->diagnostics.missing_node_count)) return 0;
+        if (!tsmp_buffer_append(&ctx->buffer, ",\"errorByteCount\":")) return 0;
+        if (!tsmp_buffer_append_size(&ctx->buffer, ctx->diagnostics.error_byte_count)) return 0;
+    }
     return tsmp_buffer_append(&ctx->buffer, ",\"nodes\":[");
 }
 
@@ -103,6 +118,14 @@ int tsmp_json_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t paren
     if (tsmp_has_field(ctx, TSMP_FIELD_CHILD_COUNT)) {
         if (!append_json_key(buffer, "childCount", &first)) return 0;
         if (!tsmp_buffer_append_u32(buffer, ts_node_child_count(node))) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_DIAGNOSTICS)) {
+        if (!append_json_key(buffer, "isError", &first)) return 0;
+        if (!append_json_bool(buffer, ts_node_is_error(node))) return 0;
+        if (!append_json_key(buffer, "isMissing", &first)) return 0;
+        if (!append_json_bool(buffer, ts_node_is_missing(node))) return 0;
+        if (!append_json_key(buffer, "hasError", &first)) return 0;
+        if (!append_json_bool(buffer, ts_node_has_error(node))) return 0;
     }
     if (tsmp_has_field(ctx, TSMP_FIELD_CHILDREN)) {
         if (!append_json_key(buffer, "children", &first)) return 0;

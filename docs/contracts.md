@@ -116,6 +116,7 @@ TSMP_FIELD_RANGE
 TSMP_FIELD_BYTE_RANGE
 TSMP_FIELD_CHILD_COUNT
 TSMP_FIELD_CHILDREN
+TSMP_FIELD_DIAGNOSTICS
 TSMP_FIELD_ALL
 ```
 
@@ -134,6 +135,13 @@ startByte
 endByte
 childCount
 children
+hasErrors
+errorNodeCount
+missingNodeCount
+errorByteCount
+isError
+isMissing
+hasError
 ```
 
 Rules:
@@ -146,6 +154,7 @@ Rules:
 - `parentId` points to the parent node id when available, otherwise it is null/empty according to format.
 - `childCount` is the number of direct Tree-sitter children.
 - `children` is intended for exploration and may be refined before stable `0.1.0`.
+- Diagnostic fields are emitted only when `TSMP_FIELD_DIAGNOSTICS` is requested, or when the default/all field set is used.
 
 Production callers should request only fields they need. Development and exploration tools may request all fields.
 
@@ -190,6 +199,62 @@ Example:
   "endByte": 28
 }
 ```
+
+## Diagnostics Contract
+
+Status: `Stable` for field names and meanings; `Preview` for future diagnostic detail expansion.
+
+Tree-sitter can recover from invalid, incomplete, or unsupported syntax. FastParse exposes that recovery information instead of treating every grammar problem as a hard parse failure.
+
+Request diagnostics with:
+
+```text
+TSMP_FIELD_DIAGNOSTICS
+```
+
+Top-level diagnostic fields:
+
+```text
+hasErrors
+errorNodeCount
+missingNodeCount
+errorByteCount
+```
+
+Per-node diagnostic fields:
+
+```text
+isError
+isMissing
+hasError
+```
+
+Meanings:
+
+- `hasErrors` means Tree-sitter reported an `ERROR` or `MISSING` node anywhere in the full parse tree.
+- `errorNodeCount` is the number of Tree-sitter `ERROR` nodes in the full parse tree.
+- `missingNodeCount` is the number of Tree-sitter `MISSING` nodes in the full parse tree.
+- `errorByteCount` is the total byte span covered by `ERROR` nodes.
+- `isError` means this node itself is an `ERROR` node.
+- `isMissing` means this node itself is a `MISSING` node.
+- `hasError` means this node or one of its descendants contains a parse error.
+
+Rules:
+
+- Diagnostics are grammar quality signals, not native call failures.
+- A parse can return `TSMP_OK` and still report `hasErrors = true`.
+- Diagnostics are computed from the full Tree-sitter tree, even when `include_rules` filters the returned node list.
+- JSON and Binary include top-level diagnostics when requested.
+- JSON, CSV, and Binary include per-node diagnostics when requested.
+- Stats currently returns counts only and does not return a diagnostics payload.
+- Bindings should expose diagnostics as ordinary output fields, not as exceptions.
+
+Recommended uses:
+
+- Evaluating grammar coverage across large corpora.
+- Detecting where a language extension needs improvement.
+- Supporting newer language syntax before the grammar fully understands it.
+- Letting parent applications store parse quality metrics next to extracted rules.
 
 ## Output Format Contract
 
@@ -395,6 +460,7 @@ Preview:
 - Detailed numeric error codes.
 - Future language names and grammar coverage.
 - Additional optional fields in Binary output.
+- Additional optional diagnostic metrics.
 - `pretty` formatting behavior.
 
 Internal:

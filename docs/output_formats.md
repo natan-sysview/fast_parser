@@ -31,12 +31,18 @@ Top-level shape:
 ```json
 {
   "language": "java",
+  "hasErrors": false,
+  "errorNodeCount": 0,
+  "missingNodeCount": 0,
+  "errorByteCount": 0,
   "nodes": [],
   "nodeCount": 0
 }
 ```
 
 Node fields depend on the requested field mask.
+
+Diagnostic top-level fields appear when `TSMP_FIELD_DIAGNOSTICS` is requested, or when the default/all field set is used. Per-node diagnostics are `isError`, `isMissing`, and `hasError`.
 
 ## CSV
 
@@ -53,6 +59,12 @@ Use CSV for:
 - Loading selected rules into data tools.
 
 CSV columns depend on the requested field mask.
+
+When diagnostics are requested, CSV adds flat columns:
+
+```text
+is_error,is_missing,has_error
+```
 
 ## Binary MessagePack
 
@@ -77,6 +89,10 @@ schemaVersion: 1
 language: string
 nodes: array
 nodeCount: integer
+hasErrors: bool               optional diagnostics
+errorNodeCount: integer       optional diagnostics
+missingNodeCount: integer     optional diagnostics
+errorByteCount: integer       optional diagnostics
 ```
 
 Important:

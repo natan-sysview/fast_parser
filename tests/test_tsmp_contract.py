@@ -38,6 +38,10 @@ class MiniMsgpack:
             return self._bytes(code & 0x1F).decode("utf-8")
         if code == 0xC0:
             return None
+        if code == 0xC2:
+            return False
+        if code == 0xC3:
+            return True
         if code == 0xC4:
             return self._bytes(self._u8())
         if code == 0xC5:
@@ -274,6 +278,49 @@ class TsmpContractTests(unittest.TestCase):
         self.assertEqual(summary.output_format, "binary")
         self.assertEqual(summary.node_count, full.node_count)
         self.assertEqual(summary.output_length, len(full.data))
+
+    def test_json_diagnostics_reports_tree_sitter_errors(self) -> None:
+        result = self.tsmp.parse_bytes(
+            b"class Demo { void broken( { }",
+            output_format="json",
+            fields=["rule", "diagnostics", "range", "byte_range"],
+        )
+        document = result.json()
+
+        self.assertTrue(document["hasErrors"])
+        self.assertGreater(document["errorNodeCount"], 0)
+        self.assertIn("missingNodeCount", document)
+        self.assertIn("errorByteCount", document)
+        self.assertTrue(any(node["hasError"] for node in document["nodes"]))
+        self.assertTrue(any("isError" in node and "isMissing" in node for node in document["nodes"]))
+        self.assertIn("startLine", document["nodes"][0])
+        self.assertIn("startByte", document["nodes"][0])
+
+    def test_csv_diagnostics_adds_flat_error_columns(self) -> None:
+        result = self.tsmp.parse_bytes(
+            b"class Demo { void broken( { }",
+            output_format="csv",
+            fields=["rule", "diagnostics"],
+        )
+        text = result.data.decode("utf-8")
+
+        self.assertTrue(text.startswith("rule,is_error,is_missing,has_error\n"))
+        self.assertIn(",1", text)
+
+    def test_binary_diagnostics_decodes_error_fields(self) -> None:
+        result = self.tsmp.parse_bytes(
+            b"class Demo { void broken( { }",
+            output_format="binary",
+            fields=["rule", "diagnostics"],
+        )
+        document = unpack_msgpack(result.data)
+
+        self.assertTrue(document["hasErrors"])
+        self.assertGreater(document["errorNodeCount"], 0)
+        self.assertIn("missingNodeCount", document)
+        self.assertIn("errorByteCount", document)
+        self.assertTrue(any(node["hasError"] for node in document["nodes"]))
+        self.assertTrue(all("isError" in node and "isMissing" in node for node in document["nodes"]))
 
     def test_stats_counts_without_output(self) -> None:
         output, node_count = self.parse_result(output_format="stats", include_rules="")

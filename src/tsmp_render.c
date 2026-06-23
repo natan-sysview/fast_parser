@@ -34,6 +34,35 @@ int tsmp_rule_filter_matches(const char *filter, const char *rule)
     return 0;
 }
 
+static void collect_diagnostics_walk(TSNode node, TsmpDiagnostics *diagnostics)
+{
+    if (ts_node_has_error(node)) {
+        diagnostics->has_errors = 1;
+    }
+    if (ts_node_is_error(node)) {
+        uint32_t start = ts_node_start_byte(node);
+        uint32_t end = ts_node_end_byte(node);
+        diagnostics->error_node_count++;
+        diagnostics->error_byte_count += end >= start ? (size_t)(end - start) : 0;
+    }
+    if (ts_node_is_missing(node)) {
+        diagnostics->missing_node_count++;
+    }
+
+    uint32_t child_count = ts_node_child_count(node);
+    for (uint32_t i = 0; i < child_count; i++) {
+        collect_diagnostics_walk(ts_node_child(node, i), diagnostics);
+    }
+}
+
+TsmpDiagnostics tsmp_collect_diagnostics(TSNode node)
+{
+    TsmpDiagnostics diagnostics;
+    memset(&diagnostics, 0, sizeof(diagnostics));
+    collect_diagnostics_walk(node, &diagnostics);
+    return diagnostics;
+}
+
 int tsmp_append_source_slice_json(TsmpBuffer *buffer, const TsmpRenderCtx *ctx, TSNode node)
 {
     uint32_t start = ts_node_start_byte(node);
@@ -113,6 +142,7 @@ int tsmp_render_tree(
     ctx.source_len = source_len;
     ctx.options = options;
     ctx.fields = options->fields == 0 ? TSMP_FIELD_ALL : options->fields;
+    ctx.diagnostics = tsmp_collect_diagnostics(ts_tree_root_node(tree));
     ctx.next_id = 1;
 
     size_t total_nodes = 0;
