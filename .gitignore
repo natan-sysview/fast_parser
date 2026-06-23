@@ -23,3 +23,7 @@ bin/libfastparse.so
 bin/fastparse.dll
 bin/libts_multi_parser.dylib
 bin/libts_multi_parser.so
+
+# .NET test/build outputs
+tests/csharp/**/bin/
+tests/csharp/**/obj/
