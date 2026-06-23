@@ -110,6 +110,8 @@ Bindings should hide this from normal users with `try/finally`, `defer`, `Drop`,
 
 Package size should be controlled with language profiles.
 
+The preferred long-term distribution model is core plus optional language extension packages. See [Language Extensions](language_extensions.md).
+
 Possible profiles:
 
 ```text

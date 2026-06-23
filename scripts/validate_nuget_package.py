@@ -75,6 +75,7 @@ def main() -> int:
         "runtimes/win-x64/native/fastparse.dll",
         "AI_AGENT_GUIDE.md",
         "docs/csharp_binding.md",
+        "docs/language_extensions.md",
         "docs/versioning.md",
     }
     missing = sorted(required - names)

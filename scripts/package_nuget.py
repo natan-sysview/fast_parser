@@ -167,6 +167,7 @@ def validate_package(package: Path) -> None:
         "AI_AGENT_GUIDE.md",
         "docs/ai_agent_integration.md",
         "docs/contracts.md",
+        "docs/language_extensions.md",
         "docs/output_formats.md",
         "docs/binary_schema.md",
         "docs/csharp_binding.md",

@@ -5,7 +5,7 @@ Use this guide when an AI agent needs to integrate FastParser into a .NET applic
 ## Install
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.4
+dotnet add package FastParser --version 0.1.0-preview.8
 ```
 
 Package ID:
@@ -128,6 +128,26 @@ FASTPARSE_LIBRARY_PATH=/path/to/libfastparse.dylib
 
 Use one `FastParseClient` per worker thread. Keep file IO, queues, and database writes in the parent application.
 
+## Optional Parse Languages
+
+FastParser currently includes Java by default. Future parse languages should be installed as separate language extension packages.
+
+Expected package-manager patterns:
+
+```bash
+dotnet add package FastParser.Language.Cobol
+pip install fastparser-language-cobol
+cargo add fastparser-language-cobol
+```
+
+After installing an extension, bindings should load it through a bundled-language API such as:
+
+```text
+load_bundled_language("cobol")
+```
+
+Read `docs/language_extensions.md` before generating code for optional parse languages.
+
 ## Avoid
 
 - Do not parse by shelling out to a CLI when using the binding.
@@ -139,6 +159,7 @@ Use one `FastParseClient` per worker thread. Keep file IO, queues, and database 
 
 ```text
 docs/contracts.md
+docs/language_extensions.md
 docs/output_formats.md
 docs/binary_schema.md
 docs/csharp_binding.md

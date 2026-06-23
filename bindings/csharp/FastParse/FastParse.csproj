@@ -39,6 +39,7 @@
     <None Include="../../../AI_AGENT_GUIDE.md" Pack="true" PackagePath="/" />
     <None Include="../../../docs/ai_agent_integration.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/contracts.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/language_extensions.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/output_formats.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/binary_schema.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/csharp_binding.md" Pack="true" PackagePath="docs/" />

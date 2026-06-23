@@ -112,6 +112,7 @@ The NuGet package includes integration docs and examples for humans and AI agent
 ```text
 AI_AGENT_GUIDE.md
 docs/contracts.md
+docs/language_extensions.md
 docs/output_formats.md
 docs/binary_schema.md
 docs/csharp_binding.md
