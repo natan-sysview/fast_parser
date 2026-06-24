@@ -11,6 +11,7 @@ option(TSMP_BUILD_SHARED "Build TSMP as a shared library" ON)
 option(TSMP_USE_VENDORED_TREE_SITTER "Compile the vendored Tree-sitter runtime" ON)
 set(FASTPARSE_COBOL_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-cobol grammar directory for the experimental COBOL language extension")
 set(FASTPARSE_PYTHON_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-python grammar directory for the experimental Python language extension")
+set(FASTPARSE_RUST_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-rust grammar directory for the experimental Rust language extension")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -150,6 +151,24 @@ if(FASTPARSE_PYTHON_GRAMMAR_DIR)
         PRIVATE
             "${FASTPARSE_PYTHON_GRAMMAR_DIR}/src")
     fastparse_configure_language_extension(fastparse_language_python "fastparse_language_python")
+endif()
+
+if(FASTPARSE_RUST_GRAMMAR_DIR)
+    if(NOT EXISTS "${FASTPARSE_RUST_GRAMMAR_DIR}/src/parser.c")
+        message(FATAL_ERROR "FASTPARSE_RUST_GRAMMAR_DIR must point to a tree-sitter-rust checkout with src/parser.c")
+    endif()
+    set(FASTPARSE_RUST_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/extensions/rust/fastparse_language_rust.c"
+        "${FASTPARSE_RUST_GRAMMAR_DIR}/src/parser.c")
+    if(EXISTS "${FASTPARSE_RUST_GRAMMAR_DIR}/src/scanner.c")
+        list(APPEND FASTPARSE_RUST_SOURCES "${FASTPARSE_RUST_GRAMMAR_DIR}/src/scanner.c")
+    endif()
+    add_library(fastparse_language_rust SHARED
+        ${FASTPARSE_RUST_SOURCES})
+    target_include_directories(fastparse_language_rust
+        PRIVATE
+            "${FASTPARSE_RUST_GRAMMAR_DIR}/src")
+    fastparse_configure_language_extension(fastparse_language_rust "fastparse_language_rust")
 endif()
 
 if(APPLE AND TSMP_BUILD_SHARED)

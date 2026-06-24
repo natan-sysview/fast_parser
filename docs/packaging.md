@@ -302,6 +302,15 @@ Publishing is gated by:
 NUGET_LANGUAGE_PYTHON_PUBLISH=true
 ```
 
+The tagged release workflow validates the local language NuGet package against the core `FastParser` package before upload. If `NUGET_LANGUAGE_PYTHON_PUBLISH=true`, it also publishes the package and runs public nuget.org smoke tests on Linux x64, Windows x64, macOS arm64, and macOS x64.
+
+NuGet trusted publishing must be configured for both package IDs:
+
+```text
+FastParser
+FastParser.Language.Python
+```
+
 ## Python Wheel / PyPI Package
 
 The release workflow also builds Python wheels for:
@@ -414,6 +423,17 @@ Publishing is gated by:
 ```text
 PYPI_LANGUAGE_PYTHON_PUBLISH=true
 ```
+
+The tagged release workflow validates each language wheel against the matching core `fastparse` wheel before upload. If `PYPI_LANGUAGE_PYTHON_PUBLISH=true`, it also publishes `fastparse-language-python` and runs public PyPI smoke tests on Linux x64, Windows x64, macOS arm64, and macOS x64.
+
+PyPI trusted publishing must be configured for both project names:
+
+```text
+fastparse
+fastparse-language-python
+```
+
+See [Package Registry Setup](package_registry_setup.md) for the exact registry fields.
 
 The workflow lives at:
 

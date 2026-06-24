@@ -61,6 +61,7 @@ Stable:
 - Rule and field behavior is documented.
 - Diagnostics quality baseline is measured over a representative corpus.
 - Extension package has public-registry post-publish smoke tests.
+- At least one second-language pilot should periodically validate that the extension standard is not tied to one grammar implementation.
 - Breaking changes follow the versioning policy in this document.
 
 ## Canonical Language Name

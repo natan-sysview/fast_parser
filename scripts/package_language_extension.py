@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Package a FastParse language extension.")
-    parser.add_argument("--language", required=True, choices=["python"])
+    parser.add_argument("--language", required=True, choices=["python", "rust"])
     parser.add_argument("--version", default="0.1.0-preview.1")
     parser.add_argument("--platform", default=default_platform())
     parser.add_argument("--arch", default=default_arch())

@@ -1,0 +1,151 @@
+# Package Registry Setup
+
+This document lists the external registry configuration required before a tagged release can publish FastParse packages.
+
+FastParse uses GitHub Actions and registry trusted publishing whenever possible. The repository should not store long-lived API tokens unless a registry has no OIDC option.
+
+## GitHub Repository Variables
+
+Configure these variables under:
+
+```text
+GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables
+```
+
+| Variable | Value | Effect |
+|---|---|---|
+| `PYPI_PUBLISH` | `true` | Publish the core `fastparse` wheels to PyPI. |
+| `PYPI_LANGUAGE_PYTHON_PUBLISH` | `true` | Publish `fastparse-language-python` wheels to PyPI. |
+| `NUGET_LANGUAGE_PYTHON_PUBLISH` | `true` | Publish `FastParser.Language.Python` to nuget.org. |
+
+The core `FastParser` NuGet package is published on tags by the existing NuGet trusted publishing step.
+
+## PyPI Trusted Publishers
+
+PyPI needs one trusted publisher per PyPI project name.
+
+Core package:
+
+```text
+Project name : fastparse
+Publisher    : GitHub
+Owner        : natan-sysview
+Repository   : fast_parser
+Workflow     : release.yml
+Environment  : any / blank
+```
+
+Python language extension:
+
+```text
+Project name : fastparse-language-python
+Publisher    : GitHub
+Owner        : natan-sysview
+Repository   : fast_parser
+Workflow     : release.yml
+Environment  : any / blank
+```
+
+Future Rust language extension:
+
+```text
+Project name : fastparse-language-rust
+Publisher    : GitHub
+Owner        : natan-sysview
+Repository   : fast_parser
+Workflow     : release.yml
+Environment  : any / blank
+```
+
+Important: a pending publisher does not reserve the package name. The first tagged publish creates the project if nobody else has claimed it.
+
+## NuGet Trusted Publishing
+
+NuGet needs a trusted publishing policy for each NuGet package ID.
+
+Core package:
+
+```text
+Package ID       : FastParser
+Repository owner : natan-sysview
+Repository       : fast_parser
+Workflow file    : release.yml
+Environment      : any / blank
+```
+
+Python language extension:
+
+```text
+Package ID       : FastParser.Language.Python
+Repository owner : natan-sysview
+Repository       : fast_parser
+Workflow file    : release.yml
+Environment      : any / blank
+```
+
+Future Rust language extension:
+
+```text
+Package ID       : FastParser.Language.Rust
+Repository owner : natan-sysview
+Repository       : fast_parser
+Workflow file    : release.yml
+Environment      : any / blank
+```
+
+## Release Flow
+
+After the registry setup is complete:
+
+```bash
+git tag v0.1.0-preview.18
+git push origin v0.1.0-preview.18
+```
+
+GitHub Actions will:
+
+1. Build native core archives for Linux, macOS arm64, macOS x64, and Windows.
+2. Build core NuGet and PyPI packages.
+3. Build Python language extension native archives.
+4. Build `fastparse-language-python` wheels.
+5. Build `FastParser.Language.Python`.
+6. Publish enabled packages to their registries.
+7. Run post-publish smoke tests from the public registries.
+8. Attach release assets and `SHA256SUMS.txt` to GitHub Releases.
+
+## Developer Install Commands
+
+Python:
+
+```bash
+pip install --pre fastparse fastparse-language-python
+```
+
+C#:
+
+```bash
+dotnet add package FastParser --prerelease
+dotnet add package FastParser.Language.Python --prerelease
+```
+
+Minimal Python smoke:
+
+```python
+from fastparse import FastParse
+
+parser = FastParse()
+parser.load_bundled_language("python")
+result = parser.parse_text("def hello(): pass", language="python")
+print(result.node_count)
+```
+
+Minimal C# smoke:
+
+```csharp
+using FastParse;
+
+using var parser = new FastParseClient();
+parser.LoadBundledLanguage("python");
+var result = parser.ParseText("def hello(): pass", new ParseOptions { Language = "python" });
+Console.WriteLine(result.NodeCount);
+```

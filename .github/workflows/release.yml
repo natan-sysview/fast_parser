@@ -343,6 +343,7 @@ jobs:
 
   python-language-wheel:
     name: Python Language Wheel python ${{ matrix.platform }}
+    needs: python-wheel
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -407,6 +408,33 @@ jobs:
           --version "${{ steps.version.outputs.value }}"
           --platform-tag "${{ matrix.platform_tag }}"
 
+      - name: Download core Python wheel artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: fastparse-${{ steps.version.outputs.value }}-python-${{ matrix.platform }}
+          path: dist/python-core
+
+      - name: Validate manylinux language wheel
+        if: matrix.linux_container
+        shell: bash
+        run: >
+          docker run --rm
+          -v "$PWD:/io"
+          -w /io
+          quay.io/pypa/manylinux2014_x86_64
+          /opt/python/cp312-cp312/bin/python
+          scripts/validate_python_language_wheel.py
+          "$(find dist/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
+          "$(find dist/python-languages -maxdepth 1 -name 'fastparse_language_python-*.whl' | head -n 1)"
+
+      - name: Validate platform language wheel
+        if: ${{ !matrix.linux_container }}
+        shell: bash
+        run: |
+          core_wheel="$(find dist/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
+          language_wheel="$(find dist/python-languages -maxdepth 1 -name 'fastparse_language_python-*.whl' | head -n 1)"
+          python scripts/validate_python_language_wheel.py "$core_wheel" "$language_wheel"
+
       - name: Upload Python language wheel artifact
         uses: actions/upload-artifact@v4
         with:
@@ -415,7 +443,9 @@ jobs:
 
   nuget-language-package:
     name: NuGet Language Package Python
-    needs: language-extension
+    needs:
+      - language-extension
+      - nuget-package
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -447,6 +477,12 @@ jobs:
           pattern: fastparse-language-python-*
           merge-multiple: true
 
+      - name: Download core NuGet package
+        uses: actions/download-artifact@v4
+        with:
+          path: nuget-artifacts
+          name: fastparse-${{ steps.version.outputs.value }}-nuget
+
       - name: Build NuGet language package
         shell: bash
         run: |
@@ -455,6 +491,16 @@ jobs:
             archives+=(--archive "$archive")
           done < <(find language-artifacts -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' \) -print0)
           python scripts/package_nuget_language_extension.py --language python --version "${{ steps.version.outputs.value }}" "${archives[@]}"
+
+      - name: Validate NuGet language package
+        shell: bash
+        run: |
+          core_package="$(find nuget-artifacts -maxdepth 1 -name 'FastParser.*.nupkg' ! -name '*.snupkg' | head -n 1)"
+          language_package="dist/nuget-languages/FastParser.Language.Python.${{ steps.version.outputs.value }}.nupkg"
+          python scripts/validate_nuget_language_package.py \
+            --core-package "$core_package" \
+            --language-package "$language_package" \
+            --version "${{ steps.version.outputs.value }}"
 
       - name: NuGet login
         id: nuget_login
@@ -499,6 +545,42 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: python-language-dist
+
+  published-pypi-language-python-smoke:
+    name: Published PyPI Language Python Smoke ${{ matrix.platform }}
+    needs: publish-pypi-language-python
+    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_PYTHON_PUBLISH == 'true'
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux-x64
+          - runner: macos-14
+            platform: macos-arm64
+          - runner: macos-15-intel
+            platform: macos-x64
+          - runner: windows-latest
+            platform: windows-x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate published PyPI language package
+        run: python scripts/validate_published_pypi_language.py --version "${{ steps.version.outputs.value }}"
 
   publish-pypi:
     name: Publish PyPI
@@ -597,6 +679,46 @@ jobs:
 
       - name: Validate published NuGet package
         run: python scripts/validate_published_nuget.py --version "${{ steps.version.outputs.value }}"
+
+  published-nuget-language-python-smoke:
+    name: Published NuGet Language Python Smoke ${{ matrix.platform }}-${{ matrix.arch }}
+    needs: nuget-language-package
+    if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_PYTHON_PUBLISH == 'true'
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate published NuGet language package
+        run: python scripts/validate_published_nuget_language.py --version "${{ steps.version.outputs.value }}"
 
   github-release:
     name: Attach To GitHub Release

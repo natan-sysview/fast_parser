@@ -174,6 +174,7 @@ def validate_package(package: Path) -> None:
         "docs/encoding.md",
         "docs/platforms.md",
         "docs/versioning.md",
+        "docs/package_registry_setup.md",
         "examples/csharp/01_parse_string/Program.cs",
         "examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj",
         "examples/csharp/02_binary_decode/Program.cs",

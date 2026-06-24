@@ -66,10 +66,12 @@ Package names must be predictable so an AI coding agent can infer the install co
 
 Current pilot packages:
 
-| Ecosystem | Python extension |
-|---|---|
-| NuGet | `FastParser.Language.Python` |
-| PyPI | `fastparse-language-python` |
+| Ecosystem | Python extension | Rust extension |
+|---|---|---|
+| NuGet | `FastParser.Language.Python` | planned |
+| PyPI | `fastparse-language-python` | planned |
+
+Python is the first package-manager pilot. Rust is the second local extension-standard pilot and proves the extension model is not Python-specific.
 
 ## Agent-Friendly Install Commands
 
@@ -432,6 +434,47 @@ python3 scripts/validate_python_language_wheel.py \
   dist/python/fastparse-0.1.0rc17-py3-none-macosx_11_0_arm64.whl \
   dist/python-languages/fastparse_language_python-0.1.0rc1-py3-none-macosx_11_0_arm64.whl
 ```
+
+## Experimental Rust Extension
+
+Status: `Preview`
+
+The repository includes a vendored `tree-sitter-rust` grammar and can build a Rust language extension when the extension grammar path is enabled:
+
+```bash
+cmake -S . -B build-rust-extension -DCMAKE_BUILD_TYPE=Release \
+  -DFASTPARSE_RUST_GRAMMAR_DIR=grammars/tree-sitter-rust
+cmake --build build-rust-extension --config Release --target fastparse_language_rust
+```
+
+Expected output on macOS:
+
+```text
+bin/libfastparse_language_rust.dylib
+```
+
+Use it from Python:
+
+```python
+parser = FastParse()
+parser.load_language_extension("bin/libfastparse_language_rust.dylib")
+result = parser.parse_text(
+    "fn hello() { println!(\"hi\"); }",
+    language="rust",
+    output_format="json",
+    include_rules=["function_item"],
+)
+```
+
+Build a native extension archive:
+
+```bash
+python3 scripts/package_language_extension.py \
+  --language rust \
+  --version 0.1.0-preview.1
+```
+
+Rust is not published as `fastparse-language-rust` or `FastParser.Language.Rust` yet. Its purpose in this preview is to validate that a second clean grammar can follow the same manifest, C ABI, archive layout, and local loading contract.
 
 ## NuGet Discovery
 

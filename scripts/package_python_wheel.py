@@ -42,6 +42,16 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def pypi_version(release_version: str) -> str:
+    if "-preview." in release_version:
+        base, preview = release_version.split("-preview.", 1)
+        return f"{base}rc{preview}"
+    if "-preview" in release_version:
+        base, preview = release_version.split("-preview", 1)
+        return f"{base}rc{preview.lstrip('.') or '0'}"
+    return release_version
+
+
 def venv_python(venv_dir: Path) -> Path:
     if os.name == "nt":
         return venv_dir / "Scripts" / "python.exe"
@@ -69,30 +79,40 @@ def main() -> int:
     env = os.environ.copy()
     env["FASTPARSE_PY_VERSION"] = args.version
     env["FASTPARSE_PY_PLATFORM_TAG"] = args.platform_tag
+    package_version = pypi_version(args.version)
+    version_file = PYTHON_PACKAGE / "fastparse" / "_version.py"
+    original_version_file = version_file.read_text(encoding="utf-8") if version_file.exists() else None
 
-    with tempfile.TemporaryDirectory(prefix="fastparse-wheel-build-") as temp:
-        venv_dir = Path(temp) / "venv"
-        venv.EnvBuilder(with_pip=True).create(venv_dir)
-        python = venv_python(venv_dir)
-        subprocess.run(
-            [str(python), "-m", "pip", "install", "--upgrade", "setuptools>=61", "wheel", "cmake>=3.20"],
-            check=True,
-        )
-        env["PATH"] = str(venv_bin(venv_dir)) + os.pathsep + env.get("PATH", "")
-        subprocess.run(
-            [
-                str(python),
-                "setup.py",
-                "bdist_wheel",
-                "--dist-dir",
-                str(output_dir),
-                "--plat-name",
-                args.platform_tag,
-            ],
-            cwd=PYTHON_PACKAGE,
-            env=env,
-            check=True,
-        )
+    try:
+        version_file.write_text(f'__version__ = "{package_version}"\n', encoding="utf-8")
+        with tempfile.TemporaryDirectory(prefix="fastparse-wheel-build-") as temp:
+            venv_dir = Path(temp) / "venv"
+            venv.EnvBuilder(with_pip=True).create(venv_dir)
+            python = venv_python(venv_dir)
+            subprocess.run(
+                [str(python), "-m", "pip", "install", "--upgrade", "setuptools>=61", "wheel", "cmake>=3.20"],
+                check=True,
+            )
+            env["PATH"] = str(venv_bin(venv_dir)) + os.pathsep + env.get("PATH", "")
+            subprocess.run(
+                [
+                    str(python),
+                    "setup.py",
+                    "bdist_wheel",
+                    "--dist-dir",
+                    str(output_dir),
+                    "--plat-name",
+                    args.platform_tag,
+                ],
+                cwd=PYTHON_PACKAGE,
+                env=env,
+                check=True,
+            )
+    finally:
+        if original_version_file is None:
+            version_file.unlink(missing_ok=True)
+        else:
+            version_file.write_text(original_version_file, encoding="utf-8")
 
     wheels = sorted(output_dir.glob("fastparse-*.whl"), key=lambda path: path.stat().st_mtime)
     if not wheels:

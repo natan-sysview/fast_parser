@@ -46,6 +46,7 @@
     <None Include="../../../docs/encoding.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/platforms.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/versioning.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/package_registry_setup.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../examples/csharp/01_parse_string/Program.cs" Pack="true" PackagePath="examples/csharp/01_parse_string/" />
     <None Include="../../../examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj" Pack="true" PackagePath="examples/csharp/01_parse_string/" />
     <None Include="../../../examples/csharp/02_binary_decode/Program.cs" Pack="true" PackagePath="examples/csharp/02_binary_decode/" />

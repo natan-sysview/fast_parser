@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build fastparse-language-<language> wheel.")
-    parser.add_argument("--language", required=True, choices=["python"])
+    parser.add_argument("--language", required=True, choices=["python", "rust"])
     parser.add_argument("--version", default="0.1.0-preview.1")
     parser.add_argument("--platform-tag", default=default_platform_tag())
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist" / "python-languages")

@@ -40,6 +40,13 @@ FastParser.Language.Python    NuGet language package
 fastparse-language-python     PyPI language wheel
 ```
 
+Rust is also included as a second local extension-standard pilot:
+
+```text
+extensions/rust
+grammars/tree-sitter-rust
+```
+
 ## Quick Start
 
 Build the native library:
@@ -207,6 +214,7 @@ Bindings are reusable code intended for application developers. Runnable demos a
 - [Benchmarks](docs/benchmarks.md)
 - [Release Checklist](docs/release_checklist.md)
 - [GitHub Publish Guide](docs/github_publish.md)
+- [Package Registry Setup](docs/package_registry_setup.md)
 
 ## Repository Layout
 

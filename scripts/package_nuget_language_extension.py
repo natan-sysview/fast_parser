@@ -21,7 +21,7 @@ ARCHIVE_RE = re.compile(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build FastParser.Language.<Name>.nupkg.")
-    parser.add_argument("--language", required=True, choices=["python"])
+    parser.add_argument("--language", required=True, choices=["python", "rust"])
     parser.add_argument("--version", required=True)
     parser.add_argument("--archive", action="append", type=Path, default=[])
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist" / "nuget-languages")
