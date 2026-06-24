@@ -115,6 +115,34 @@ def wait_for_version(version: str, timeout_seconds: int, interval_seconds: int) 
         time.sleep(interval_seconds)
 
 
+def install_from_pypi(python: Path, version: str, timeout_seconds: int, interval_seconds: int) -> None:
+    deadline = time.monotonic() + timeout_seconds
+    command = [
+        str(python),
+        "-m",
+        "pip",
+        "install",
+        "--no-cache-dir",
+        "--index-url",
+        "https://pypi.org/simple",
+        f"{PACKAGE_NAME}=={version}",
+    ]
+    while True:
+        completed = subprocess.run(
+            command,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        if completed.returncode == 0:
+            return
+        if time.monotonic() >= deadline:
+            raise RuntimeError(f"could not install {PACKAGE_NAME} {version} from PyPI:\n{completed.stdout}")
+        print(f"Waiting for pip to install {PACKAGE_NAME} {version} from PyPI...", flush=True)
+        print(completed.stdout, flush=True)
+        time.sleep(interval_seconds)
+
+
 def main() -> int:
     args = parse_args()
     version = pypi_version(args.version)
@@ -125,7 +153,7 @@ def main() -> int:
         venv.EnvBuilder(with_pip=True).create(venv_dir)
         python = venv_python(venv_dir)
         subprocess.run([str(python), "-m", "pip", "install", "--upgrade", "pip"], check=True)
-        subprocess.run([str(python), "-m", "pip", "install", f"{PACKAGE_NAME}=={version}"], check=True)
+        install_from_pypi(python, version, args.timeout_seconds, args.interval_seconds)
         completed = subprocess.run(
             [str(python), "-c", PROGRAM],
             text=True,

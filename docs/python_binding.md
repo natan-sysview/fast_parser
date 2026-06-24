@@ -69,10 +69,10 @@ pip install fastparse
 Install from a GitHub Release wheel:
 
 ```bash
-pip install fastparse-0.1.0rc15-py3-none-macosx_11_0_arm64.whl
+pip install fastparse-0.1.0rc16-py3-none-macosx_11_0_arm64.whl
 ```
 
-Python package versions use PEP 440. A FastParse release named `0.1.0-preview.15` is published to PyPI as `0.1.0rc15`.
+Python package versions use PEP 440. A FastParse release named `0.1.0-preview.16` is published to PyPI as `0.1.0rc16`.
 
 The wheel bundles the native library under `fastparse/native/` and includes `py.typed` markers for type-aware tooling. Normal consumers do not need to set `FASTPARSE_LIBRARY_PATH`.
 
