@@ -40,7 +40,7 @@ def default_platform_tag() -> str:
 
 
 def python_package_version() -> str:
-    version = os.environ.get("FASTPARSE_PY_VERSION", "0.1.0-preview.13")
+    version = os.environ.get("FASTPARSE_PY_VERSION", "0.1.0-preview.14")
     if "-preview." in version:
         base, preview = version.split("-preview.", 1)
         return f"{base}rc{preview}"
@@ -96,7 +96,7 @@ class bdist_wheel(_bdist_wheel):
 
 setup(
     version=python_package_version(),
-    package_data={"fastparse": ["native/*"]},
+    package_data={"fastparse": ["native/*", "py.typed"], "tsmp": ["py.typed"]},
     include_package_data=True,
     cmdclass={"build_py": build_py, "bdist_wheel": bdist_wheel},
 )

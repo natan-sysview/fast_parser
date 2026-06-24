@@ -65,8 +65,10 @@ def validate_contents(wheel: Path) -> None:
         names = set(zf.namelist())
     required = {
         "fastparse/__init__.py",
+        "fastparse/py.typed",
         "tsmp/__init__.py",
         "tsmp/native.py",
+        "tsmp/py.typed",
     }
     missing = sorted(required_name for required_name in required if not any(name.endswith(required_name) for name in names))
     if missing:

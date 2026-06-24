@@ -243,21 +243,21 @@ Build it locally from an existing GitHub release:
 
 ```bash
 python3 scripts/package_nuget.py \
-  --version 0.1.0-preview.13 \
-  --release-tag v0.1.0-preview.13
+  --version 0.1.0-preview.14 \
+  --release-tag v0.1.0-preview.14
 ```
 
 Validate it from a clean consumer project:
 
 ```bash
-python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.13.nupkg
+python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.14.nupkg
 ```
 
 Install from the local package directory:
 
 ```bash
 dotnet add package FastParser \
-  --version 0.1.0-preview.13 \
+  --version 0.1.0-preview.14 \
   --source dist/nuget
 ```
 
@@ -286,13 +286,15 @@ Python package versions must use PEP 440. Preview release names are converted be
 
 | FastParse release | PyPI version |
 |---|---|
-| `0.1.0-preview.13` | `0.1.0rc13` |
+| `0.1.0-preview.14` | `0.1.0rc14` |
 
 Each wheel includes:
 
 ```text
 fastparse/
+fastparse/py.typed
 tsmp/
+tsmp/py.typed
 fastparse/native/<platform native library>
 ```
 
@@ -310,14 +312,14 @@ Build a local wheel:
 
 ```bash
 python3 scripts/package_python_wheel.py \
-  --version 0.1.0-preview.13
+  --version 0.1.0-preview.14
 ```
 
 Validate a wheel in a clean virtual environment:
 
 ```bash
 python3 scripts/validate_python_wheel.py \
-  dist/python/fastparse-0.1.0rc13-py3-none-macosx_11_0_arm64.whl
+  dist/python/fastparse-0.1.0rc14-py3-none-macosx_11_0_arm64.whl
 ```
 
 Tagged releases build wheels in GitHub Actions and upload them as artifacts. Publishing to PyPI is gated by the repository variable:
@@ -335,6 +337,8 @@ workflow: release.yml
 project: fastparse
 ```
 
+Tagged PyPI releases also run a post-publish smoke test from pypi.org on Linux x64, Windows x64, macOS arm64, and macOS x64. The smoke test installs the exact published package in a clean virtual environment, loads the bundled native library, parses Java as JSON, checks binary output, and checks diagnostics output.
+
 The workflow lives at:
 
 ```text
@@ -344,14 +348,14 @@ The workflow lives at:
 It can run manually with a version:
 
 ```text
-workflow_dispatch -> version = 0.1.0-preview.13
+workflow_dispatch -> version = 0.1.0-preview.14
 ```
 
 Or automatically on tags:
 
 ```bash
-git tag v0.1.0-preview.13
-git push origin v0.1.0-preview.13
+git tag v0.1.0-preview.14
+git push origin v0.1.0-preview.14
 ```
 
 For tags, the workflow attaches generated archives to the GitHub Release.
@@ -361,7 +365,7 @@ For tags, the workflow attaches generated archives to the GitHub Release.
 Create a local package for the current platform:
 
 ```bash
-python3 scripts/package_release.py --version 0.1.0-preview.13
+python3 scripts/package_release.py --version 0.1.0-preview.14
 ```
 
 After building, the package appears under:

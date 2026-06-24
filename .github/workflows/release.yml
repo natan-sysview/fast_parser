@@ -306,6 +306,42 @@ jobs:
         with:
           packages-dir: python-dist
 
+  published-pypi-smoke:
+    name: Published PyPI Smoke ${{ matrix.platform }}
+    needs: publish-pypi
+    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_PUBLISH == 'true'
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux-x64
+          - runner: macos-14
+            platform: macos-arm64
+          - runner: macos-15-intel
+            platform: macos-x64
+          - runner: windows-latest
+            platform: windows-x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate published PyPI package
+        run: python scripts/validate_published_pypi.py --version "${{ steps.version.outputs.value }}"
+
   published-nuget-smoke:
     name: Published NuGet Smoke ${{ matrix.platform }}-${{ matrix.arch }}
     needs: nuget-package
