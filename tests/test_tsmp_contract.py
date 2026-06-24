@@ -51,6 +51,16 @@ def cobol_language_extension_path() -> Path:
     return ROOT / "bin" / name
 
 
+def python_language_extension_path() -> Path:
+    if sys.platform == "darwin":
+        name = "libfastparse_language_python.dylib"
+    elif sys.platform == "win32":
+        name = "fastparse_language_python.dll"
+    else:
+        name = "libfastparse_language_python.so"
+    return ROOT / "bin" / name
+
+
 def load_cobol_extension(parser: Tsmp, extension_path: Path) -> None:
     if not parser.language_available("cobol"):
         parser.load_language_extension(extension_path)
@@ -526,6 +536,61 @@ class TsmpContractTests(unittest.TestCase):
         )
 
         self.assertGreater(result.node_count, 0)
+
+    def test_python_language_extension_parses_json_binary_and_diagnostics(self) -> None:
+        extension_path = python_language_extension_path()
+        if not extension_path.exists():
+            self.skipTest(f"Python extension is not built: {extension_path}")
+
+        parser = Tsmp(default_library_path())
+        if not parser.language_available("python"):
+            load_result = parser.load_language_extension(extension_path)
+            self.assertEqual(load_result.language, "python")
+            self.assertEqual(load_result.display_name, "Python")
+        self.assertTrue(parser.language_available("python"))
+
+        source = (
+            b"import os\n\n"
+            b"class Demo:\n"
+            b"    def run(self, value: int) -> int:\n"
+            b"        return value + 1\n"
+        )
+        json_result = parser.parse_bytes(
+            source,
+            ParseOptions(
+                language="python",
+                output_format=OutputFormat.JSON,
+                include_rules=["import_statement", "class_definition", "function_definition"],
+                fields=Field.RULE | Field.TEXT | Field.RANGE | Field.BYTE_RANGE | Field.DIAGNOSTICS,
+            ),
+        )
+        json_document = json_result.json()
+        self.assertFalse(json_document["hasErrors"])
+        self.assertEqual(
+            [node["rule"] for node in json_document["nodes"]],
+            ["import_statement", "class_definition", "function_definition"],
+        )
+        self.assertIn("startLine", json_document["nodes"][0])
+        self.assertIn("startByte", json_document["nodes"][0])
+
+        binary_result = parser.parse_bytes(
+            source,
+            ParseOptions(
+                language="python",
+                output_format=OutputFormat.BINARY,
+                include_rules=["class_definition", "function_definition"],
+                fields=Field.RULE | Field.TEXT | Field.BYTE_RANGE,
+            ),
+        )
+        binary_document = binary_result.binary_document()
+        self.assertEqual([node.rule for node in binary_document.nodes], ["class_definition", "function_definition"])
+
+        diagnostics = parser.parse_bytes(
+            b"def broken(:\n    pass\n",
+            ParseOptions(language="python", output_format=OutputFormat.DIAGNOSTICS),
+        ).json()
+        self.assertTrue(diagnostics["hasErrors"])
+        self.assertGreater(diagnostics["missingNodeCount"], 0)
 
     def test_empty_source_is_valid(self) -> None:
         output, node_count = self.tsmp.parse_result(b"", language="java", output_format="json")

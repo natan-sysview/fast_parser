@@ -371,6 +371,34 @@ result = parser.parse_bytes(source, language="cobol", fields=["rule", "diagnosti
 
 This is not packaged as `FastParser.Language.Cobol` yet. The first goal is to evaluate grammar quality against real COBOL corpora using diagnostics.
 
+## Experimental Python Extension
+
+Status: `Preview`
+
+The repository can build a Python language extension when pointed at a `tree-sitter-python` checkout:
+
+```bash
+cmake -S . -B build-python-extension -DCMAKE_BUILD_TYPE=Release \
+  -DFASTPARSE_PYTHON_GRAMMAR_DIR=/path/to/tree-sitter-python
+cmake --build build-python-extension --config Release --target fastparse_language_python
+```
+
+Expected output on macOS:
+
+```text
+bin/libfastparse_language_python.dylib
+```
+
+Use it from Python:
+
+```python
+parser = FastParse()
+parser.load_language_extension("bin/libfastparse_language_python.dylib")
+result = parser.parse_bytes(source, language="python", output_format="json")
+```
+
+This proves the grammar-extension path with a cleaner grammar before packaging future language extensions.
+
 ## NuGet Discovery
 
 Status: `Preview`

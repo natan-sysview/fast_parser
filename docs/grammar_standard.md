@@ -153,6 +153,56 @@ src/scanner.cc
 
 C++ scanners are allowed, but the extension build must explicitly support C++ linking on Linux, macOS, and Windows.
 
+## Grammar Workspaces
+
+Status: `Preview`
+
+FastParse uses two grammar workspaces:
+
+```text
+experimental-grammars/
+grammars/
+```
+
+`experimental-grammars/` is the repair and research area.
+
+Use it for:
+
+- New grammar forks.
+- Grammar repairs.
+- Dialect experiments.
+- Diagnostics baselines.
+- Corpus runs.
+- Comparing multiple grammars for the same language.
+
+Rules:
+
+- Nothing under `experimental-grammars/` is part of a public package contract.
+- Experimental grammars are not automatically compiled into the core.
+- Experimental grammars are not shipped in official release assets unless explicitly packaged as experimental assets.
+- Parser hangs, high error rates, or unstable rule names are acceptable while the grammar is under repair.
+
+`grammars/` is the promoted grammar workspace.
+
+Use it for:
+
+- Grammars with clear license metadata.
+- Grammars that build reproducibly.
+- Grammars that can produce a dynamic FastParse extension.
+- Grammars ready for preview packaging or core inclusion.
+
+Promotion flow:
+
+```text
+experimental-grammars/tree-sitter-<language>
+        -> diagnostics and repair
+        -> grammars/tree-sitter-<language>
+        -> extensions/<language>
+        -> package-manager extension
+```
+
+Before moving a grammar from `experimental-grammars/` to `grammars/`, capture the diagnostics baseline that justified the promotion.
+
 ## Native Extension ABI
 
 Status: `Preview`
