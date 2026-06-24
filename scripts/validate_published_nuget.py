@@ -52,6 +52,21 @@ if (document.Nodes.Count != 1 || document.Nodes[0].Rule != "method_declaration")
     throw new InvalidOperationException("published NuGet binary smoke failed");
 }
 
+var diagnostics = parser.ParseText(
+    "class Demo { void broken( { }",
+    new ParseOptions
+    {
+        Format = FastParseFormat.Diagnostics
+    });
+
+using var diagnosticsDocument = diagnostics.JsonDocument();
+if (diagnosticsDocument.RootElement.TryGetProperty("nodes", out _) ||
+    !diagnosticsDocument.RootElement.GetProperty("hasErrors").GetBoolean() ||
+    diagnosticsDocument.RootElement.GetProperty("errorNodeCount").GetUInt64() == 0)
+{
+    throw new InvalidOperationException("published NuGet diagnostics smoke failed");
+}
+
 Console.WriteLine("FastParser published NuGet smoke OK");
 Console.WriteLine(parser.Version);
 Console.WriteLine(parser.LibraryPath);

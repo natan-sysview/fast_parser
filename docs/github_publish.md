@@ -85,8 +85,8 @@ git push origin main
 After GitHub CI passes:
 
 ```bash
-git tag v0.1.0-preview.4
-git push origin v0.1.0-preview.4
+git tag v0.1.0-preview.10
+git push origin v0.1.0-preview.10
 ```
 
 The release workflow builds downloadable native packages on GitHub-hosted runners:
@@ -104,5 +104,5 @@ You can also run the release workflow manually from GitHub Actions with:
 
 ```text
 workflow_dispatch
-version = 0.1.0-preview.4
+version = 0.1.0-preview.10
 ```
