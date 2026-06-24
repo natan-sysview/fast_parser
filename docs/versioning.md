@@ -5,7 +5,7 @@ FastParser follows semantic versioning for the public .NET package once stable r
 Preview releases use suffixes such as:
 
 ```text
-0.1.0-preview.14
+0.1.0-preview.15
 ```
 
 ## Compatibility Surfaces

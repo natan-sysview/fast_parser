@@ -22,7 +22,7 @@ PYPI_JSON_URL = "https://pypi.org/pypi/fastparse/json"
 PROGRAM = r'''
 import fastparse
 from importlib.metadata import version
-from fastparse import FastParse
+from fastparse import FastParse, Field, OutputFormat, ParseOptions
 from tsmp import default_library_path
 
 assert fastparse.__version__ == version("fastparse"), (fastparse.__version__, version("fastparse"))
@@ -41,13 +41,16 @@ assert doc["nodes"][0]["rule"] == "method_declaration", doc
 
 binary_result = parser.parse_bytes(
     b"class Demo { void run() { System.out.println(\"pypi\"); } }",
-    language="java",
-    output_format="binary",
-    include_rules=["method_declaration"],
-    fields=["rule", "text"],
+    ParseOptions(
+        output_format=OutputFormat.BINARY,
+        include_rules=["method_declaration"],
+        fields=Field.RULE | Field.TEXT,
+    ),
 )
 assert binary_result.node_count == 1, binary_result.node_count
 assert binary_result.data and b"tsmp-binary" in binary_result.data, binary_result.data[:32]
+binary_doc = binary_result.binary_document()
+assert binary_doc.nodes[0].rule == "method_declaration", binary_doc
 
 diagnostics = parser.parse_bytes(
     b"class Demo { void broken( { }",

@@ -1,5 +1,6 @@
 from .native import (
     FIELD_NAMES,
+    Field,
     TSMP_FIELD_ALL,
     TSMP_FIELD_BYTE_RANGE,
     TSMP_FIELD_CHILDREN,
@@ -19,6 +20,9 @@ from .native import (
     TSMP_NORMALIZATION_COBOL_FIXED_LEGACY,
     TSMP_NORMALIZATION_NONE,
     NativeParseError,
+    Normalization,
+    OutputFormat,
+    ParseOptions,
     LanguageLoadResult,
     ParseResult,
     ParseSummary,
@@ -29,11 +33,27 @@ from .native import (
     default_library_path,
     parse_field_mask,
 )
+from .binary import (
+    BinaryChild,
+    BinaryDocument,
+    BinaryNode,
+    MessagePackDecodeError,
+    decode_binary,
+    unpack_messagepack,
+)
 
 __all__ = [
+    "BinaryChild",
+    "BinaryDocument",
+    "BinaryNode",
     "FIELD_NAMES",
+    "Field",
+    "MessagePackDecodeError",
     "NativeParseError",
+    "Normalization",
+    "OutputFormat",
     "LanguageLoadResult",
+    "ParseOptions",
     "ParseResult",
     "ParseSummary",
     "FastParse",
@@ -58,6 +78,8 @@ __all__ = [
     "Tsmp",
     "TsmpError",
     "TsmpLibrary",
+    "decode_binary",
     "default_library_path",
     "parse_field_mask",
+    "unpack_messagepack",
 ]

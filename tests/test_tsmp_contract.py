@@ -15,7 +15,17 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "bindings" / "python"))
 
 from fastparse import FastParse  # noqa: E402
-from tsmp import NativeParseError, Tsmp, default_library_path, parse_field_mask  # noqa: E402
+from tsmp import (  # noqa: E402
+    Field,
+    NativeParseError,
+    Normalization,
+    OutputFormat,
+    ParseOptions,
+    Tsmp,
+    decode_binary,
+    default_library_path,
+    parse_field_mask,
+)
 
 
 SOURCE_PATH = ROOT / "file_test" / "java" / "HelloWorld.java"
@@ -203,6 +213,58 @@ class TsmpContractTests(unittest.TestCase):
         self.assertEqual(result.node_count, 1)
         self.assertEqual(document["nodes"][0]["rule"], "method_declaration")
 
+    def test_python_binding_accepts_parse_options_and_enums(self) -> None:
+        options = ParseOptions(
+            output_format=OutputFormat.JSON,
+            include_rules=["method_declaration"],
+            fields=Field.RULE | Field.TEXT | Field.BYTE_RANGE,
+            normalization=Normalization.AUTO_SAFE,
+        )
+        result = self.tsmp.parse_text("class Demo { void run() {} }", options)
+        document = result.json()
+
+        self.assertEqual(result.output_format, "json")
+        self.assertEqual(result.node_count, 1)
+        self.assertEqual(document["nodes"][0]["rule"], "method_declaration")
+        self.assertIn("startByte", document["nodes"][0])
+
+    def test_python_binding_options_can_be_overridden_per_call(self) -> None:
+        options = ParseOptions(
+            output_format=OutputFormat.STATS,
+            include_rules=["method_declaration"],
+            fields=Field.RULE,
+        )
+        result = self.tsmp.parse_text(
+            "class Demo { void run() {} }",
+            options,
+            output_format=OutputFormat.JSON,
+            fields=Field.RULE | Field.TEXT,
+        )
+        document = result.json()
+
+        self.assertEqual(result.output_format, "json")
+        self.assertEqual(document["nodes"][0]["rule"], "method_declaration")
+        self.assertIn("text", document["nodes"][0])
+
+    def test_python_binding_parse_text_summary(self) -> None:
+        summary = self.tsmp.parse_text_summary(
+            "class Demo { void run() {} }",
+            ParseOptions(
+                output_format=OutputFormat.JSON,
+                include_rules=["method_declaration"],
+                fields=Field.RULE | Field.TEXT,
+            ),
+        )
+        full = self.tsmp.parse_text(
+            "class Demo { void run() {} }",
+            output_format="json",
+            include_rules=["method_declaration"],
+            fields=["rule", "text"],
+        )
+
+        self.assertEqual(summary.node_count, full.node_count)
+        self.assertEqual(summary.output_length, len(full.data))
+
     def test_python_binding_summary_does_not_copy_output(self) -> None:
         summary = self.tsmp.parse_bytes_summary(
             self.source,
@@ -285,6 +347,26 @@ class TsmpContractTests(unittest.TestCase):
         self.assertIsInstance(document["nodes"][0]["text"], bytes)
         self.assertIn(b"caf\xe9", document["nodes"][0]["text"])
         self.assertIn("startByte", document["nodes"][0])
+
+    def test_binary_document_decodes_to_structured_python_objects(self) -> None:
+        result = self.tsmp.parse_bytes(
+            b"class Demo { // caf\xe9\n  void m() {}\n}\n",
+            ParseOptions(
+                output_format=OutputFormat.BINARY,
+                include_rules=["class_declaration", "method_declaration"],
+                fields=Field.ID | Field.PARENT_ID | Field.RULE | Field.TEXT | Field.BYTE_RANGE,
+            ),
+        )
+        document = result.binary_document()
+        also_document = decode_binary(result.data)
+
+        self.assertEqual(document.format, "tsmp-binary")
+        self.assertEqual(document.schema_version, 1)
+        self.assertEqual(document.language, "java")
+        self.assertEqual(document.node_count, result.node_count)
+        self.assertEqual([node.rule for node in document.nodes], ["class_declaration", "method_declaration"])
+        self.assertIn(b"caf\xe9", document.nodes[0].text or b"")
+        self.assertEqual(also_document.nodes[1].rule, "method_declaration")
 
     def test_binary_summary_reports_length_without_copy(self) -> None:
         full = self.tsmp.parse_bytes(

@@ -33,6 +33,25 @@ print(result.node_count)
 print(result.text)
 ```
 
+## Typed Options
+
+Python supports both simple strings/lists and typed options.
+
+```python
+from fastparse import FastParse, Field, OutputFormat, ParseOptions
+
+parser = FastParse()
+options = ParseOptions(
+    language="java",
+    output_format=OutputFormat.JSON,
+    include_rules=["method_declaration"],
+    fields=Field.RULE | Field.TEXT | Field.BYTE_RANGE,
+)
+
+result = parser.parse_text("class Demo { void run() {} }", options)
+print(result.json())
+```
+
 ## PyPI / Wheel Use
 
 The public Python package name is:
@@ -50,10 +69,10 @@ pip install fastparse
 Install from a GitHub Release wheel:
 
 ```bash
-pip install fastparse-0.1.0rc14-py3-none-macosx_11_0_arm64.whl
+pip install fastparse-0.1.0rc15-py3-none-macosx_11_0_arm64.whl
 ```
 
-Python package versions use PEP 440. A FastParse release named `0.1.0-preview.14` is published to PyPI as `0.1.0rc14`.
+Python package versions use PEP 440. A FastParse release named `0.1.0-preview.15` is published to PyPI as `0.1.0rc15`.
 
 The wheel bundles the native library under `fastparse/native/` and includes `py.typed` markers for type-aware tooling. Normal consumers do not need to set `FASTPARSE_LIBRARY_PATH`.
 
@@ -73,7 +92,27 @@ payload = result.data
 
 `payload` is MessagePack bytes.
 
-If using the optional `msgpack` package:
+Python includes a small schema-specific decoder:
+
+```python
+from fastparse import FastParse, Field, OutputFormat, ParseOptions
+
+parser = FastParse()
+result = parser.parse_bytes(
+    source,
+    ParseOptions(
+        output_format=OutputFormat.BINARY,
+        include_rules=["class_declaration", "method_declaration"],
+        fields=Field.ID | Field.PARENT_ID | Field.RULE | Field.TEXT | Field.BYTE_RANGE,
+    ),
+)
+
+document = result.binary_document()
+print(document.schema_version)
+print(document.nodes[0].rule)
+```
+
+Applications may also decode with the optional `msgpack` package:
 
 ```python
 import msgpack
@@ -118,17 +157,26 @@ TSMP_LIBRARY_PATH=/path/to/libfastparse.dylib python3 your_app.py
 
 ```text
 FastParse(...)
+ParseOptions(...)
 parse_bytes(...)
 parse_text(...)
 parse_bytes_summary(...)
+parse_text_summary(...)
 load_language_extension(...)
 language_available(...)
 version
+OutputFormat
+Field
+Normalization
 ParseResult.data
 ParseResult.text
 ParseResult.json()
+ParseResult.binary_document()
 ParseSummary.output_length
 ParseSummary.node_count
+BinaryDocument
+BinaryNode
+BinaryChild
 ```
 
 ## Language Extensions

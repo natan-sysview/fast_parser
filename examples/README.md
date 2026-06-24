@@ -11,6 +11,7 @@ examples/
   python/
     01_parse_string/
     02_bulk_probe/
+    03_binary_decode/
 
   csharp/
     01_parse_string/
@@ -29,6 +30,12 @@ Run a bulk probe over a directory:
 
 ```bash
 python3 examples/python/02_bulk_probe/bulk_probe.py /path/to/java/root --workers 8
+```
+
+Decode binary MessagePack into Python dataclasses:
+
+```bash
+python3 examples/python/03_binary_decode/binary_decode.py
 ```
 
 ## C#

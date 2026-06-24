@@ -16,7 +16,7 @@ from pathlib import Path
 PROGRAM = r'''
 import fastparse
 from importlib.metadata import version
-from fastparse import FastParse
+from fastparse import FastParse, Field, OutputFormat, ParseOptions
 from tsmp import default_library_path
 
 assert fastparse.__version__ == version("fastparse"), (fastparse.__version__, version("fastparse"))
@@ -41,6 +41,18 @@ diagnostics = parser.parse_bytes(
 quality = diagnostics.json()
 assert quality["hasErrors"] is True, quality
 assert "nodes" not in quality, quality
+
+binary = parser.parse_bytes(
+    b"class Demo { void run() { System.out.println(\"wheel\"); } }",
+    ParseOptions(
+        output_format=OutputFormat.BINARY,
+        include_rules=["method_declaration"],
+        fields=Field.RULE | Field.TEXT,
+    ),
+)
+binary_doc = binary.binary_document()
+assert binary_doc.format == "tsmp-binary", binary_doc
+assert binary_doc.nodes[0].rule == "method_declaration", binary_doc
 
 print("FastParse Python wheel smoke OK")
 print(parser.version)

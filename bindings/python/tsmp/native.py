@@ -5,8 +5,11 @@ import json
 import os
 import sys
 from dataclasses import dataclass
+from enum import IntEnum, IntFlag
 from pathlib import Path
 from typing import Any, Iterable
+
+from .binary import BinaryDocument, decode_binary
 
 
 TSMP_FORMAT_JSON = 1
@@ -65,6 +68,33 @@ NORMALIZATION_NAMES = {
 }
 
 
+class OutputFormat(IntEnum):
+    JSON = TSMP_FORMAT_JSON
+    CSV = TSMP_FORMAT_CSV
+    STATS = TSMP_FORMAT_STATS
+    BINARY = TSMP_FORMAT_BINARY
+    DIAGNOSTICS = TSMP_FORMAT_DIAGNOSTICS
+
+
+class Field(IntFlag):
+    ID = TSMP_FIELD_ID
+    PARENT_ID = TSMP_FIELD_PARENT_ID
+    RULE = TSMP_FIELD_RULE
+    TEXT = TSMP_FIELD_TEXT
+    RANGE = TSMP_FIELD_RANGE
+    BYTE_RANGE = TSMP_FIELD_BYTE_RANGE
+    CHILD_COUNT = TSMP_FIELD_CHILD_COUNT
+    CHILDREN = TSMP_FIELD_CHILDREN
+    DIAGNOSTICS = TSMP_FIELD_DIAGNOSTICS
+    ALL = TSMP_FIELD_ALL
+
+
+class Normalization(IntEnum):
+    AUTO_SAFE = TSMP_NORMALIZATION_AUTO_SAFE
+    NONE = TSMP_NORMALIZATION_NONE
+    COBOL_FIXED_LEGACY = TSMP_NORMALIZATION_COBOL_FIXED_LEGACY
+
+
 class TsmpError(RuntimeError):
     pass
 
@@ -86,6 +116,9 @@ class ParseResult:
     def json(self) -> Any:
         return json.loads(self.data)
 
+    def binary_document(self) -> BinaryDocument:
+        return decode_binary(self.data)
+
 
 @dataclass(frozen=True)
 class ParseSummary:
@@ -98,6 +131,17 @@ class ParseSummary:
 class LanguageLoadResult:
     language: str
     display_name: str
+
+
+@dataclass(frozen=True)
+class ParseOptions:
+    language: str = "java"
+    output_format: str | int | OutputFormat = OutputFormat.JSON
+    include_rules: str | Iterable[str] | None = None
+    fields: int | str | Iterable[str] | Field | None = None
+    include_tokens: bool = False
+    pretty: bool = False
+    normalization: str | int | Normalization | None = None
 
 
 class _TsmpOptions(ctypes.Structure):
@@ -178,7 +222,8 @@ def parse_field_mask(fields: int | str | Iterable[str] | None) -> int:
     if fields is None or fields == "":
         return 0
     if isinstance(fields, int):
-        return fields
+        value = int(fields)
+        return 0 if value == TSMP_FIELD_ALL else value
     if isinstance(fields, str):
         raw_names = fields.split(",")
     else:
@@ -186,6 +231,12 @@ def parse_field_mask(fields: int | str | Iterable[str] | None) -> int:
 
     mask = 0
     for name in raw_names:
+        if isinstance(name, int):
+            value = int(name)
+            if value == TSMP_FIELD_ALL:
+                return 0
+            mask |= value
+            continue
         normalized = str(name).strip().lower().replace("-", "_")
         if not normalized:
             continue
@@ -240,6 +291,32 @@ def _rules_value(include_rules: str | Iterable[str] | None) -> bytes | None:
     else:
         value = "|".join(rule for rule in include_rules if rule)
     return value.encode("utf-8") if value else None
+
+
+_UNSET = object()
+
+
+def _merge_options(
+    options: ParseOptions | None,
+    *,
+    language: Any,
+    output_format: Any,
+    include_rules: Any,
+    fields: Any,
+    include_tokens: Any,
+    pretty: Any,
+    normalization: Any,
+) -> ParseOptions:
+    base = options or ParseOptions()
+    return ParseOptions(
+        language=base.language if language is _UNSET else language,
+        output_format=base.output_format if output_format is _UNSET else output_format,
+        include_rules=base.include_rules if include_rules is _UNSET else include_rules,
+        fields=base.fields if fields is _UNSET else fields,
+        include_tokens=base.include_tokens if include_tokens is _UNSET else bool(include_tokens),
+        pretty=base.pretty if pretty is _UNSET else bool(pretty),
+        normalization=base.normalization if normalization is _UNSET else normalization,
+    )
 
 
 def _native_string(pointer: Any) -> str:
@@ -330,17 +407,18 @@ class Tsmp:
     def parse_bytes(
         self,
         source: bytes | bytearray | memoryview,
+        options: ParseOptions | None = None,
         *,
-        language: str = "java",
-        output_format: str | int = "json",
-        include_rules: str | Iterable[str] | None = None,
-        fields: int | str | Iterable[str] | None = None,
-        include_tokens: bool = False,
-        pretty: bool = False,
-        normalization: str | int | None = None,
+        language: str | object = _UNSET,
+        output_format: str | int | OutputFormat | object = _UNSET,
+        include_rules: str | Iterable[str] | object | None = _UNSET,
+        fields: int | str | Iterable[str] | Field | object | None = _UNSET,
+        include_tokens: bool | object = _UNSET,
+        pretty: bool | object = _UNSET,
+        normalization: str | int | Normalization | object | None = _UNSET,
     ) -> ParseResult:
-        data, node_count, format_name, _output_length = self._parse_native(
-            source,
+        merged = _merge_options(
+            options,
             language=language,
             output_format=output_format,
             include_rules=include_rules,
@@ -348,6 +426,16 @@ class Tsmp:
             include_tokens=include_tokens,
             pretty=pretty,
             normalization=normalization,
+        )
+        data, node_count, format_name, _output_length = self._parse_native(
+            source,
+            language=merged.language,
+            output_format=merged.output_format,
+            include_rules=merged.include_rules,
+            fields=merged.fields,
+            include_tokens=merged.include_tokens,
+            pretty=merged.pretty,
+            normalization=merged.normalization,
             copy_data=True,
         )
         return ParseResult(data, node_count, format_name)
@@ -355,17 +443,18 @@ class Tsmp:
     def parse_bytes_summary(
         self,
         source: bytes | bytearray | memoryview,
+        options: ParseOptions | None = None,
         *,
-        language: str = "java",
-        output_format: str | int = "json",
-        include_rules: str | Iterable[str] | None = None,
-        fields: int | str | Iterable[str] | None = None,
-        include_tokens: bool = False,
-        pretty: bool = False,
-        normalization: str | int | None = None,
+        language: str | object = _UNSET,
+        output_format: str | int | OutputFormat | object = _UNSET,
+        include_rules: str | Iterable[str] | object | None = _UNSET,
+        fields: int | str | Iterable[str] | Field | object | None = _UNSET,
+        include_tokens: bool | object = _UNSET,
+        pretty: bool | object = _UNSET,
+        normalization: str | int | Normalization | object | None = _UNSET,
     ) -> ParseSummary:
-        _data, node_count, format_name, output_length = self._parse_native(
-            source,
+        merged = _merge_options(
+            options,
             language=language,
             output_format=output_format,
             include_rules=include_rules,
@@ -373,6 +462,16 @@ class Tsmp:
             include_tokens=include_tokens,
             pretty=pretty,
             normalization=normalization,
+        )
+        _data, node_count, format_name, output_length = self._parse_native(
+            source,
+            language=merged.language,
+            output_format=merged.output_format,
+            include_rules=merged.include_rules,
+            fields=merged.fields,
+            include_tokens=merged.include_tokens,
+            pretty=merged.pretty,
+            normalization=merged.normalization,
             copy_data=False,
         )
         return ParseSummary(output_length, node_count, format_name)
@@ -446,12 +545,24 @@ class Tsmp:
     def parse_text(
         self,
         source: str,
+        options: ParseOptions | None = None,
         *,
         encoding: str = "utf-8",
         errors: str = "strict",
         **kwargs: Any,
     ) -> ParseResult:
-        return self.parse_bytes(source.encode(encoding, errors=errors), **kwargs)
+        return self.parse_bytes(source.encode(encoding, errors=errors), options, **kwargs)
+
+    def parse_text_summary(
+        self,
+        source: str,
+        options: ParseOptions | None = None,
+        *,
+        encoding: str = "utf-8",
+        errors: str = "strict",
+        **kwargs: Any,
+    ) -> ParseSummary:
+        return self.parse_bytes_summary(source.encode(encoding, errors=errors), options, **kwargs)
 
     def parse_result(self, source: bytes | bytearray | memoryview, **kwargs: Any) -> tuple[bytes, int]:
         result = self.parse_bytes(source, **kwargs)
