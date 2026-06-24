@@ -4,6 +4,8 @@ TSMP is designed to support multiple Tree-sitter grammars while keeping the C AB
 
 For the package-manager-first extension model, read [Language Extensions](language_extensions.md).
 
+For the official grammar lifecycle, naming, ABI, manifest, diagnostics, normalization, and validation requirements, read [FastParse Grammar Standard](grammar_standard.md).
+
 The public API does not change when a language is added. Callers select the language through:
 
 ```c

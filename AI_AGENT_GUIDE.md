@@ -197,7 +197,7 @@ After installing an extension, bindings should load it through a bundled-languag
 load_bundled_language("cobol")
 ```
 
-Read `docs/language_extensions.md` before generating code for optional parse languages.
+Read `docs/language_extensions.md` and `docs/grammar_standard.md` before generating code for optional parse languages.
 
 ## Avoid
 
@@ -210,6 +210,7 @@ Read `docs/language_extensions.md` before generating code for optional parse lan
 
 ```text
 docs/contracts.md
+docs/grammar_standard.md
 docs/language_extensions.md
 docs/output_formats.md
 docs/binary_schema.md

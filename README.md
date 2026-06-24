@@ -113,6 +113,8 @@ After loading, use the registered language name in normal parse options:
 
 Extension loading is a setup step. Load extensions before starting concurrent parse workers.
 
+Official grammar extensions must follow [FastParse Grammar Standard](docs/grammar_standard.md).
+
 ## Source Normalization
 
 New bindings use `auto_safe` normalization by default. Modern languages are left unchanged. For COBOL, FastParse removes known legacy trailer bytes in RAM before parsing, such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record.

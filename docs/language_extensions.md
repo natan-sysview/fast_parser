@@ -4,6 +4,8 @@ FastParse supports a small core library plus optional language extensions.
 
 This document defines the professional package-manager-first model for adding parseable languages such as COBOL, PL/SQL, Python, Rust, or other Tree-sitter grammars without making the core package heavy.
 
+For the grammar quality, ABI, manifest, normalization, and validation standard that every extension must follow, read [FastParse Grammar Standard](grammar_standard.md).
+
 Terminology:
 
 - Host language: the language used by the application, for example C#, Python, Rust, Java, or C.
@@ -212,7 +214,7 @@ queries/
 
 Status: `Preview`
 
-Every extension should include a manifest.
+Every extension should include a manifest. The normative manifest contract lives in [FastParse Grammar Standard](grammar_standard.md#extension-manifest).
 
 Example:
 
@@ -259,7 +261,7 @@ Rules:
 
 Status: `Preview`
 
-The language extension dynamic library should export stable symbols.
+The language extension dynamic library should export stable symbols. The normative ABI contract lives in [FastParse Grammar Standard](grammar_standard.md#native-extension-abi).
 
 Recommended first ABI:
 
@@ -513,6 +515,8 @@ This avoids returning to a monolithic package with many unused grammars.
 Status: `Stable` for diagnostic field names; `Preview` for extension quality scoring.
 
 Language extensions should be evaluated with FastParse diagnostics enabled.
+
+The full grammar quality standard lives in [FastParse Grammar Standard](grammar_standard.md#diagnostics-and-grammar-quality).
 
 Recommended fields for grammar evaluation:
 

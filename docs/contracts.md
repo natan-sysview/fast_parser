@@ -84,6 +84,8 @@ Status: `Preview`
 
 The core can load optional parse languages from native language extension libraries.
 
+Official grammar extensions must also follow [FastParse Grammar Standard](grammar_standard.md).
+
 Native functions:
 
 ```text
