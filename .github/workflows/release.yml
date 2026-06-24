@@ -260,7 +260,19 @@ jobs:
           --version "${{ steps.version.outputs.value }}"
           --platform-tag "${{ matrix.platform_tag }}"
 
-      - name: Validate Python wheel
+      - name: Validate manylinux wheel
+        if: matrix.linux_container
+        run: >
+          docker run --rm
+          -v "$PWD:/io"
+          -w /io
+          quay.io/pypa/manylinux2014_x86_64
+          /opt/python/cp312-cp312/bin/python
+          scripts/validate_python_wheel.py
+          "$(find dist/python -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
+
+      - name: Validate platform wheel
+        if: ${{ !matrix.linux_container }}
         shell: bash
         run: |
           wheel="$(find dist/python -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
