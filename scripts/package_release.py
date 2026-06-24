@@ -20,7 +20,7 @@ C_API_VERSION = "fastparse-c-api/0.5.0"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Package FastParse release artifacts.")
-    parser.add_argument("--version", default="0.1.0-preview.16")
+    parser.add_argument("--version", default="0.1.0-preview.17")
     parser.add_argument("--platform", default=default_platform())
     parser.add_argument("--arch", default=default_arch())
     parser.add_argument("--build-dir", type=Path, default=ROOT / "build")

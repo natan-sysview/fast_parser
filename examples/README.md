@@ -12,6 +12,8 @@ examples/
     01_parse_string/
     02_bulk_probe/
     03_binary_decode/
+    04_inventory_to_sqlite/
+    05_diagnostics_scan/
 
   csharp/
     01_parse_string/
@@ -36,6 +38,29 @@ Decode binary MessagePack into Python dataclasses:
 
 ```bash
 python3 examples/python/03_binary_decode/binary_decode.py
+```
+
+Read a component inventory DB, parse source files with 12 Python threads, decode
+binary MessagePack into Python dataclasses, and write useful AST tables:
+
+```bash
+python3 examples/python/04_inventory_to_sqlite/inventory_to_sqlite.py \
+  --inventory-db /path/to/inventario.db \
+  --source-root /path/to/componentes \
+  --language java \
+  --extension java \
+  --workers 12 \
+  --out-db exports/fastparse_python_ast.sqlite
+```
+
+Run a fast parse-quality scan with diagnostics-only output:
+
+```bash
+python3 examples/python/05_diagnostics_scan/diagnostics_scan.py /path/to/java/root \
+  --glob "*.java" \
+  --language java \
+  --workers 12 \
+  --out-db exports/fastparse_python_diagnostics.sqlite
 ```
 
 ## C#

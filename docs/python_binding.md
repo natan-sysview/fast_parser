@@ -63,16 +63,16 @@ fastparse
 Install from PyPI after publication:
 
 ```bash
-pip install fastparse
+pip install --pre fastparse
 ```
 
 Install from a GitHub Release wheel:
 
 ```bash
-pip install fastparse-0.1.0rc16-py3-none-macosx_11_0_arm64.whl
+pip install fastparse-0.1.0rc17-py3-none-macosx_11_0_arm64.whl
 ```
 
-Python package versions use PEP 440. A FastParse release named `0.1.0-preview.16` is published to PyPI as `0.1.0rc16`.
+Python package versions use PEP 440. A FastParse release named `0.1.0-preview.17` is published to PyPI as `0.1.0rc17`.
 
 The wheel bundles the native library under `fastparse/native/` and includes `py.typed` markers for type-aware tooling. Normal consumers do not need to set `FASTPARSE_LIBRARY_PATH`.
 
@@ -136,6 +136,55 @@ print(quality["hasErrors"], quality["errorNodeCount"])
 ```
 
 This returns a tiny JSON object and no `nodes` array.
+
+## Enterprise Examples
+
+Python examples live under:
+
+```text
+examples/python
+```
+
+Recommended examples for real applications:
+
+```bash
+python3 examples/python/03_binary_decode/binary_decode.py
+```
+
+Decode FastParse binary output into Python dataclasses.
+
+```bash
+python3 examples/python/04_inventory_to_sqlite/inventory_to_sqlite.py \
+  --inventory-db /path/to/inventario.db \
+  --source-root /path/to/componentes \
+  --language java \
+  --extension java \
+  --workers 12 \
+  --out-db exports/fastparse_python_ast.sqlite
+```
+
+Read an inventory database, parse source files with Python threads, decode binary
+MessagePack, and write SQLite tables:
+
+```text
+parse_files
+ast_nodes
+ast_children
+```
+
+The default stores the full AST and all fields. Use `--rules` and `--fields`
+once the caller knows which grammar rules are needed.
+
+```bash
+python3 examples/python/05_diagnostics_scan/diagnostics_scan.py /path/to/source/root \
+  --glob "*.java" \
+  --language java \
+  --workers 12 \
+  --out-db exports/fastparse_python_diagnostics.sqlite
+```
+
+Scan parse quality using diagnostics-only output. This is the right mode for
+grammar evaluation because it avoids materializing the full AST payload.
 
 ## Library Loading
 
@@ -237,3 +286,17 @@ For high-throughput scans:
 - Use threads when the work is mostly native parsing and writing output.
 - Use processes only when Python-side CPU work dominates and IPC cost is acceptable.
 - Keep SQLite writes in one writer thread/process.
+- Prefer one `FastParse` instance per worker thread for long-running scans.
+- Load language extensions before starting worker threads when possible.
+
+## AI-Agent Integration Notes
+
+Agents should treat FastParse as a RAM-only native parser:
+
+- Read files in the parent language.
+- Pass `bytes` to `FastParse.parse_bytes`.
+- Use `OutputFormat.BINARY` plus `result.binary_document()` for high-throughput structured data.
+- Use `OutputFormat.DIAGNOSTICS` for grammar quality scans.
+- Store data in SQLite, files, queues, or services outside FastParse.
+- Keep package-manager installs normal: `pip install --pre fastparse`.
+- Do not write temporary source files just to call FastParse.

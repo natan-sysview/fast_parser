@@ -243,21 +243,21 @@ Build it locally from an existing GitHub release:
 
 ```bash
 python3 scripts/package_nuget.py \
-  --version 0.1.0-preview.16 \
-  --release-tag v0.1.0-preview.16
+  --version 0.1.0-preview.17 \
+  --release-tag v0.1.0-preview.17
 ```
 
 Validate it from a clean consumer project:
 
 ```bash
-python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.16.nupkg
+python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.17.nupkg
 ```
 
 Install from the local package directory:
 
 ```bash
 dotnet add package FastParser \
-  --version 0.1.0-preview.16 \
+  --version 0.1.0-preview.17 \
   --source dist/nuget
 ```
 
@@ -286,7 +286,7 @@ Python package versions must use PEP 440. Preview release names are converted be
 
 | FastParse release | PyPI version |
 |---|---|
-| `0.1.0-preview.16` | `0.1.0rc16` |
+| `0.1.0-preview.17` | `0.1.0rc17` |
 
 Each wheel includes:
 
@@ -312,14 +312,14 @@ Build a local wheel:
 
 ```bash
 python3 scripts/package_python_wheel.py \
-  --version 0.1.0-preview.16
+  --version 0.1.0-preview.17
 ```
 
 Validate a wheel in a clean virtual environment:
 
 ```bash
 python3 scripts/validate_python_wheel.py \
-  dist/python/fastparse-0.1.0rc16-py3-none-macosx_11_0_arm64.whl
+  dist/python/fastparse-0.1.0rc17-py3-none-macosx_11_0_arm64.whl
 ```
 
 Tagged releases build wheels in GitHub Actions and upload them as artifacts. Publishing to PyPI is gated by the repository variable:
@@ -348,14 +348,14 @@ The workflow lives at:
 It can run manually with a version:
 
 ```text
-workflow_dispatch -> version = 0.1.0-preview.16
+workflow_dispatch -> version = 0.1.0-preview.17
 ```
 
 Or automatically on tags:
 
 ```bash
-git tag v0.1.0-preview.16
-git push origin v0.1.0-preview.16
+git tag v0.1.0-preview.17
+git push origin v0.1.0-preview.17
 ```
 
 For tags, the workflow attaches generated archives to the GitHub Release.
@@ -365,7 +365,7 @@ For tags, the workflow attaches generated archives to the GitHub Release.
 Create a local package for the current platform:
 
 ```bash
-python3 scripts/package_release.py --version 0.1.0-preview.16
+python3 scripts/package_release.py --version 0.1.0-preview.17
 ```
 
 After building, the package appears under:

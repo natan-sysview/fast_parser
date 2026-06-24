@@ -5,7 +5,7 @@ Use this guide when an AI agent needs to integrate FastParser into a .NET applic
 ## Install
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.16
+dotnet add package FastParser --version 0.1.0-preview.17
 ```
 
 Package ID:
