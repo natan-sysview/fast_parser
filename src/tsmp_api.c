@@ -108,7 +108,8 @@ int tsmp_parse(
     if (options->format != TSMP_FORMAT_JSON &&
         options->format != TSMP_FORMAT_CSV &&
         options->format != TSMP_FORMAT_STATS &&
-        options->format != TSMP_FORMAT_BINARY) {
+        options->format != TSMP_FORMAT_BINARY &&
+        options->format != TSMP_FORMAT_DIAGNOSTICS) {
         return result_set_error(out_result, TSMP_ERROR_UNSUPPORTED_FORMAT, "Unsupported output format.");
     }
 

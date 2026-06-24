@@ -332,6 +332,23 @@ class TsmpContractTests(unittest.TestCase):
         self.assertTrue(any(node["hasError"] for node in document["nodes"]))
         self.assertTrue(all("isError" in node and "isMissing" in node for node in document["nodes"]))
 
+    def test_diagnostics_format_returns_small_quality_payload(self) -> None:
+        result = self.tsmp.parse_bytes(
+            b"class Demo { void broken( { }",
+            output_format="diagnostics",
+        )
+        document = result.json()
+
+        self.assertEqual(result.output_format, "diagnostics")
+        self.assertEqual(document["language"], "java")
+        self.assertEqual(document["nodeCount"], result.node_count)
+        self.assertTrue(document["hasErrors"])
+        self.assertGreater(document["errorNodeCount"], 0)
+        self.assertIn("missingNodeCount", document)
+        self.assertIn("errorByteCount", document)
+        self.assertNotIn("nodes", document)
+        self.assertLess(len(result.data), 160)
+
     def test_stats_counts_without_output(self) -> None:
         output, node_count = self.parse_result(output_format="stats", include_rules="")
 

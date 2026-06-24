@@ -149,7 +149,7 @@ def write_manifest(package_dir: Path, *, version: str, target_platform: str, arc
         "link_library": link_library,
         "c_api": C_API_VERSION,
         "headers": ["include/fastparse.h", "include/tsmp.h"],
-        "formats": ["json", "csv", "stats", "binary"],
+        "formats": ["json", "csv", "stats", "binary", "diagnostics"],
         "bindings": ["python", "csharp"],
         "docs": ["README.md", "docs/contracts.md", "docs/c_api.md", "docs/output_formats.md"],
     }

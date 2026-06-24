@@ -61,6 +61,7 @@ FastParseFormat.Json    human-readable AST data
 FastParseFormat.Csv     flat rows for tabular pipelines
 FastParseFormat.Binary  MessagePack for high-throughput consumers
 FastParseFormat.Stats   counts only, no output copy
+FastParseFormat.Diagnostics small grammar-quality JSON without AST nodes
 ```
 
 ## Field Selection

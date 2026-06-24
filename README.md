@@ -10,6 +10,7 @@ The first public version ships with Java support. Parent applications own file I
 - Filters AST nodes by grammar rule name.
 - Lets callers choose which node fields are returned.
 - Returns JSON, CSV, MessagePack binary, or stats.
+- Returns diagnostics-only quality reports for large grammar scans.
 - Exposes a small C ABI designed for Python, C#, Rust, Java, and other bindings.
 - Can load optional language extensions by native library path.
 - Is thread-safe per parse call.
@@ -119,6 +120,7 @@ Extension loading is a setup step. Load extensions before starting concurrent pa
 | CSV | `TSMP_FORMAT_CSV` | Tabular export, spreadsheets, quick inspection. |
 | Binary | `TSMP_FORMAT_BINARY` | High-performance program-to-program exchange. |
 | Stats | `TSMP_FORMAT_STATS` | Count matching nodes without serializing AST output. |
+| Diagnostics | `TSMP_FORMAT_DIAGNOSTICS` | Parse-quality counters without serializing AST nodes. |
 
 Binary output is MessagePack schema version 1. Node `text` is encoded as MessagePack `bin`, not as a string, so source bytes are preserved without Unicode assumptions.
 

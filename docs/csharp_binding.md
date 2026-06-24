@@ -129,6 +129,24 @@ Console.WriteLine(document.Nodes[0].HasError);
 
 `HasErrors = true` is not a native failure. It means parsing succeeded but the grammar reported `ERROR` or `MISSING` nodes.
 
+## Diagnostics Format
+
+Use `FastParseFormat.Diagnostics` for large grammar-quality scans where the AST is not needed:
+
+```csharp
+var result = parser.ParseBytes(source, new ParseOptions
+{
+    Language = "cobol",
+    Format = FastParseFormat.Diagnostics
+});
+
+using var document = result.JsonDocument();
+Console.WriteLine(document.RootElement.GetProperty("hasErrors").GetBoolean());
+Console.WriteLine(document.RootElement.GetProperty("errorNodeCount").GetUInt64());
+```
+
+This format returns a small JSON payload and does not include a `nodes` array.
+
 ## Library Loading
 
 The binding searches upward from `AppContext.BaseDirectory` for:

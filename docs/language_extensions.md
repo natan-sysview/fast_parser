@@ -557,6 +557,8 @@ most_common_error_parent_rules
 
 For COBOL, this lets FastParse compare candidate grammars against large enterprise corpora and choose the most robust implementation before publishing a stable extension.
 
+For large first-pass scans, prefer `TSMP_FORMAT_DIAGNOSTICS` / `FastParseFormat.Diagnostics`. It returns only aggregate parse-quality counters and avoids serializing the full AST.
+
 ## Versioning Strategy
 
 Status: `Preview`

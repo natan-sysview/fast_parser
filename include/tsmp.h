@@ -48,7 +48,8 @@ typedef enum {
     TSMP_FORMAT_JSON = 1,
     TSMP_FORMAT_CSV = 2,
     TSMP_FORMAT_STATS = 3,
-    TSMP_FORMAT_BINARY = 4
+    TSMP_FORMAT_BINARY = 4,
+    TSMP_FORMAT_DIAGNOSTICS = 5
 } TsmpFormat;
 
 typedef enum {

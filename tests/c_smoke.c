@@ -48,6 +48,31 @@ int main(void)
     }
     tsmp_result_free(&result);
 
+    TsmpOptions diagnostics_options = {
+        "java",
+        TSMP_FORMAT_DIAGNOSTICS,
+        NULL,
+        0,
+        0,
+        0
+    };
+
+    const unsigned char broken_source[] = "class Demo { void broken( { }";
+    status = tsmp_parse(broken_source, sizeof(broken_source) - 1, &diagnostics_options, &result);
+    if (status != TSMP_OK || result.status != TSMP_OK) return fail_result("diagnostics parse", &result);
+    if (!result.data || result.length == 0 || result.node_count == 0) {
+        tsmp_result_free(&result);
+        fprintf(stderr, "diagnostics contract failed\n");
+        return 1;
+    }
+    if (!contains_bytes(result.data, result.length, "\"hasErrors\":true") ||
+        contains_bytes(result.data, result.length, "\"nodes\"")) {
+        tsmp_result_free(&result);
+        fprintf(stderr, "diagnostics payload did not match expected shape\n");
+        return 1;
+    }
+    tsmp_result_free(&result);
+
     status = fastparse_parse(source, sizeof(source) - 1, &stats_options, &result);
     if (status != TSMP_OK || result.status != TSMP_OK) return fail_result("fastparse stats parse", &result);
     if (result.node_count == 0 || result.data != NULL || result.length != 0) {

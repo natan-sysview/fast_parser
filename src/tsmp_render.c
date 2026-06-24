@@ -36,6 +36,9 @@ int tsmp_rule_filter_matches(const char *filter, const char *rule)
 
 static void collect_diagnostics_walk(TSNode node, TsmpDiagnostics *diagnostics)
 {
+    if (ts_node_is_named(node)) {
+        diagnostics->named_node_count++;
+    }
     if (ts_node_has_error(node)) {
         diagnostics->has_errors = 1;
     }
@@ -61,6 +64,45 @@ TsmpDiagnostics tsmp_collect_diagnostics(TSNode node)
     memset(&diagnostics, 0, sizeof(diagnostics));
     collect_diagnostics_walk(node, &diagnostics);
     return diagnostics;
+}
+
+int tsmp_render_diagnostics(
+    const char *language,
+    TsmpDiagnostics diagnostics,
+    TsmpResult *out_result)
+{
+    TsmpBuffer buffer;
+    if (!tsmp_buffer_init(&buffer, 256)) {
+        out_result->status = TSMP_ERROR_OUT_OF_MEMORY;
+        return TSMP_ERROR_OUT_OF_MEMORY;
+    }
+
+    if (!tsmp_buffer_append(&buffer, "{\"language\":")) goto oom;
+    if (!tsmp_buffer_append_json_string(&buffer, language)) goto oom;
+    if (!tsmp_buffer_append(&buffer, ",\"nodeCount\":")) goto oom;
+    if (!tsmp_buffer_append_size(&buffer, diagnostics.named_node_count)) goto oom;
+    if (!tsmp_buffer_append(&buffer, ",\"hasErrors\":")) goto oom;
+    if (!tsmp_buffer_append(&buffer, diagnostics.has_errors ? "true" : "false")) goto oom;
+    if (!tsmp_buffer_append(&buffer, ",\"errorNodeCount\":")) goto oom;
+    if (!tsmp_buffer_append_size(&buffer, diagnostics.error_node_count)) goto oom;
+    if (!tsmp_buffer_append(&buffer, ",\"missingNodeCount\":")) goto oom;
+    if (!tsmp_buffer_append_size(&buffer, diagnostics.missing_node_count)) goto oom;
+    if (!tsmp_buffer_append(&buffer, ",\"errorByteCount\":")) goto oom;
+    if (!tsmp_buffer_append_size(&buffer, diagnostics.error_byte_count)) goto oom;
+    if (!tsmp_buffer_append(&buffer, "}")) goto oom;
+
+    size_t output_len = buffer.len;
+    out_result->status = TSMP_OK;
+    out_result->data = (unsigned char *)tsmp_buffer_take(&buffer);
+    out_result->length = output_len;
+    out_result->node_count = diagnostics.named_node_count;
+    out_result->error_message = NULL;
+    return TSMP_OK;
+
+oom:
+    tsmp_buffer_free(&buffer);
+    out_result->status = TSMP_ERROR_OUT_OF_MEMORY;
+    return TSMP_ERROR_OUT_OF_MEMORY;
 }
 
 int tsmp_append_source_slice_json(TsmpBuffer *buffer, const TsmpRenderCtx *ctx, TSNode node)
@@ -142,8 +184,19 @@ int tsmp_render_tree(
     ctx.source_len = source_len;
     ctx.options = options;
     ctx.fields = options->fields == 0 ? TSMP_FIELD_ALL : options->fields;
-    ctx.diagnostics = tsmp_collect_diagnostics(ts_tree_root_node(tree));
     ctx.next_id = 1;
+
+    int needs_diagnostics =
+        options->format == TSMP_FORMAT_DIAGNOSTICS ||
+        ((options->format == TSMP_FORMAT_JSON || options->format == TSMP_FORMAT_BINARY) &&
+         tsmp_has_field(&ctx, TSMP_FIELD_DIAGNOSTICS));
+    if (needs_diagnostics) {
+        ctx.diagnostics = tsmp_collect_diagnostics(ts_tree_root_node(tree));
+    }
+
+    if (options->format == TSMP_FORMAT_DIAGNOSTICS) {
+        return tsmp_render_diagnostics(options->language, ctx.diagnostics, out_result);
+    }
 
     size_t total_nodes = 0;
     if (options->format == TSMP_FORMAT_STATS || options->format == TSMP_FORMAT_BINARY) {

@@ -125,6 +125,44 @@ result.length = 0
 result.node_count = matching node count
 ```
 
+## Diagnostics
+
+Native constant:
+
+```text
+TSMP_FORMAT_DIAGNOSTICS
+```
+
+Use diagnostics for:
+
+- Large grammar quality scans.
+- Comparing language extensions.
+- Finding files that Tree-sitter recovered with `ERROR` or `MISSING` nodes.
+- Storing parse-quality metrics without storing AST payloads.
+
+Result behavior:
+
+```text
+result.data = small UTF-8 JSON object
+result.length > 0
+result.node_count = full named node count
+```
+
+Shape:
+
+```json
+{
+  "language": "cobol",
+  "nodeCount": 29584,
+  "hasErrors": true,
+  "errorNodeCount": 3,
+  "missingNodeCount": 1,
+  "errorByteCount": 1204
+}
+```
+
+This format does not include a `nodes` array and ignores field selection. Tree-sitter exposes error flags on nodes; FastParse walks the tree once in C to aggregate the counters.
+
 ## Recommended Usage
 
 Exploration:
@@ -148,5 +186,13 @@ Counting:
 ```text
 format = stats
 rules = exact list to count
+fields = ignored for output
+```
+
+Grammar quality scan:
+
+```text
+format = diagnostics
+rules = ignored for output
 fields = ignored for output
 ```

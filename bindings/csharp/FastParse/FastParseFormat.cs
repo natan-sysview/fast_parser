@@ -15,5 +15,8 @@ public enum FastParseFormat
     Stats = 3,
 
     /// <summary>Binary MessagePack AST output.</summary>
-    Binary = 4
+    Binary = 4,
+
+    /// <summary>Small JSON parse-quality payload without AST nodes.</summary>
+    Diagnostics = 5
 }

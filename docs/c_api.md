@@ -186,6 +186,23 @@ TSMP_ERROR_OUT_OF_MEMORY       6
 TSMP_ERROR_EXTENSION_LOAD      7
 ```
 
+## Diagnostics Format
+
+Use `TSMP_FORMAT_DIAGNOSTICS` to evaluate parse quality without serializing AST nodes:
+
+```c
+TsmpOptions options = {
+    .language = "cobol",
+    .format = TSMP_FORMAT_DIAGNOSTICS,
+    .include_rules = NULL,
+    .fields = 0,
+    .include_tokens = 0,
+    .pretty = 0
+};
+```
+
+`result.data` contains a small JSON object with `nodeCount`, `hasErrors`, `errorNodeCount`, `missingNodeCount`, and `errorByteCount`. `result.node_count` is the same full named node count reported in the JSON payload.
+
 `TSMP_ERROR_IO` is reserved for compatibility. The FastParse core does not perform file I/O.
 
 ## Memory Ownership

@@ -57,6 +57,23 @@ import msgpack
 document = msgpack.unpackb(payload, raw=False)
 ```
 
+## Diagnostics Output
+
+Use diagnostics when scanning large corpora for grammar quality:
+
+```python
+result = parser.parse_bytes(
+    source,
+    language="cobol",
+    output_format="diagnostics",
+)
+
+quality = result.json()
+print(quality["hasErrors"], quality["errorNodeCount"])
+```
+
+This returns a tiny JSON object and no `nodes` array.
+
 ## Library Loading
 
 The binding searches for the native library under `bin/`.

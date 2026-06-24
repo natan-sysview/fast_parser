@@ -138,6 +138,26 @@ public sealed class FastParseClientTests
     }
 
     [Fact]
+    public void DiagnosticsFormatReturnsSmallQualityPayload()
+    {
+        using var parser = NewParser();
+
+        var result = parser.ParseText("class Demo { void broken( { }", new ParseOptions
+        {
+            Format = FastParseFormat.Diagnostics
+        });
+
+        Assert.Equal(FastParseFormat.Diagnostics, result.Format);
+        Assert.True(result.Data.Length < 160);
+        using var document = result.JsonDocument();
+        Assert.Equal("java", document.RootElement.GetProperty("language").GetString());
+        Assert.Equal(result.NodeCount, document.RootElement.GetProperty("nodeCount").GetUInt64());
+        Assert.True(document.RootElement.GetProperty("hasErrors").GetBoolean());
+        Assert.True(document.RootElement.GetProperty("errorNodeCount").GetUInt64() > 0);
+        Assert.False(document.RootElement.TryGetProperty("nodes", out _));
+    }
+
+    [Fact]
     public void StatsSummaryAvoidsCopyingOutputBytes()
     {
         using var parser = NewParser();

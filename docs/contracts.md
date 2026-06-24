@@ -299,6 +299,7 @@ JSON
 CSV
 Binary
 Stats
+Diagnostics
 ```
 
 ### JSON
@@ -355,6 +356,22 @@ Rules:
 - `data = NULL`.
 - `length = 0`.
 - `node_count` is populated.
+
+### Diagnostics
+
+Status: `Preview`
+
+Diagnostics is intended for ultra-light grammar quality evaluation.
+
+Rules:
+
+- Output is a small UTF-8 JSON object.
+- Output does not include AST nodes.
+- Output does not include source text.
+- Output ignores field selection.
+- `node_count` is the full named node count.
+- Top-level diagnostic counters are computed from the full Tree-sitter tree.
+- This format is preferred for scanning large corpora before requesting full AST output from selected files.
 
 ## Result Memory Contract
 
