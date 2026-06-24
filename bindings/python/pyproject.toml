@@ -1,13 +1,21 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=61", "wheel", "cmake>=3.20"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "fastparse"
-version = "0.4.0"
-description = "Python binding for the FastParse Tree-sitter parser library"
+dynamic = ["version"]
+description = "Python binding for the FastParse Tree-sitter parser library with bundled native runtime"
 requires-python = ">=3.10"
 readme = "README.md"
 
+[project.urls]
+Homepage = "https://github.com/natan-sysview/fast_parser"
+Repository = "https://github.com/natan-sysview/fast_parser"
+Documentation = "https://github.com/natan-sysview/fast_parser/tree/main/docs"
+
 [tool.setuptools.packages.find]
 where = ["."]
+
+[tool.setuptools.dynamic]
+version = {attr = "fastparse.__version__"}

@@ -15,12 +15,12 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-C_API_VERSION = "fastparse-c-api/0.4.0"
+C_API_VERSION = "fastparse-c-api/0.5.0"
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Package FastParse release artifacts.")
-    parser.add_argument("--version", default="0.1.0-preview.10")
+    parser.add_argument("--version", default="0.1.0-preview.11")
     parser.add_argument("--platform", default=default_platform())
     parser.add_argument("--arch", default=default_arch())
     parser.add_argument("--build-dir", type=Path, default=ROOT / "build")
@@ -150,6 +150,7 @@ def write_manifest(package_dir: Path, *, version: str, target_platform: str, arc
         "c_api": C_API_VERSION,
         "headers": ["include/fastparse.h", "include/tsmp.h"],
         "formats": ["json", "csv", "stats", "binary", "diagnostics"],
+        "normalization": ["auto_safe", "none", "cobol_fixed_legacy"],
         "bindings": ["python", "csharp"],
         "docs": ["README.md", "docs/contracts.md", "docs/c_api.md", "docs/output_formats.md"],
     }

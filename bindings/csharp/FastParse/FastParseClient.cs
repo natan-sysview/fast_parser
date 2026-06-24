@@ -11,6 +11,7 @@ public sealed unsafe class FastParseClient : IDisposable
     private readonly nint _library;
     private readonly VersionDelegate _version;
     private readonly ParseDelegate _parse;
+    private readonly ParseV2Delegate? _parseV2;
     private readonly ResultFreeDelegate _resultFree;
     private readonly LoadLanguageExtensionDelegate _loadLanguageExtension;
     private readonly LanguageAvailableDelegate _languageAvailable;
@@ -29,6 +30,7 @@ public sealed unsafe class FastParseClient : IDisposable
         (_library, LibraryPath) = LoadNativeLibrary(libraryPath);
         _version = LoadFunction<VersionDelegate>("fastparse_version", "tsmp_version");
         _parse = LoadFunction<ParseDelegate>("fastparse_parse", "tsmp_parse");
+        _parseV2 = TryLoadFunction<ParseV2Delegate>("fastparse_parse_v2", "tsmp_parse_v2");
         _resultFree = LoadFunction<ResultFreeDelegate>("fastparse_result_free", "tsmp_result_free");
         _loadLanguageExtension = LoadRequiredFunction<LoadLanguageExtensionDelegate>("fastparse_load_language_extension");
         _languageAvailable = LoadRequiredFunction<LanguageAvailableDelegate>("fastparse_language_available");
@@ -174,6 +176,16 @@ public sealed unsafe class FastParseClient : IDisposable
             IncludeTokens = options.IncludeTokens ? 1 : 0,
             Pretty = options.Pretty ? 1 : 0
         };
+        var nativeOptionsV2 = new NativeOptionsV2
+        {
+            Language = language,
+            Format = (int)options.Format,
+            IncludeRules = includeRules,
+            Fields = (uint)options.Fields,
+            IncludeTokens = options.IncludeTokens ? 1 : 0,
+            Pretty = options.Pretty ? 1 : 0,
+            Normalization = (int)options.Normalization
+        };
 
         NativeResult nativeResult = default;
         int status;
@@ -182,11 +194,27 @@ public sealed unsafe class FastParseClient : IDisposable
         {
             fixed (byte* sourcePtr = source)
             {
-                status = _parse(
-                    source.IsEmpty ? null : sourcePtr,
-                    (nuint)source.Length,
-                    &nativeOptions,
-                    &nativeResult);
+                if (_parseV2 is not null)
+                {
+                    status = _parseV2(
+                        source.IsEmpty ? null : sourcePtr,
+                        (nuint)source.Length,
+                        &nativeOptionsV2,
+                        &nativeResult);
+                }
+                else
+                {
+                    if (options.Normalization != FastParseNormalization.AutoSafe)
+                    {
+                        throw new FastParseException(0, 0, "native FastParse library does not support explicit normalization options");
+                    }
+
+                    status = _parse(
+                        source.IsEmpty ? null : sourcePtr,
+                        (nuint)source.Length,
+                        &nativeOptions,
+                        &nativeResult);
+                }
             }
 
             if (status != 0 || nativeResult.Status != 0)
@@ -224,6 +252,18 @@ public sealed unsafe class FastParseClient : IDisposable
         if (!NativeLibrary.TryGetExport(_library, preferredName, out var symbol))
         {
             symbol = NativeLibrary.GetExport(_library, fallbackName);
+        }
+
+        return Marshal.GetDelegateForFunctionPointer<T>(symbol);
+    }
+
+    private T? TryLoadFunction<T>(string preferredName, string fallbackName)
+        where T : Delegate
+    {
+        if (!NativeLibrary.TryGetExport(_library, preferredName, out var symbol) &&
+            !NativeLibrary.TryGetExport(_library, fallbackName, out symbol))
+        {
+            return null;
         }
 
         return Marshal.GetDelegateForFunctionPointer<T>(symbol);
@@ -380,6 +420,13 @@ public sealed unsafe class FastParseClient : IDisposable
         NativeResult* result);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int ParseV2Delegate(
+        byte* source,
+        nuint sourceLen,
+        NativeOptionsV2* options,
+        NativeResult* result);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void ResultFreeDelegate(NativeResult* result);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -400,6 +447,18 @@ public sealed unsafe class FastParseClient : IDisposable
         public uint Fields;
         public int IncludeTokens;
         public int Pretty;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeOptionsV2
+    {
+        public nint Language;
+        public int Format;
+        public nint IncludeRules;
+        public uint Fields;
+        public int IncludeTokens;
+        public int Pretty;
+        public int Normalization;
     }
 
     [StructLayout(LayoutKind.Sequential)]

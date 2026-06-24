@@ -53,6 +53,12 @@ typedef enum {
 } TsmpFormat;
 
 typedef enum {
+    TSMP_NORMALIZATION_AUTO_SAFE = 0,
+    TSMP_NORMALIZATION_NONE = 1,
+    TSMP_NORMALIZATION_COBOL_FIXED_LEGACY = 2
+} TsmpNormalization;
+
+typedef enum {
     TSMP_FIELD_ID          = 1u << 0,
     TSMP_FIELD_PARENT_ID   = 1u << 1,
     TSMP_FIELD_RULE        = 1u << 2,
@@ -75,6 +81,16 @@ typedef struct {
 } TsmpOptions;
 
 typedef struct {
+    const char *language;
+    TsmpFormat format;
+    const char *include_rules; /* Pipe-separated exact rule names. NULL/empty = all. */
+    unsigned int fields;       /* 0 = TSMP_FIELD_ALL. */
+    int include_tokens;        /* 0 = named nodes only. Non-zero includes direct token children. */
+    int pretty;                /* Reserved for formatted JSON. */
+    TsmpNormalization normalization;
+} TsmpOptionsV2;
+
+typedef struct {
     int status;
     unsigned char *data;
     size_t length;
@@ -90,6 +106,12 @@ TSMP_API int tsmp_parse(
     const TsmpOptions *options,
     TsmpResult *out_result);
 
+TSMP_API int tsmp_parse_v2(
+    const unsigned char *source,
+    size_t source_len,
+    const TsmpOptionsV2 *options,
+    TsmpResult *out_result);
+
 TSMP_API void tsmp_result_free(TsmpResult *result);
 
 /* FastParse branded aliases. The tsmp_* ABI remains supported for compatibility. */
@@ -99,6 +121,12 @@ TSMP_API int fastparse_parse(
     const unsigned char *source,
     size_t source_len,
     const TsmpOptions *options,
+    TsmpResult *out_result);
+
+TSMP_API int fastparse_parse_v2(
+    const unsigned char *source,
+    size_t source_len,
+    const TsmpOptionsV2 *options,
     TsmpResult *out_result);
 
 TSMP_API void fastparse_result_free(TsmpResult *result);

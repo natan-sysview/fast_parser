@@ -56,8 +56,8 @@ Recommended package names:
 | Ecosystem | Core package | COBOL extension | PL/SQL extension |
 |---|---|---|---|
 | NuGet | `FastParser` | `FastParser.Language.Cobol` | `FastParser.Language.Plsql` |
-| PyPI | `fastparser` | `fastparser-language-cobol` | `fastparser-language-plsql` |
-| crates.io | `fastparser` | `fastparser-language-cobol` | `fastparser-language-plsql` |
+| PyPI | `fastparse` | `fastparse-language-cobol` | `fastparse-language-plsql` |
+| crates.io | `fastparse` | `fastparse-language-cobol` | `fastparse-language-plsql` |
 | Maven | `io.fastparser:fastparser` | `io.fastparser:fastparser-language-cobol` | `io.fastparser:fastparser-language-plsql` |
 
 Package names must be predictable so an AI coding agent can infer the install command from a requested language.
@@ -78,15 +78,15 @@ dotnet add package FastParser.Language.Cobol
 Python / PyPI:
 
 ```bash
-pip install fastparser
-pip install fastparser-language-cobol
+pip install fastparse
+pip install fastparse-language-cobol
 ```
 
 Rust / crates.io:
 
 ```bash
-cargo add fastparser
-cargo add fastparser-language-cobol
+cargo add fastparse
+cargo add fastparse-language-cobol
 ```
 
 Java / Maven:
@@ -94,12 +94,12 @@ Java / Maven:
 ```xml
 <dependency>
   <groupId>io.fastparser</groupId>
-  <artifactId>fastparser</artifactId>
+  <artifactId>fastparse</artifactId>
   <version>...</version>
 </dependency>
 <dependency>
   <groupId>io.fastparser</groupId>
-  <artifactId>fastparser-language-cobol</artifactId>
+  <artifactId>fastparse-language-cobol</artifactId>
   <version>...</version>
 </dependency>
 ```
@@ -108,7 +108,7 @@ The same pattern applies to other languages:
 
 ```text
 FastParser.Language.Plsql
-fastparser-language-plsql
+fastparse-language-plsql
 ```
 
 ## User-Facing API
@@ -158,9 +158,9 @@ var result = parser.ParseText(cobolSource, new ParseOptions
 Example Python shape:
 
 ```python
-from fastparser import FastParser
+from fastparse import FastParse
 
-parser = FastParser()
+parser = FastParse()
 parser.load_bundled_language("cobol")
 result = parser.parse_text(cobol_source, language="cobol", output_format="json")
 ```
@@ -168,8 +168,8 @@ result = parser.parse_text(cobol_source, language="cobol", output_format="json")
 Example Rust shape:
 
 ```rust
-let mut parser = fastparser::Parser::new()?;
-fastparser_language_cobol::register(&mut parser)?;
+let mut parser = fastparse::Parser::new()?;
+fastparse_language_cobol::register(&mut parser)?;
 
 let result = parser.parse_text(cobol_source, ParseOptions {
     language: "cobol",
@@ -223,7 +223,7 @@ Example:
   "displayName": "COBOL",
   "version": "0.1.0",
   "abi": "fastparse-language-extension/1",
-  "coreAbi": "fastparse-c-api/0.4.0",
+  "coreAbi": "fastparse-c-api/0.5.0",
   "grammar": {
     "name": "tree-sitter-cobol",
     "source": "https://github.com/example/tree-sitter-cobol",
@@ -419,7 +419,7 @@ Python extension wheels should place native assets inside the installed package.
 Conceptual package:
 
 ```text
-fastparser_language_cobol/
+fastparse_language_cobol/
   __init__.py
   manifest.json
   native/
@@ -432,8 +432,8 @@ fastparser_language_cobol/
 Expected developer flow:
 
 ```bash
-pip install fastparser
-pip install fastparser-language-cobol
+pip install fastparse
+pip install fastparse-language-cobol
 ```
 
 Expected Python flow:
@@ -454,15 +454,15 @@ Rust extension crates should expose registration helpers.
 Expected developer flow:
 
 ```bash
-cargo add fastparser
-cargo add fastparser-language-cobol
+cargo add fastparse
+cargo add fastparse-language-cobol
 ```
 
 Expected Rust flow:
 
 ```rust
-let mut parser = fastparser::Parser::new()?;
-fastparser_language_cobol::register(&mut parser)?;
+let mut parser = fastparse::Parser::new()?;
+fastparse_language_cobol::register(&mut parser)?;
 ```
 
 The extension crate may:

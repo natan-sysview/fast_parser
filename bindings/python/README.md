@@ -1,23 +1,39 @@
-# TSMP Python Binding
+# FastParse Python Binding
 
-Small `ctypes` binding for the TSMP native C library.
+Small `ctypes` binding for the FastParse native C library.
 
 The binding keeps the same design boundary as the native library:
 
 - Python owns file I/O.
 - Python passes bytes already loaded in RAM.
-- TSMP returns JSON, CSV, MessagePack binary, or stats in RAM.
+- FastParse returns JSON, CSV, MessagePack binary, diagnostics, or stats in RAM.
 - Python copies the returned native buffer and frees the native result.
+
+## Install
+
+From PyPI, once the package is published:
+
+```bash
+pip install fastparse
+```
+
+From a downloaded wheel:
+
+```bash
+pip install fastparse-0.1.0rc11-py3-none-macosx_11_0_arm64.whl
+```
+
+The wheel includes the native library for its platform, so normal users do not need `FASTPARSE_LIBRARY_PATH`.
 
 ## Quick Use
 
 ```python
-from tsmp import Tsmp
+from fastparse import FastParse
 
-tsmp = Tsmp()
+parser = FastParse()
 source = b"class Demo { void run() {} }"
 
-result = tsmp.parse_bytes(
+result = parser.parse_bytes(
     source,
     language="java",
     output_format="json",
@@ -45,7 +61,7 @@ print(result.data)  # MessagePack bytes
 If the caller only needs node/output counts and does not need to copy the generated JSON/CSV into Python:
 
 ```python
-summary = tsmp.parse_bytes_summary(
+summary = parser.parse_bytes_summary(
     source,
     language="java",
     output_format="json",

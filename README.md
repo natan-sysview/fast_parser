@@ -13,6 +13,7 @@ The first public version ships with Java support. Parent applications own file I
 - Returns diagnostics-only quality reports for large grammar scans.
 - Exposes a small C ABI designed for Python, C#, Rust, Java, and other bindings.
 - Can load optional language extensions by native library path.
+- Can apply safe memory-only normalization for legacy sources such as COBOL trailers.
 - Is thread-safe per parse call.
 
 FastParse does not read files, write files, walk directories, create databases, or own thread pools.
@@ -21,7 +22,7 @@ FastParse does not read files, write files, walk directories, create databases, 
 
 ```text
 Project version      : 0.1.0-preview
-C API version        : fastparse-c-api/0.4.0
+C API version        : fastparse-c-api/0.5.0
 Binary schema        : 1
 Supported languages  : java
 Extension preview    : explicit path loading for optional languages
@@ -111,6 +112,12 @@ After loading, use the registered language name in normal parse options:
 ```
 
 Extension loading is a setup step. Load extensions before starting concurrent parse workers.
+
+## Source Normalization
+
+New bindings use `auto_safe` normalization by default. Modern languages are left unchanged. For COBOL, FastParse removes known legacy trailer bytes in RAM before parsing, such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record.
+
+Use `none` when the caller needs byte-for-byte parsing with no cleanup. Normalization does not write to disk and does not change the output field contract.
 
 ## Output Formats
 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(fastparse
-    VERSION 0.4.0
+    VERSION 0.5.0
     DESCRIPTION "Small memory-only Tree-sitter parser library"
     LANGUAGES C)
 

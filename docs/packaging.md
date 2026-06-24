@@ -243,27 +243,97 @@ Build it locally from an existing GitHub release:
 
 ```bash
 python3 scripts/package_nuget.py \
-  --version 0.1.0-preview.10 \
-  --release-tag v0.1.0-preview.10
+  --version 0.1.0-preview.11 \
+  --release-tag v0.1.0-preview.11
 ```
 
 Validate it from a clean consumer project:
 
 ```bash
-python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.10.nupkg
+python3 scripts/validate_nuget_package.py dist/nuget/FastParser.0.1.0-preview.11.nupkg
 ```
 
 Install from the local package directory:
 
 ```bash
 dotnet add package FastParser \
-  --version 0.1.0-preview.10 \
+  --version 0.1.0-preview.11 \
   --source dist/nuget
 ```
 
 Publishing to nuget.org uses NuGet Trusted Publishing from GitHub Actions. The public NuGet package ID is `FastParser`; the C# namespace remains `FastParse`.
 
 Tagged NuGet releases also run a post-publish smoke test from nuget.org on Linux x64, Windows x64, macOS arm64, and macOS x64.
+
+## Python Wheel / PyPI Package
+
+The release workflow also builds Python wheels for:
+
+```text
+manylinux2014_x86_64
+macosx_10_15_x86_64
+macosx_11_0_arm64
+win_amd64
+```
+
+The public PyPI package name is:
+
+```text
+fastparse
+```
+
+Python package versions must use PEP 440. Preview release names are converted before publishing:
+
+| FastParse release | PyPI version |
+|---|---|
+| `0.1.0-preview.11` | `0.1.0rc11` |
+
+Each wheel includes:
+
+```text
+fastparse/
+tsmp/
+fastparse/native/<platform native library>
+```
+
+Normal Python consumers install and import without manually configuring native paths:
+
+```bash
+pip install fastparse
+```
+
+```python
+from fastparse import FastParse
+```
+
+Build a local wheel:
+
+```bash
+python3 scripts/package_python_wheel.py \
+  --version 0.1.0-preview.11
+```
+
+Validate a wheel in a clean virtual environment:
+
+```bash
+python3 scripts/validate_python_wheel.py \
+  dist/python/fastparse-0.1.0rc11-py3-none-macosx_11_0_arm64.whl
+```
+
+Tagged releases build wheels in GitHub Actions and upload them as artifacts. Publishing to PyPI is gated by the repository variable:
+
+```text
+PYPI_PUBLISH=true
+```
+
+PyPI should be configured with Trusted Publishing for:
+
+```text
+owner: natan-sysview
+repository: fast_parser
+workflow: release.yml
+project: fastparse
+```
 
 The workflow lives at:
 
@@ -274,14 +344,14 @@ The workflow lives at:
 It can run manually with a version:
 
 ```text
-workflow_dispatch -> version = 0.1.0-preview.10
+workflow_dispatch -> version = 0.1.0-preview.11
 ```
 
 Or automatically on tags:
 
 ```bash
-git tag v0.1.0-preview.10
-git push origin v0.1.0-preview.10
+git tag v0.1.0-preview.11
+git push origin v0.1.0-preview.11
 ```
 
 For tags, the workflow attaches generated archives to the GitHub Release.
@@ -291,7 +361,7 @@ For tags, the workflow attaches generated archives to the GitHub Release.
 Create a local package for the current platform:
 
 ```bash
-python3 scripts/package_release.py --version 0.1.0-preview.10
+python3 scripts/package_release.py --version 0.1.0-preview.11
 ```
 
 After building, the package appears under:

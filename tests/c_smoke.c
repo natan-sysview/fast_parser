@@ -82,6 +82,25 @@ int main(void)
     }
     fastparse_result_free(&result);
 
+    TsmpOptionsV2 v2_options = {
+        "java",
+        TSMP_FORMAT_STATS,
+        NULL,
+        0,
+        0,
+        0,
+        TSMP_NORMALIZATION_AUTO_SAFE
+    };
+
+    status = fastparse_parse_v2(source, sizeof(source) - 1, &v2_options, &result);
+    if (status != TSMP_OK || result.status != TSMP_OK) return fail_result("fastparse v2 stats parse", &result);
+    if (result.node_count == 0 || result.data != NULL || result.length != 0) {
+        fastparse_result_free(&result);
+        fprintf(stderr, "fastparse v2 stats contract failed\n");
+        return 1;
+    }
+    fastparse_result_free(&result);
+
     TsmpOptions json_options = {
         "java",
         TSMP_FORMAT_JSON,

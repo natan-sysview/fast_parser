@@ -74,12 +74,12 @@ def validate_manifest(package_dir: Path, *, platform_name: str, library_path: Pa
         "platform": platform_name,
         "library": expected_library,
         "link_library": expected_link_library,
-        "c_api": "fastparse-c-api/0.4.0",
+        "c_api": "fastparse-c-api/0.5.0",
     }
     for key, value in expected.items():
         if manifest.get(key) != value:
             raise AssertionError(f"manifest {key!r} expected {value!r}, found {manifest.get(key)!r}")
-    for key in ("version", "arch", "formats", "bindings", "headers", "docs"):
+    for key in ("version", "arch", "formats", "normalization", "bindings", "headers", "docs"):
         if key not in manifest:
             raise AssertionError(f"manifest missing key: {key}")
 

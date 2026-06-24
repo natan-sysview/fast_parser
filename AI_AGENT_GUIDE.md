@@ -5,7 +5,7 @@ Use this guide when an AI agent needs to integrate FastParser into a .NET applic
 ## Install
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.10
+dotnet add package FastParser --version 0.1.0-preview.11
 ```
 
 Package ID:
@@ -88,6 +88,18 @@ IncludeRules = "class_declaration|method_declaration"
 ```
 
 Leave it empty to include the full AST.
+
+## Source Normalization
+
+Use the default `FastParseNormalization.AutoSafe` unless the user explicitly needs byte-for-byte original parsing.
+
+For COBOL, `AutoSafe` removes known legacy trailer bytes in RAM before parsing, such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record. Modern languages are left unchanged.
+
+Disable cleanup only when original byte offsets must refer to the unmodified source:
+
+```csharp
+Normalization = FastParseNormalization.None
+```
 
 ## Parse Diagnostics
 
@@ -175,8 +187,8 @@ Expected package-manager patterns:
 
 ```bash
 dotnet add package FastParser.Language.Cobol
-pip install fastparser-language-cobol
-cargo add fastparser-language-cobol
+pip install fastparse-language-cobol
+cargo add fastparse-language-cobol
 ```
 
 After installing an extension, bindings should load it through a bundled-language API such as:

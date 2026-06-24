@@ -1,8 +1,10 @@
 _tsmp_version
 _tsmp_parse
+_tsmp_parse_v2
 _tsmp_result_free
 _fastparse_version
 _fastparse_parse
+_fastparse_parse_v2
 _fastparse_result_free
 _fastparse_load_language_extension
 _fastparse_language_available

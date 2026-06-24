@@ -220,6 +220,34 @@ public sealed class FastParseClientTests
         Assert.Contains("method_declaration", result.Text, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void CobolAutoSafeNormalizationRemovesLegacyTrailer()
+    {
+        var extensionPath = FindCobolLanguageExtensionOrNull();
+        if (extensionPath is null)
+        {
+            return;
+        }
+
+        using var parser = NewParser();
+        parser.LoadLanguageExtension(extensionPath);
+        var source = Encoding.UTF8.GetBytes(
+            "       IDENTIFICATION DIVISION.\n" +
+            "       PROGRAM-ID. DEMO.\n" +
+            "FHA\n" +
+            "\u001A");
+
+        var result = parser.ParseBytes(source, new ParseOptions
+        {
+            Language = "cobol",
+            Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+        });
+
+        Assert.True(result.NodeCount > 0);
+        Assert.DoesNotContain("FHA", result.Text, StringComparison.Ordinal);
+        Assert.DoesNotContain("\\u001a", result.Text, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static string FindNativeLibrary()
     {
         var fileName = OperatingSystem.IsWindows()
@@ -280,6 +308,37 @@ public sealed class FastParseClientTests
         }
 
         throw new FileNotFoundException($"Could not find native FastParse test language extension {fileName}.");
+    }
+
+    private static string? FindCobolLanguageExtensionOrNull()
+    {
+        var fileName = OperatingSystem.IsWindows()
+            ? "fastparse_language_cobol.dll"
+            : OperatingSystem.IsMacOS()
+                ? "libfastparse_language_cobol.dylib"
+                : "libfastparse_language_cobol.so";
+
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            foreach (var relative in new[]
+            {
+                Path.Combine("bin", fileName),
+                Path.Combine("bin", "Release", fileName),
+                Path.Combine("bin", "Debug", fileName)
+            })
+            {
+                var candidate = Path.Combine(directory.FullName, relative);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            directory = directory.Parent;
+        }
+
+        return null;
     }
 
     private static FastParseClient NewParser()

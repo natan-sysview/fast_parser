@@ -19,7 +19,7 @@ const char *fastparse_version(void);
 Returns a static UTF-8 string such as:
 
 ```text
-fastparse-c-api/0.4.0
+fastparse-c-api/0.5.0
 ```
 
 ```c
@@ -72,6 +72,20 @@ typedef struct {
 } TsmpOptions;
 ```
 
+`TsmpOptions` is the compatibility ABI. New callers should prefer `TsmpOptionsV2`:
+
+```c
+typedef struct {
+    const char *language;
+    TsmpFormat format;
+    const char *include_rules;
+    unsigned int fields;
+    int include_tokens;
+    int pretty;
+    TsmpNormalization normalization;
+} TsmpOptionsV2;
+```
+
 Defaults:
 
 ```c
@@ -91,6 +105,33 @@ Meaning:
 - `fields = 0` means all fields.
 - `include_tokens = 0` keeps anonymous tokens out of top-level output.
 - `pretty` is reserved for future formatted JSON.
+- `normalization = TSMP_NORMALIZATION_AUTO_SAFE` applies conservative language-specific cleanup before parsing.
+
+Normalization modes:
+
+```c
+TSMP_NORMALIZATION_AUTO_SAFE
+TSMP_NORMALIZATION_NONE
+TSMP_NORMALIZATION_COBOL_FIXED_LEGACY
+```
+
+`AUTO_SAFE` currently applies COBOL fixed-format legacy cleanup when `language = "cobol"` and leaves modern languages unchanged. The cleanup is memory-only and removes known non-source trailer bytes such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record.
+
+Call `fastparse_parse_v2` / `tsmp_parse_v2` to use normalization:
+
+```c
+TsmpOptionsV2 options = {
+    .language = "cobol",
+    .format = TSMP_FORMAT_BINARY,
+    .include_rules = NULL,
+    .fields = 0,
+    .include_tokens = 0,
+    .pretty = 0,
+    .normalization = TSMP_NORMALIZATION_AUTO_SAFE
+};
+
+int status = fastparse_parse_v2(source, source_len, &options, &result);
+```
 
 ## Example: JSON Methods
 

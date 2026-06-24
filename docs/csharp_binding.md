@@ -26,7 +26,7 @@ FastParser.<version>.snupkg
 Install it from a local package directory:
 
 ```bash
-dotnet add package FastParser --version 0.1.0-preview.10 --source /path/to/package-dir
+dotnet add package FastParser --version 0.1.0-preview.11 --source /path/to/package-dir
 ```
 
 Once the package is published to nuget.org, the command becomes:
@@ -216,6 +216,31 @@ var result = parser.ParseText(cobolSource, new ParseOptions
 ```
 
 Load extensions before starting concurrent parse workers.
+
+## Source Normalization
+
+`ParseOptions.Normalization` controls memory-only cleanup before parsing:
+
+```csharp
+var result = parser.ParseBytes(cobolSourceBytes, new ParseOptions
+{
+    Language = "cobol",
+    Format = FastParseFormat.Binary,
+    Normalization = FastParseNormalization.AutoSafe
+});
+```
+
+Modes:
+
+```text
+FastParseNormalization.AutoSafe
+FastParseNormalization.None
+FastParseNormalization.CobolFixedLegacy
+```
+
+`AutoSafe` is the default. For COBOL it removes known fixed-format legacy trailer bytes such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record. Modern languages are left unchanged.
+
+Use `None` when the caller needs byte-for-byte parsing with no cleanup.
 
 ## Debugging And Symbols
 

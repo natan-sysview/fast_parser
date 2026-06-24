@@ -149,11 +149,14 @@ include_rules: list<string> | string | null = null
 fields: list<string> | bitmask | null = null
 include_tokens: bool = false
 pretty: bool = false
+normalization: "auto_safe" | "none" | "cobol_fixed_legacy" = "auto_safe"
 ```
 
 `fields = null` should map to native `fields = 0`, which means all fields.
 
 `include_rules = null` or empty should map to all named nodes.
+
+`normalization = "auto_safe"` should map to `TSMP_NORMALIZATION_AUTO_SAFE` when the native library supports `fastparse_parse_v2`. Bindings may fall back to `fastparse_parse` for older native libraries only when the caller did not request explicit normalization.
 
 ## Error Mapping
 

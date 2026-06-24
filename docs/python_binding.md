@@ -33,6 +33,30 @@ print(result.node_count)
 print(result.text)
 ```
 
+## PyPI / Wheel Use
+
+The public Python package name is:
+
+```text
+fastparse
+```
+
+Install from PyPI after publication:
+
+```bash
+pip install fastparse
+```
+
+Install from a GitHub Release wheel:
+
+```bash
+pip install fastparse-0.1.0rc11-py3-none-macosx_11_0_arm64.whl
+```
+
+Python package versions use PEP 440. A FastParse release named `0.1.0-preview.11` is published to PyPI as `0.1.0rc11`.
+
+The wheel bundles the native library under `fastparse/native/`. Normal consumers do not need to set `FASTPARSE_LIBRARY_PATH`.
+
 ## Binary Output
 
 ```python
@@ -76,7 +100,7 @@ This returns a tiny JSON object and no `nodes` array.
 
 ## Library Loading
 
-The binding searches for the native library under `bin/`.
+The binding first searches the bundled wheel path under `fastparse/native/`, then the local checkout `bin/` path.
 
 Override explicitly:
 
@@ -130,6 +154,31 @@ result = parser.parse_bytes(
 ```
 
 Extension loading is setup work. Do it before starting worker threads.
+
+## Source Normalization
+
+Python exposes native normalization with the `normalization` option:
+
+```python
+result = parser.parse_bytes(
+    cobol_source_bytes,
+    language="cobol",
+    output_format="binary",
+    normalization="auto_safe",
+)
+```
+
+Supported values:
+
+```text
+auto_safe
+none
+cobol_fixed_legacy
+```
+
+`auto_safe` is the default. For COBOL it removes known legacy trailer bytes in RAM before parsing, such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record. For modern languages it currently leaves the source untouched.
+
+Use `normalization="none"` when a caller needs byte-for-byte parsing with no cleanup.
 
 ## Threading
 

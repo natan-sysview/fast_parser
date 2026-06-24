@@ -477,6 +477,55 @@ Example parent-application flow:
 read source bytes -> enqueue work -> worker calls FastParse -> copy result -> free result -> parent stores/uses data
 ```
 
+## Normalization Contract
+
+Status: `Preview`
+
+FastParse can apply memory-only source normalization before parsing. Normalization is intended for legacy source files that contain transport/editor markers that are not part of the program text.
+
+Supported native modes:
+
+```text
+TSMP_NORMALIZATION_AUTO_SAFE
+TSMP_NORMALIZATION_NONE
+TSMP_NORMALIZATION_COBOL_FIXED_LEGACY
+```
+
+Binding names:
+
+```text
+auto_safe
+none
+cobol_fixed_legacy
+```
+
+Default binding behavior:
+
+- Python: `normalization="auto_safe"`.
+- C#: `ParseOptions.Normalization = FastParseNormalization.AutoSafe`.
+- C ABI V2: caller chooses `TsmpOptionsV2.normalization`.
+- C ABI compatibility parse: `fastparse_parse` / `tsmp_parse` behaves as `TSMP_NORMALIZATION_NONE`.
+
+Current `auto_safe` behavior:
+
+- For `language = "cobol"`, applies `cobol_fixed_legacy`.
+- For modern languages such as Java, leaves bytes unchanged.
+
+Current COBOL fixed legacy cleanup:
+
+- Removes UTF-8 BOM at the start.
+- Removes final legacy EOF/control markers: `0x1A`, `0x7F`, and NUL.
+- Removes final invalid trailer records `FHA` and a lone `*` in column 1.
+- Does not shift COBOL columns.
+- Does not remove valid fixed-format code records.
+- Does not write normalized source to disk.
+
+Output contract:
+
+- AST fields are still controlled by the normal output field mask.
+- Normalization changes the bytes that Tree-sitter sees, so `text`, byte ranges, and line/column positions are relative to the normalized in-memory source.
+- Use `none` when byte-for-byte original offsets are required.
+
 ## Error Contract
 
 Status: `Preview`

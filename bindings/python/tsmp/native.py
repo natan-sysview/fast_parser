@@ -15,6 +15,10 @@ TSMP_FORMAT_STATS = 3
 TSMP_FORMAT_BINARY = 4
 TSMP_FORMAT_DIAGNOSTICS = 5
 
+TSMP_NORMALIZATION_AUTO_SAFE = 0
+TSMP_NORMALIZATION_NONE = 1
+TSMP_NORMALIZATION_COBOL_FIXED_LEGACY = 2
+
 TSMP_FIELD_ID = 1 << 0
 TSMP_FIELD_PARENT_ID = 1 << 1
 TSMP_FIELD_RULE = 1 << 2
@@ -48,6 +52,16 @@ FIELD_NAMES = {
     "children": TSMP_FIELD_CHILDREN,
     "diagnostics": TSMP_FIELD_DIAGNOSTICS,
     "all": TSMP_FIELD_ALL,
+}
+
+NORMALIZATION_NAMES = {
+    "auto": TSMP_NORMALIZATION_AUTO_SAFE,
+    "auto_safe": TSMP_NORMALIZATION_AUTO_SAFE,
+    "safe": TSMP_NORMALIZATION_AUTO_SAFE,
+    "none": TSMP_NORMALIZATION_NONE,
+    "off": TSMP_NORMALIZATION_NONE,
+    "cobol_fixed_legacy": TSMP_NORMALIZATION_COBOL_FIXED_LEGACY,
+    "cobol": TSMP_NORMALIZATION_COBOL_FIXED_LEGACY,
 }
 
 
@@ -97,6 +111,18 @@ class _TsmpOptions(ctypes.Structure):
     ]
 
 
+class _TsmpOptionsV2(ctypes.Structure):
+    _fields_ = [
+        ("language", ctypes.c_char_p),
+        ("format", ctypes.c_int),
+        ("include_rules", ctypes.c_char_p),
+        ("fields", ctypes.c_uint),
+        ("include_tokens", ctypes.c_int),
+        ("pretty", ctypes.c_int),
+        ("normalization", ctypes.c_int),
+    ]
+
+
 class _TsmpResult(ctypes.Structure):
     _fields_ = [
         ("status", ctypes.c_int),
@@ -128,6 +154,17 @@ def default_library_path() -> Path:
         candidates = ("fastparse.dll", "tsmp.dll")
     else:
         candidates = ("libfastparse.so", "libtsmp.so", "libts_multi_parser.so")
+
+    site_packages = Path(__file__).resolve().parents[1]
+    wheel_native_dirs = (
+        Path(__file__).resolve().parent / "native",
+        site_packages / "fastparse" / "native",
+    )
+    for directory in wheel_native_dirs:
+        for name in candidates:
+            candidate = directory / name
+            if candidate.exists():
+                return candidate
 
     for directory in ("bin", "lib"):
         for name in candidates:
@@ -178,6 +215,23 @@ def _format_value(output_format: str | int) -> tuple[str, int]:
         raise ValueError(f"unknown format '{output_format}'. Valid formats: {valid}") from exc
 
 
+def _normalization_value(normalization: str | int | None) -> tuple[str, int]:
+    if normalization is None:
+        return "auto_safe", TSMP_NORMALIZATION_AUTO_SAFE
+    if isinstance(normalization, int):
+        for name, value in NORMALIZATION_NAMES.items():
+            if value == normalization:
+                return name, value
+        raise ValueError(f"unknown TSMP normalization value: {normalization}")
+
+    normalized = normalization.strip().lower().replace("-", "_")
+    try:
+        return normalized, NORMALIZATION_NAMES[normalized]
+    except KeyError as exc:
+        valid = ", ".join(sorted(NORMALIZATION_NAMES))
+        raise ValueError(f"unknown normalization '{normalization}'. Valid values: {valid}") from exc
+
+
 def _rules_value(include_rules: str | Iterable[str] | None) -> bytes | None:
     if include_rules is None:
         return None
@@ -211,6 +265,7 @@ class Tsmp:
 
         self._version_fn = _native_function(self._lib, "fastparse_version", "tsmp_version")
         self._parse_fn = _native_function(self._lib, "fastparse_parse", "tsmp_parse")
+        self._parse_v2_fn = getattr(self._lib, "fastparse_parse_v2", None)
         self._free_fn = _native_function(self._lib, "fastparse_result_free", "tsmp_result_free")
         self._load_language_extension_fn = getattr(self._lib, "fastparse_load_language_extension")
         self._language_available_fn = getattr(self._lib, "fastparse_language_available")
@@ -226,6 +281,15 @@ class Tsmp:
             ctypes.POINTER(_TsmpResult),
         ]
         self._parse_fn.restype = ctypes.c_int
+
+        if self._parse_v2_fn is not None:
+            self._parse_v2_fn.argtypes = [
+                ctypes.c_void_p,
+                ctypes.c_size_t,
+                ctypes.POINTER(_TsmpOptionsV2),
+                ctypes.POINTER(_TsmpResult),
+            ]
+            self._parse_v2_fn.restype = ctypes.c_int
 
         self._free_fn.argtypes = [ctypes.POINTER(_TsmpResult)]
         self._free_fn.restype = None
@@ -273,6 +337,7 @@ class Tsmp:
         fields: int | str | Iterable[str] | None = None,
         include_tokens: bool = False,
         pretty: bool = False,
+        normalization: str | int | None = None,
     ) -> ParseResult:
         data, node_count, format_name, _output_length = self._parse_native(
             source,
@@ -282,6 +347,7 @@ class Tsmp:
             fields=fields,
             include_tokens=include_tokens,
             pretty=pretty,
+            normalization=normalization,
             copy_data=True,
         )
         return ParseResult(data, node_count, format_name)
@@ -296,6 +362,7 @@ class Tsmp:
         fields: int | str | Iterable[str] | None = None,
         include_tokens: bool = False,
         pretty: bool = False,
+        normalization: str | int | None = None,
     ) -> ParseSummary:
         _data, node_count, format_name, output_length = self._parse_native(
             source,
@@ -305,6 +372,7 @@ class Tsmp:
             fields=fields,
             include_tokens=include_tokens,
             pretty=pretty,
+            normalization=normalization,
             copy_data=False,
         )
         return ParseSummary(output_length, node_count, format_name)
@@ -319,22 +387,39 @@ class Tsmp:
         fields: int | str | Iterable[str] | None,
         include_tokens: bool,
         pretty: bool,
+        normalization: str | int | None,
         copy_data: bool,
     ) -> tuple[bytes, int, str, int]:
         source_bytes = source if isinstance(source, bytes) else bytes(source)
         format_name, format_code = _format_value(output_format)
+        _normalization_name, normalization_code = _normalization_value(normalization)
         source_pointer = ctypes.c_char_p(source_bytes) if source_bytes else None
-        options = _TsmpOptions(
-            language.encode("utf-8"),
-            format_code,
-            _rules_value(include_rules),
-            parse_field_mask(fields),
-            1 if include_tokens else 0,
-            1 if pretty else 0,
-        )
+        if self._parse_v2_fn is not None:
+            options = _TsmpOptionsV2(
+                language.encode("utf-8"),
+                format_code,
+                _rules_value(include_rules),
+                parse_field_mask(fields),
+                1 if include_tokens else 0,
+                1 if pretty else 0,
+                normalization_code,
+            )
+            parse_fn = self._parse_v2_fn
+        else:
+            if normalization_code != TSMP_NORMALIZATION_AUTO_SAFE:
+                raise TsmpError("native FastParse library does not support explicit normalization options")
+            options = _TsmpOptions(
+                language.encode("utf-8"),
+                format_code,
+                _rules_value(include_rules),
+                parse_field_mask(fields),
+                1 if include_tokens else 0,
+                1 if pretty else 0,
+            )
+            parse_fn = self._parse_fn
         result = _TsmpResult()
 
-        status = self._parse_fn(
+        status = parse_fn(
             ctypes.cast(source_pointer, ctypes.c_void_p) if source_pointer is not None else None,
             len(source_bytes),
             ctypes.byref(options),

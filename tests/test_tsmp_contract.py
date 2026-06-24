@@ -31,6 +31,21 @@ def test_language_extension_path() -> Path:
     return ROOT / "bin" / name
 
 
+def cobol_language_extension_path() -> Path:
+    if sys.platform == "darwin":
+        name = "libfastparse_language_cobol.dylib"
+    elif sys.platform == "win32":
+        name = "fastparse_language_cobol.dll"
+    else:
+        name = "libfastparse_language_cobol.so"
+    return ROOT / "bin" / name
+
+
+def load_cobol_extension(parser: Tsmp, extension_path: Path) -> None:
+    if not parser.language_available("cobol"):
+        parser.load_language_extension(extension_path)
+
+
 class MiniMsgpack:
     def __init__(self, data: bytes) -> None:
         self.data = data
@@ -381,6 +396,54 @@ class TsmpContractTests(unittest.TestCase):
         self.assertEqual(result.node_count, 1)
         self.assertEqual(document["language"], "java_extension")
         self.assertEqual(document["nodes"][0]["rule"], "method_declaration")
+
+    def test_cobol_auto_safe_normalization_removes_legacy_trailer(self) -> None:
+        extension_path = cobol_language_extension_path()
+        if not extension_path.exists():
+            self.skipTest(f"COBOL extension is not built: {extension_path}")
+
+        parser = Tsmp(default_library_path())
+        load_cobol_extension(parser, extension_path)
+        source = (
+            b"       IDENTIFICATION DIVISION.\n"
+            b"       PROGRAM-ID. DEMO.\n"
+            b"FHA\n"
+            b"\x1a"
+        )
+
+        result = parser.parse_bytes(
+            source,
+            language="cobol",
+            output_format="json",
+            fields=["rule", "text", "byte_range"],
+        )
+
+        self.assertGreater(result.node_count, 0)
+        self.assertNotIn(b"FHA", result.data)
+        self.assertNotIn(b"\\u001a", result.data)
+
+    def test_cobol_normalization_can_be_disabled(self) -> None:
+        extension_path = cobol_language_extension_path()
+        if not extension_path.exists():
+            self.skipTest(f"COBOL extension is not built: {extension_path}")
+
+        parser = Tsmp(default_library_path())
+        load_cobol_extension(parser, extension_path)
+        source = (
+            b"\xef\xbb\xbf"
+            b"       IDENTIFICATION DIVISION.\n"
+            b"       PROGRAM-ID. DEMO.\n"
+        )
+
+        result = parser.parse_bytes(
+            source,
+            language="cobol",
+            output_format="json",
+            fields=["rule", "text", "byte_range"],
+            normalization="none",
+        )
+
+        self.assertGreater(result.node_count, 0)
 
     def test_empty_source_is_valid(self) -> None:
         output, node_count = self.tsmp.parse_result(b"", language="java", output_format="json")

@@ -37,6 +37,11 @@ public sealed class ParseOptions
     public bool Pretty { get; init; }
 
     /// <summary>
+    /// Source normalization to apply before parsing. AutoSafe applies conservative legacy cleanup for languages such as COBOL.
+    /// </summary>
+    public FastParseNormalization Normalization { get; init; } = FastParseNormalization.AutoSafe;
+
+    /// <summary>
     /// Default JSON parse options that return the exploratory AST output.
     /// </summary>
     public static ParseOptions JsonAll { get; } = new();
