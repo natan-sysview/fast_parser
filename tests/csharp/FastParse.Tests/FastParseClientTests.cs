@@ -248,6 +248,43 @@ public sealed class FastParseClientTests
         Assert.DoesNotContain("\\u001a", result.Text, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public void LoadBundledPythonLanguageWithEnvironmentOverride()
+    {
+        var extensionPath = FindPythonLanguageExtensionOrNull();
+        if (extensionPath is null)
+        {
+            return;
+        }
+
+        var oldValue = Environment.GetEnvironmentVariable("FASTPARSE_LANGUAGE_PYTHON_PATH");
+        try
+        {
+            Environment.SetEnvironmentVariable("FASTPARSE_LANGUAGE_PYTHON_PATH", extensionPath);
+            using var parser = NewParser();
+
+            var load = parser.LoadBundledLanguage("python");
+            Assert.Equal("python", load.Language);
+            Assert.True(parser.LanguageAvailable("python"));
+
+            var result = parser.ParseText(
+                "def run(value):\n    return value + 1\n",
+                new ParseOptions
+                {
+                    Language = "python",
+                    IncludeRules = "function_definition",
+                    Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+                });
+
+            Assert.Equal(1UL, result.NodeCount);
+            Assert.Contains("function_definition", result.Text, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("FASTPARSE_LANGUAGE_PYTHON_PATH", oldValue);
+        }
+    }
+
     private static string FindNativeLibrary()
     {
         var fileName = OperatingSystem.IsWindows()
@@ -317,6 +354,37 @@ public sealed class FastParseClientTests
             : OperatingSystem.IsMacOS()
                 ? "libfastparse_language_cobol.dylib"
                 : "libfastparse_language_cobol.so";
+
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            foreach (var relative in new[]
+            {
+                Path.Combine("bin", fileName),
+                Path.Combine("bin", "Release", fileName),
+                Path.Combine("bin", "Debug", fileName)
+            })
+            {
+                var candidate = Path.Combine(directory.FullName, relative);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            directory = directory.Parent;
+        }
+
+        return null;
+    }
+
+    private static string? FindPythonLanguageExtensionOrNull()
+    {
+        var fileName = OperatingSystem.IsWindows()
+            ? "fastparse_language_python.dll"
+            : OperatingSystem.IsMacOS()
+                ? "libfastparse_language_python.dylib"
+                : "libfastparse_language_python.so";
 
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)

@@ -35,6 +35,19 @@ Once the package is published to nuget.org, the command becomes:
 dotnet add package FastParser
 ```
 
+Optional parse-language extensions use separate NuGet packages. The first pilot package is:
+
+```bash
+dotnet add package FastParser.Language.Python --prerelease
+```
+
+Then load the extension by language name:
+
+```csharp
+using var parser = new FastParseClient();
+parser.LoadBundledLanguage("python");
+```
+
 The NuGet package carries native libraries using standard RID folders:
 
 ```text
@@ -183,6 +196,7 @@ FastParseClient.ParseBytes(...)
 FastParseClient.ParseText(...)
 FastParseClient.ParseBytesSummary(...)
 FastParseClient.LoadLanguageExtension(...)
+FastParseClient.LoadBundledLanguage(...)
 FastParseClient.LanguageAvailable(...)
 ParseOptions
 ParseResult
@@ -198,7 +212,23 @@ The native parser is thread-safe per call. Parent applications still own thread 
 
 ## Language Extensions
 
-Load optional parse languages from a native extension path before parsing:
+Load optional parse languages from a package-manager extension before parsing:
+
+```csharp
+using var parser = new FastParseClient();
+
+var load = parser.LoadBundledLanguage("python");
+Console.WriteLine(load.Language);     // python
+Console.WriteLine(load.DisplayName);  // Python
+
+var result = parser.ParseText("def hello(): pass", new ParseOptions
+{
+    Language = "python",
+    Format = FastParseFormat.Json
+});
+```
+
+Advanced local builds can load a native extension path explicitly:
 
 ```csharp
 using var parser = new FastParseClient();

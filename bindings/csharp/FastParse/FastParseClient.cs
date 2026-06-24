@@ -95,6 +95,57 @@ public sealed unsafe class FastParseClient : IDisposable
     }
 
     /// <summary>
+    /// Loads a FastParse language extension installed by a package manager.
+    /// For example, <c>FastParser.Language.Python</c> can be loaded with <c>LoadBundledLanguage("python")</c>.
+    /// </summary>
+    /// <param name="language">Canonical language name such as <c>python</c> or <c>cobol</c>.</param>
+    public LanguageExtensionLoadResult LoadBundledLanguage(string language)
+    {
+        EnsureNotDisposed();
+        if (LanguageAvailable(language))
+        {
+            return new LanguageExtensionLoadResult { Language = language, DisplayName = language };
+        }
+
+        var candidates = BundledLanguageExtensionCandidates(language).Distinct().ToArray();
+        var errors = new List<string>();
+        foreach (var candidate in candidates)
+        {
+            if (!File.Exists(candidate))
+            {
+                errors.Add($"{candidate}: missing");
+                continue;
+            }
+
+            try
+            {
+                var result = LoadLanguageExtension(candidate);
+                if (!LanguageAvailable(language))
+                {
+                    throw new FastParseException(0, 0, $"extension loaded {result.Language}, but {language} is still unavailable");
+                }
+
+                return result;
+            }
+            catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException or FastParseException)
+            {
+                errors.Add($"{candidate}: {ex.GetType().Name}: {ex.Message.Split('\n')[0]}");
+            }
+        }
+
+        var message = new StringBuilder()
+            .AppendLine($"Unable to load bundled FastParse language extension '{language}'.")
+            .AppendLine($"Install package: FastParser.Language.{ToPackageLanguageName(language)}")
+            .AppendLine($"OS: {RuntimeInformation.OSDescription}")
+            .AppendLine($"Architecture: {RuntimeInformation.ProcessArchitecture}")
+            .AppendLine($"AppContext.BaseDirectory: {AppContext.BaseDirectory}")
+            .AppendLine("Tried:")
+            .AppendLine(string.Join(Environment.NewLine, errors.Select(error => $"  - {error}")))
+            .ToString();
+        throw new DllNotFoundException(message);
+    }
+
+    /// <summary>
     /// Parses source bytes and copies output bytes into managed memory.
     /// </summary>
     /// <param name="source">Source code bytes.</param>
@@ -393,6 +444,16 @@ public sealed unsafe class FastParseClient : IDisposable
                 : "libfastparse.so";
     }
 
+    private static string LanguageExtensionFileName(string language)
+    {
+        var canonical = CanonicalLanguageName(language);
+        return OperatingSystem.IsMacOS()
+            ? $"libfastparse_language_{canonical}.dylib"
+            : OperatingSystem.IsWindows()
+                ? $"fastparse_language_{canonical}.dll"
+                : $"libfastparse_language_{canonical}.so";
+    }
+
     private static string RuntimeIdentifier()
     {
         var platform = OperatingSystem.IsMacOS()
@@ -407,6 +468,47 @@ public sealed unsafe class FastParseClient : IDisposable
             _ => RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()
         };
         return $"{platform}-{arch}";
+    }
+
+    private static IEnumerable<string> BundledLanguageExtensionCandidates(string language)
+    {
+        var canonical = CanonicalLanguageName(language);
+        var envName = $"FASTPARSE_LANGUAGE_{canonical.ToUpperInvariant()}_PATH";
+        var explicitPath = Environment.GetEnvironmentVariable(envName);
+        if (!string.IsNullOrWhiteSpace(explicitPath))
+        {
+            yield return explicitPath;
+            yield break;
+        }
+
+        var fileName = LanguageExtensionFileName(canonical);
+        var rid = RuntimeIdentifier();
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            yield return Path.Combine(directory.FullName, "runtimes", rid, "native", fileName);
+            yield return Path.Combine(directory.FullName, "fastparse", "languages", canonical, "native", rid, fileName);
+            yield return Path.Combine(directory.FullName, "fastparse", "languages", canonical, "runtimes", rid, "native", fileName);
+            yield return Path.Combine(directory.FullName, fileName);
+            directory = directory.Parent;
+        }
+    }
+
+    private static string CanonicalLanguageName(string language)
+    {
+        var canonical = language.Trim().ToLowerInvariant().Replace("-", "_");
+        if (string.IsNullOrWhiteSpace(canonical))
+        {
+            throw new ArgumentException("Language is required.", nameof(language));
+        }
+
+        return canonical;
+    }
+
+    private static string ToPackageLanguageName(string language)
+    {
+        var canonical = CanonicalLanguageName(language);
+        return string.Join('.', canonical.Split('_', StringSplitOptions.RemoveEmptyEntries).Select(part => char.ToUpperInvariant(part[0]) + part[1..]));
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

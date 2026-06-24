@@ -1,0 +1,30 @@
+{
+  "extensionKind": "fastparse-language",
+  "language": "python",
+  "displayName": "Python",
+  "version": "0.1.0-preview.1",
+  "extensionAbi": 1,
+  "coreAbi": "fastparse-c-api/0.5.0",
+  "binarySchemaVersion": 1,
+  "grammar": {
+    "name": "tree-sitter-python",
+    "source": "https://github.com/tree-sitter/tree-sitter-python",
+    "revision": "vendored",
+    "license": "MIT"
+  },
+  "symbols": {
+    "descriptor": "fastparse_language_extension_descriptor",
+    "treeSitterLanguage": "tree_sitter_python"
+  },
+  "normalization": {
+    "default": "auto_safe",
+    "supported": ["auto_safe", "none"]
+  },
+  "platforms": [
+    "linux-x64",
+    "osx-arm64",
+    "osx-x64",
+    "win-x64"
+  ],
+  "status": "preview"
+}

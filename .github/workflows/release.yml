@@ -284,6 +284,222 @@ jobs:
           name: fastparse-${{ steps.version.outputs.value }}-python-${{ matrix.platform }}
           path: dist/python/*.whl
 
+  language-extension:
+    name: Language Extension python ${{ matrix.platform }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+            archive_ext: tar.gz
+            archive_glob: dist/languages/*.tar.gz
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+            archive_ext: tar.gz
+            archive_glob: dist/languages/*.tar.gz
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+            archive_ext: tar.gz
+            archive_glob: dist/languages/*.tar.gz
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+            archive_ext: zip
+            archive_glob: dist/languages/*.zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build and package Python language extension
+        run: >
+          python scripts/package_language_extension.py
+          --language python
+          --version "${{ steps.version.outputs.value }}"
+          --platform ${{ matrix.platform }}
+          --arch ${{ matrix.arch }}
+
+      - name: Upload language extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-python-${{ steps.version.outputs.value }}-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ${{ matrix.archive_glob }}
+
+  python-language-wheel:
+    name: Python Language Wheel python ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux-x64
+            platform_tag: manylinux2014_x86_64
+            linux_container: true
+          - runner: macos-15-intel
+            platform: macos-x64
+            platform_tag: macosx_10_15_x86_64
+            linux_container: false
+          - runner: macos-14
+            platform: macos-arm64
+            platform_tag: macosx_11_0_arm64
+            linux_container: false
+          - runner: windows-latest
+            platform: windows-x64
+            platform_tag: win_amd64
+            linux_container: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build manylinux language wheel
+        if: matrix.linux_container
+        run: >
+          docker run --rm
+          -v "$PWD:/io"
+          -w /io
+          quay.io/pypa/manylinux2014_x86_64
+          /opt/python/cp312-cp312/bin/python
+          scripts/package_python_language_wheel.py
+          --language python
+          --version "${{ steps.version.outputs.value }}"
+          --platform-tag "${{ matrix.platform_tag }}"
+          --output-dir /io/dist/python-languages
+
+      - name: Build platform language wheel
+        if: ${{ !matrix.linux_container }}
+        run: >
+          python scripts/package_python_language_wheel.py
+          --language python
+          --version "${{ steps.version.outputs.value }}"
+          --platform-tag "${{ matrix.platform_tag }}"
+
+      - name: Upload Python language wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-python-${{ steps.version.outputs.value }}-wheel-${{ matrix.platform }}
+          path: dist/python-languages/*.whl
+
+  nuget-language-package:
+    name: NuGet Language Package Python
+    needs: language-extension
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download language extension archives
+        uses: actions/download-artifact@v4
+        with:
+          path: language-artifacts
+          pattern: fastparse-language-python-*
+          merge-multiple: true
+
+      - name: Build NuGet language package
+        shell: bash
+        run: |
+          archives=()
+          while IFS= read -r -d '' archive; do
+            archives+=(--archive "$archive")
+          done < <(find language-artifacts -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' \) -print0)
+          python scripts/package_nuget_language_extension.py --language python --version "${{ steps.version.outputs.value }}" "${archives[@]}"
+
+      - name: NuGet login
+        id: nuget_login
+        uses: NuGet/login@v1
+        with:
+          user: NATANBARRON
+        if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_PYTHON_PUBLISH == 'true'
+
+      - name: Publish NuGet language package
+        run: >
+          dotnet nuget push
+          "dist/nuget-languages/FastParser.Language.Python.${{ steps.version.outputs.value }}.nupkg"
+          --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+        if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_PYTHON_PUBLISH == 'true'
+
+      - name: Upload NuGet language package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-python-${{ steps.version.outputs.value }}-nuget
+          path: dist/nuget-languages/*.nupkg
+
+  publish-pypi-language-python:
+    name: Publish PyPI Language Python
+    needs: python-language-wheel
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_PYTHON_PUBLISH == 'true'
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download Python language wheels
+        uses: actions/download-artifact@v4
+        with:
+          path: python-language-dist
+          pattern: fastparse-language-python-*-wheel-*
+          merge-multiple: true
+
+      - name: Publish language wheels to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python-language-dist
+
   publish-pypi:
     name: Publish PyPI
     needs: python-wheel
@@ -388,6 +604,9 @@ jobs:
       - package
       - nuget-package
       - python-wheel
+      - language-extension
+      - python-language-wheel
+      - nuget-language-package
       - published-nuget-smoke
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')

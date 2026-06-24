@@ -35,10 +35,9 @@ if(TSMP_USE_VENDORED_TREE_SITTER)
         "${TSMP_VENDOR_TREE_SITTER_DIR}/lib/src/lib.c")
 endif()
 
-file(GLOB TSMP_GRAMMAR_PARSERS CONFIGURE_DEPENDS
-    "${TSMP_GRAMMARS_DIR}/tree-sitter-*/src/parser.c")
-file(GLOB TSMP_GRAMMAR_SCANNERS CONFIGURE_DEPENDS
-    "${TSMP_GRAMMARS_DIR}/tree-sitter-*/src/scanner.c")
+set(TSMP_GRAMMAR_PARSERS
+    "${TSMP_GRAMMARS_DIR}/tree-sitter-java/src/parser.c")
+set(TSMP_GRAMMAR_SCANNERS)
 
 set(TSMP_GRAMMAR_INCLUDES)
 foreach(parser_source IN LISTS TSMP_GRAMMAR_PARSERS)

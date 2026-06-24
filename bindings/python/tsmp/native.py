@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import ctypes
+import importlib
+import importlib.resources
 import json
 import os
+import platform
 import sys
 from dataclasses import dataclass
 from enum import IntEnum, IntFlag
@@ -404,6 +407,19 @@ class Tsmp:
         finally:
             self._language_load_result_free_fn(ctypes.byref(result))
 
+    def load_bundled_language(self, language: str) -> LanguageLoadResult:
+        """Load an installed FastParse language package such as fastparse-language-python."""
+        if self.language_available(language):
+            return LanguageLoadResult(language=language, display_name=language)
+        extension_path = bundled_language_extension_path(language)
+        load_result = self.load_language_extension(extension_path)
+        if not self.language_available(language):
+            raise NativeParseError(
+                f"bundled FastParse language package loaded {load_result.language!r}, "
+                f"but {language!r} is still unavailable"
+            )
+        return load_result
+
     def parse_bytes(
         self,
         source: bytes | bytearray | memoryview,
@@ -574,3 +590,68 @@ class Tsmp:
 
 TsmpLibrary = Tsmp
 FastParse = Tsmp
+
+
+def bundled_language_extension_path(language: str) -> Path:
+    canonical = language.strip().lower().replace("-", "_")
+    if not canonical:
+        raise ValueError("language is required")
+
+    env_name = f"FASTPARSE_LANGUAGE_{canonical.upper()}_PATH"
+    if os.environ.get(env_name):
+        return Path(os.environ[env_name])
+
+    package_name = f"fastparse_language_{canonical}"
+    try:
+        package = importlib.import_module(package_name)
+    except ModuleNotFoundError as exc:
+        raise FileNotFoundError(
+            f"FastParse language package '{package_name}' is not installed. "
+            f"Install it with: pip install fastparse-language-{language}"
+        ) from exc
+
+    extension_path_fn = getattr(package, "extension_path", None)
+    if callable(extension_path_fn):
+        return Path(extension_path_fn())
+
+    file_name = _language_extension_file_name(canonical)
+    platform_key = _language_platform_key()
+    package_root = importlib.resources.files(package)
+    candidates = [
+        package_root / "native" / platform_key / file_name,
+        package_root / "native" / file_name,
+    ]
+    for candidate in candidates:
+        candidate_path = Path(str(candidate))
+        if candidate_path.is_file():
+            return candidate_path
+
+    searched = ", ".join(str(candidate) for candidate in candidates)
+    raise FileNotFoundError(
+        f"FastParse language package '{package_name}' does not include a native asset "
+        f"for {platform_key}. Searched: {searched}"
+    )
+
+
+def _language_extension_file_name(language: str) -> str:
+    if sys.platform == "darwin":
+        return f"libfastparse_language_{language}.dylib"
+    if sys.platform == "win32":
+        return f"fastparse_language_{language}.dll"
+    return f"libfastparse_language_{language}.so"
+
+
+def _language_platform_key() -> str:
+    machine = platform.machine().lower()
+    if machine in {"x86_64", "amd64"}:
+        arch = "x64"
+    elif machine in {"arm64", "aarch64"}:
+        arch = "arm64"
+    else:
+        arch = machine
+
+    if sys.platform == "darwin":
+        return f"osx-{arch}"
+    if sys.platform == "win32":
+        return f"win-{arch}"
+    return f"linux-{arch}"

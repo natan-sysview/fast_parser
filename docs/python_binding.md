@@ -76,6 +76,22 @@ Python package versions use PEP 440. A FastParse release named `0.1.0-preview.17
 
 The wheel bundles the native library under `fastparse/native/` and includes `py.typed` markers for type-aware tooling. Normal consumers do not need to set `FASTPARSE_LIBRARY_PATH`.
 
+Optional parse-language extensions use separate wheels. The first pilot extension is:
+
+```bash
+pip install --pre fastparse-language-python
+```
+
+After installing the extension wheel, load it by language name:
+
+```python
+from fastparse import FastParse
+
+parser = FastParse()
+parser.load_bundled_language("python")
+result = parser.parse_text("def hello(): pass", language="python", output_format="json")
+```
+
 ## Binary Output
 
 ```python
@@ -212,6 +228,7 @@ parse_text(...)
 parse_bytes_summary(...)
 parse_text_summary(...)
 load_language_extension(...)
+load_bundled_language(...)
 language_available(...)
 version
 OutputFormat
@@ -251,6 +268,19 @@ result = parser.parse_bytes(
 ```
 
 Extension loading is setup work. Do it before starting worker threads.
+
+For package-manager installs, prefer bundled loading:
+
+```python
+parser = FastParse()
+parser.load_bundled_language("python")
+```
+
+The binding resolves installed `fastparse-language-<name>` packages with `importlib.resources`. For enterprise deployments or tests, override one extension with:
+
+```bash
+FASTPARSE_LANGUAGE_PYTHON_PATH=/path/to/libfastparse_language_python.dylib python3 your_app.py
+```
 
 ## Source Normalization
 

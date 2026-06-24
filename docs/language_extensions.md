@@ -64,6 +64,13 @@ Recommended package names:
 
 Package names must be predictable so an AI coding agent can infer the install command from a requested language.
 
+Current pilot packages:
+
+| Ecosystem | Python extension |
+|---|---|
+| NuGet | `FastParser.Language.Python` |
+| PyPI | `fastparse-language-python` |
+
 ## Agent-Friendly Install Commands
 
 Status: `Stable` as documentation convention.
@@ -203,9 +210,12 @@ For unpacked native release archives:
 
 ```text
 manifest.json
-lib/libfastparse_language_cobol.so
-lib/libfastparse_language_cobol.dylib
-bin/fastparse_language_cobol.dll
+README.md
+grammar/
+native/linux-x64/libfastparse_language_cobol.so
+native/osx-arm64/libfastparse_language_cobol.dylib
+native/osx-x64/libfastparse_language_cobol.dylib
+native/win-x64/fastparse_language_cobol.dll
 docs/
 queries/
 ```
@@ -224,7 +234,7 @@ Example:
   "language": "cobol",
   "displayName": "COBOL",
   "version": "0.1.0",
-  "abi": "fastparse-language-extension/1",
+  "extensionAbi": 1,
   "coreAbi": "fastparse-c-api/0.5.0",
   "grammar": {
     "name": "tree-sitter-cobol",
@@ -251,7 +261,7 @@ Rules:
 - `extensionKind` must be `fastparse-language`.
 - `language` is the canonical parse language name.
 - `language` must be lowercase and package-friendly.
-- `abi` identifies the language extension ABI.
+- `extensionAbi` identifies the language extension ABI.
 - `coreAbi` identifies the compatible FastParse core ABI.
 - `symbols.treeSitterLanguage` names the exported Tree-sitter language function.
 - `aliases` are optional convenience names and must never replace the canonical name.
@@ -331,7 +341,7 @@ Current implementation status:
 ```text
 load_language_extension(path)  implemented
 language_available(language)   implemented
-load_bundled_language(language) planned
+load_bundled_language(language) implemented in Python and C#
 list_languages()               planned
 ```
 
@@ -375,11 +385,11 @@ This is not packaged as `FastParser.Language.Cobol` yet. The first goal is to ev
 
 Status: `Preview`
 
-The repository can build a Python language extension when pointed at a `tree-sitter-python` checkout:
+The repository includes a vendored `tree-sitter-python` grammar and can build a Python language extension when the extension grammar path is enabled:
 
 ```bash
 cmake -S . -B build-python-extension -DCMAKE_BUILD_TYPE=Release \
-  -DFASTPARSE_PYTHON_GRAMMAR_DIR=/path/to/tree-sitter-python
+  -DFASTPARSE_PYTHON_GRAMMAR_DIR=grammars/tree-sitter-python
 cmake --build build-python-extension --config Release --target fastparse_language_python
 ```
 
@@ -398,6 +408,30 @@ result = parser.parse_bytes(source, language="python", output_format="json")
 ```
 
 This proves the grammar-extension path with a cleaner grammar before packaging future language extensions.
+
+Build a native extension archive:
+
+```bash
+python3 scripts/package_language_extension.py \
+  --language python \
+  --version 0.1.0-preview.1
+```
+
+Build a PyPI extension wheel:
+
+```bash
+python3 scripts/package_python_language_wheel.py \
+  --language python \
+  --version 0.1.0-preview.1
+```
+
+Validate with the core `fastparse` wheel:
+
+```bash
+python3 scripts/validate_python_language_wheel.py \
+  dist/python/fastparse-0.1.0rc17-py3-none-macosx_11_0_arm64.whl \
+  dist/python-languages/fastparse_language_python-0.1.0rc1-py3-none-macosx_11_0_arm64.whl
+```
 
 ## NuGet Discovery
 
@@ -425,6 +459,12 @@ Expected developer flow:
 ```bash
 dotnet add package FastParser
 dotnet add package FastParser.Language.Cobol
+```
+
+Python pilot:
+
+```bash
+dotnet add package FastParser.Language.Python --prerelease
 ```
 
 Expected C# flow:
@@ -464,6 +504,12 @@ Expected developer flow:
 ```bash
 pip install fastparse
 pip install fastparse-language-cobol
+```
+
+Python pilot:
+
+```bash
+pip install --pre fastparse-language-python
 ```
 
 Expected Python flow:

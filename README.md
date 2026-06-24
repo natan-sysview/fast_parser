@@ -25,13 +25,20 @@ Project version      : 0.1.0-preview
 C API version        : fastparse-c-api/0.5.0
 Binary schema        : 1
 Supported languages  : java
-Extension preview    : explicit path loading for optional languages
+Extension preview    : explicit path loading and bundled Python package loading
 License              : Apache-2.0
 ```
 
 The `fastparse_*` symbols are the public names. The older `tsmp_*` symbols remain available as compatibility aliases.
 
 Java is built into the core package. Other parse languages should be delivered as optional language extensions so the default package stays small.
+
+The first packaged extension pilot is Python:
+
+```text
+FastParser.Language.Python    NuGet language package
+fastparse-language-python     PyPI language wheel
+```
 
 ## Quick Start
 
@@ -97,7 +104,9 @@ Every successful or failed parse call that receives a `TsmpResult` must be follo
 
 ## Language Extensions
 
-FastParse can load a native language extension before parsing:
+FastParse can load a native language extension before parsing.
+
+Advanced users can load an explicit native extension path:
 
 ```c
 FastParseLanguageLoadResult load = {0};
@@ -112,6 +121,21 @@ After loading, use the registered language name in normal parse options:
 ```
 
 Extension loading is a setup step. Load extensions before starting concurrent parse workers.
+
+Package-manager language extensions are loaded by bindings with the bundled-language API:
+
+```python
+from fastparse import FastParse
+
+parser = FastParse()
+parser.load_bundled_language("python")
+result = parser.parse_text("def hello(): pass", language="python")
+```
+
+```csharp
+using var parser = new FastParseClient();
+parser.LoadBundledLanguage("python");
+```
 
 Official grammar extensions must follow [FastParse Grammar Standard](docs/grammar_standard.md).
 
@@ -177,6 +201,8 @@ Bindings are reusable code intended for application developers. Runnable demos a
 - [Encoding And Bytes Contract](docs/encoding.md)
 - [Threading, Platforms, And Packaging](docs/packaging.md)
 - [Language Strategy](docs/languages.md)
+- [Language Extensions](docs/language_extensions.md)
+- [FastParse Grammar Standard](docs/grammar_standard.md)
 - [Java Inventory SQLite Lab](docs/java_inventory.md)
 - [Benchmarks](docs/benchmarks.md)
 - [Release Checklist](docs/release_checklist.md)

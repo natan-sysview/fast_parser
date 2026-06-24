@@ -265,6 +265,43 @@ Publishing to nuget.org uses NuGet Trusted Publishing from GitHub Actions. The p
 
 Tagged NuGet releases also run a post-publish smoke test from nuget.org on Linux x64, Windows x64, macOS arm64, and macOS x64.
 
+## NuGet Language Extension Packages
+
+Optional parse languages are packaged separately from the core `FastParser` package. The first pilot package is:
+
+```text
+FastParser.Language.Python
+```
+
+The package contains only language-extension assets:
+
+```text
+contentFiles/any/any/fastparse/languages/python/manifest.json
+buildTransitive/FastParser.Language.Python.targets
+runtimes/linux-x64/native/libfastparse_language_python.so
+runtimes/osx-arm64/native/libfastparse_language_python.dylib
+runtimes/osx-x64/native/libfastparse_language_python.dylib
+runtimes/win-x64/native/fastparse_language_python.dll
+```
+
+Build from language archives:
+
+```bash
+python3 scripts/package_nuget_language_extension.py \
+  --language python \
+  --version 0.1.0-preview.17 \
+  --archive dist/languages/fastparse-language-python-0.1.0-preview.17-linux-x64.tar.gz \
+  --archive dist/languages/fastparse-language-python-0.1.0-preview.17-macos-arm64.tar.gz \
+  --archive dist/languages/fastparse-language-python-0.1.0-preview.17-macos-x64.tar.gz \
+  --archive dist/languages/fastparse-language-python-0.1.0-preview.17-windows-x64.zip
+```
+
+Publishing is gated by:
+
+```text
+NUGET_LANGUAGE_PYTHON_PUBLISH=true
+```
+
 ## Python Wheel / PyPI Package
 
 The release workflow also builds Python wheels for:
@@ -338,6 +375,45 @@ project: fastparse
 ```
 
 Tagged PyPI releases also run a post-publish smoke test from pypi.org on Linux x64, Windows x64, macOS arm64, and macOS x64. The smoke test installs the exact published package in a clean virtual environment, loads the bundled native library, parses Java as JSON, checks binary output, decodes binary output, and checks diagnostics output.
+
+## PyPI Language Extension Wheels
+
+Optional parse languages are packaged as separate wheels. The first pilot package is:
+
+```text
+fastparse-language-python
+```
+
+Each wheel contains one native language extension for the platform tag:
+
+```text
+fastparse_language_python/
+fastparse_language_python/manifest.json
+fastparse_language_python/py.typed
+fastparse_language_python/native/osx-arm64/libfastparse_language_python.dylib
+```
+
+Build locally:
+
+```bash
+python3 scripts/package_python_language_wheel.py \
+  --language python \
+  --version 0.1.0-preview.17
+```
+
+Validate with a core wheel:
+
+```bash
+python3 scripts/validate_python_language_wheel.py \
+  dist/python/fastparse-0.1.0rc17-py3-none-macosx_11_0_arm64.whl \
+  dist/python-languages/fastparse_language_python-0.1.0rc17-py3-none-macosx_11_0_arm64.whl
+```
+
+Publishing is gated by:
+
+```text
+PYPI_LANGUAGE_PYTHON_PUBLISH=true
+```
 
 The workflow lives at:
 

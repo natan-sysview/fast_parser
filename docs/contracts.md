@@ -104,12 +104,12 @@ Rules:
 - Unsupported or unloaded language names return `TSMP_ERROR_UNSUPPORTED_LANGUAGE` from parse calls.
 - Failed extension loads return `TSMP_ERROR_EXTENSION_LOAD` with a diagnostic message when available.
 
-The current preview supports explicit path loading. Package-manager bundled discovery is planned separately.
+The current preview supports explicit path loading in the C API and package-manager bundled discovery in the Python and C# bindings.
 
 Example flow:
 
 ```text
-load extension path -> verify language_available("cobol") -> parse source bytes with language="cobol"
+load extension path or bundled package -> verify language_available("cobol") -> parse source bytes with language="cobol"
 ```
 
 ## Rule Filter Contract

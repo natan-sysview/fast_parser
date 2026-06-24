@@ -166,9 +166,21 @@ Use one `FastParseClient` per worker thread. Keep file IO, queues, and database 
 
 ## Optional Parse Languages
 
-FastParser currently includes Java by default. Future parse languages should be installed as separate language extension packages.
+FastParser includes Java by default. Additional parse languages are installed as separate language extension packages.
 
-Current preview builds can also load an explicit native extension path:
+Preferred package-manager flow:
+
+```bash
+dotnet add package FastParser
+dotnet add package FastParser.Language.Python --prerelease
+```
+
+```csharp
+using var parser = new FastParseClient();
+parser.LoadBundledLanguage("python");
+```
+
+Advanced local builds can also load an explicit native extension path:
 
 ```csharp
 using var parser = new FastParseClient();
@@ -183,7 +195,7 @@ Language = "cobol"
 
 Load extensions before starting concurrent parse workers.
 
-Expected package-manager patterns:
+Expected package-manager patterns for other ecosystems:
 
 ```bash
 dotnet add package FastParser.Language.Cobol

@@ -30,6 +30,7 @@ from .native import (
     Tsmp,
     TsmpError,
     TsmpLibrary,
+    bundled_language_extension_path,
     default_library_path,
     parse_field_mask,
 )
@@ -79,6 +80,7 @@ __all__ = [
     "TsmpError",
     "TsmpLibrary",
     "decode_binary",
+    "bundled_language_extension_path",
     "default_library_path",
     "parse_field_mask",
     "unpack_messagepack",
