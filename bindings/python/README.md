@@ -20,7 +20,7 @@ pip install fastparse
 From a downloaded wheel:
 
 ```bash
-pip install fastparse-0.1.0rc12-py3-none-macosx_11_0_arm64.whl
+pip install fastparse-0.1.0rc13-py3-none-macosx_11_0_arm64.whl
 ```
 
 The wheel includes the native library for its platform, so normal users do not need `FASTPARSE_LIBRARY_PATH`.

@@ -46,7 +46,7 @@ dotnet test tests/csharp/FastParse.Tests/FastParse.Tests.csproj --configuration 
 Build release archives locally:
 
 ```bash
-python3 scripts/package_release.py --version 0.1.0-preview.12
+python3 scripts/package_release.py --version 0.1.0-preview.13
 ```
 
 GitHub Actions release artifacts:

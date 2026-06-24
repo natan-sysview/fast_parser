@@ -40,7 +40,7 @@ def default_platform_tag() -> str:
 
 
 def python_package_version() -> str:
-    version = os.environ.get("FASTPARSE_PY_VERSION", "0.1.0-preview.12")
+    version = os.environ.get("FASTPARSE_PY_VERSION", "0.1.0-preview.13")
     if "-preview." in version:
         base, preview = version.split("-preview.", 1)
         return f"{base}rc{preview}"

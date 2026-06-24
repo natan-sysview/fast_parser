@@ -36,7 +36,7 @@ def default_platform_tag() -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build FastParse Python wheel.")
-    parser.add_argument("--version", required=True, help="Release version, for example 0.1.0-preview.12")
+    parser.add_argument("--version", required=True, help="Release version, for example 0.1.0-preview.13")
     parser.add_argument("--platform-tag", default=default_platform_tag())
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist" / "python")
     return parser.parse_args()

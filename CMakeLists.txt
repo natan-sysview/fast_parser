@@ -74,7 +74,7 @@ target_compile_definitions(tsmp
         TREE_SITTER_HIDE_SYMBOLS)
 
 if(UNIX AND NOT APPLE)
-    target_compile_definitions(tsmp PRIVATE _DEFAULT_SOURCE)
+    target_compile_definitions(tsmp PRIVATE _DEFAULT_SOURCE _BSD_SOURCE)
 endif()
 
 if(MSVC)
