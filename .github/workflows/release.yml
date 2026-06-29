@@ -149,6 +149,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release-artifacts
+          pattern: fastparse-${{ steps.version.outputs.value }}-*
           merge-multiple: true
 
       - name: Build NuGet package
@@ -412,7 +413,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: fastparse-${{ steps.version.outputs.value }}-python-${{ matrix.platform }}
-          path: dist/python-core
+          path: artifacts/python-core
 
       - name: Validate manylinux language wheel
         if: matrix.linux_container
@@ -424,14 +425,14 @@ jobs:
           quay.io/pypa/manylinux2014_x86_64
           /opt/python/cp312-cp312/bin/python
           scripts/validate_python_language_wheel.py
-          "$(find dist/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
+          "$(find artifacts/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
           "$(find dist/python-languages -maxdepth 1 -name 'fastparse_language_python-*.whl' | head -n 1)"
 
       - name: Validate platform language wheel
         if: ${{ !matrix.linux_container }}
         shell: bash
         run: |
-          core_wheel="$(find dist/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
+          core_wheel="$(find artifacts/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
           language_wheel="$(find dist/python-languages -maxdepth 1 -name 'fastparse_language_python-*.whl' | head -n 1)"
           python scripts/validate_python_language_wheel.py "$core_wheel" "$language_wheel"
 
@@ -592,11 +593,16 @@ jobs:
       id-token: write
 
     steps:
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
       - name: Download Python wheels
         uses: actions/download-artifact@v4
         with:
           path: python-dist
-          pattern: fastparse-*-python-*
+          pattern: fastparse-${{ steps.version.outputs.value }}-python-*
           merge-multiple: true
 
       - name: Publish wheels to PyPI
