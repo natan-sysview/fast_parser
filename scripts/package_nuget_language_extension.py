@@ -25,6 +25,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--language", required=True, choices=["python", "rust"])
     parser.add_argument("--version", required=True)
     parser.add_argument("--archive", action="append", type=Path, default=[])
+    parser.add_argument("--dependency-source", type=Path, help="Optional local NuGet source used to restore FastParser while packing.")
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist" / "nuget-languages")
     return parser.parse_args()
 
@@ -165,22 +166,32 @@ def write_pack_project(language: str, version: str, staging: Path) -> Path:
     return project
 
 
-def make_package(staging: Path, project: Path, output_dir: Path, package_name: str, version: str) -> Path:
+def make_package(
+    staging: Path,
+    project: Path,
+    output_dir: Path,
+    package_name: str,
+    version: str,
+    dependency_source: Path | None,
+) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     package = output_dir / f"{package_name}.{version}.nupkg"
     if package.exists():
         package.unlink()
+    command = [
+        "dotnet",
+        "pack",
+        str(project),
+        "--configuration",
+        "Release",
+        "--output",
+        str(output_dir),
+        f"-p:PackageVersion={version}",
+    ]
+    if dependency_source is not None:
+        command.extend(["--source", str(dependency_source)])
     subprocess.run(
-        [
-            "dotnet",
-            "pack",
-            str(project),
-            "--configuration",
-            "Release",
-            "--output",
-            str(output_dir),
-            f"-p:PackageVersion={version}",
-        ],
+        command,
         cwd=staging,
         check=True,
     )
@@ -223,7 +234,14 @@ def main() -> int:
             raise AssertionError(f"missing required RID assets: {', '.join(missing)}")
         write_targets(args.language, staging)
         project = write_pack_project(args.language, args.version, staging)
-        package = make_package(staging, project, args.output_dir.resolve(), package_id(args.language), args.version)
+        package = make_package(
+            staging,
+            project,
+            args.output_dir.resolve(),
+            package_id(args.language),
+            args.version,
+            args.dependency_source.resolve() if args.dependency_source else None,
+        )
         validate_package(package, args.language)
     print(f"NuGet language package: {package}")
     return 0
