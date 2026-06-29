@@ -13,8 +13,6 @@ import zipfile
 from pathlib import Path
 
 
-SOURCE = "https://api.nuget.org/v3/index.json"
-
 PROGRAM = r'''using FastParse;
 
 using var parser = new FastParseClient();
@@ -149,8 +147,6 @@ def main() -> int:
                 args.version,
                 "--source",
                 str(package_source),
-                "--source",
-                SOURCE,
             ],
             env=env,
         )
