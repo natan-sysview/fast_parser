@@ -4,12 +4,11 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
 import re
 import shutil
+import subprocess
 import tarfile
 import tempfile
-import uuid
 import zipfile
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -115,129 +114,100 @@ def write_targets(language: str, staging: Path) -> None:
     (targets_dir / f"{package_id(language)}.targets").write_text(targets, encoding="utf-8")
 
 
-def write_nuspec(language: str, version: str, staging: Path) -> Path:
+def write_pack_project(language: str, version: str, staging: Path) -> Path:
     pid = package_id(language)
     readme = staging / "README.md"
     if not readme.exists():
         readme.write_text(f"# {pid}\n\nFastParse {language} language extension.\n", encoding="utf-8")
-    nuspec = staging / f"{pid}.nuspec"
-    nuspec.write_text(
+    project = staging / f"{pid}.csproj"
+    project.write_text(
         f'''<?xml version="1.0" encoding="utf-8"?>
-<package>
-  <metadata>
-    <id>{escape(pid)}</id>
-    <version>{escape(version)}</version>
-    <authors>natan-sysview</authors>
-    <description>FastParse {escape(language)} language extension native assets.</description>
-    <packageTypes>
-      <packageType name="Dependency" />
-    </packageTypes>
-    <license type="expression">Apache-2.0</license>
-    <projectUrl>https://github.com/natan-sysview/fast_parser</projectUrl>
-    <repository type="git" url="https://github.com/natan-sysview/fast_parser" />
-    <tags>fastparse tree-sitter parser {escape(language)} native</tags>
-    <readme>README.md</readme>
-    <dependencies>
-      <group targetFramework="net8.0">
-        <dependency id="FastParser" version="{escape(version)}" />
-      </group>
-      <group targetFramework="net9.0">
-        <dependency id="FastParser" version="{escape(version)}" />
-      </group>
-    </dependencies>
-    <contentFiles>
-      <files include="any/any/fastparse/languages/{escape(language)}/manifest.json" buildAction="None" copyToOutput="true" />
-    </contentFiles>
-  </metadata>
-</package>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <PackageId>{escape(pid)}</PackageId>
+    <Version>{escape(version)}</Version>
+    <Authors>natan-sysview</Authors>
+    <Company>natan-sysview</Company>
+    <Description>FastParse {escape(language)} language extension native assets.</Description>
+    <PackageTags>fastparse;tree-sitter;parser;{escape(language)};native</PackageTags>
+    <PackageProjectUrl>https://github.com/natan-sysview/fast_parser</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/natan-sysview/fast_parser</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Preview FastParse language extension for {escape(language)}.</PackageReleaseNotes>
+    <PackageType>Dependency</PackageType>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>false</SuppressDependenciesWhenPacking>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FastParser" Version="{escape(version)}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="buildTransitive/{escape(pid)}.targets" Pack="true" PackagePath="buildTransitive/" />
+    <None Include="runtimes/**" Pack="true" PackagePath="runtimes/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Content Include="contentFiles/any/any/fastparse/languages/{escape(language)}/manifest.json"
+             Pack="true"
+             PackagePath="contentFiles/any/any/fastparse/languages/{escape(language)}/manifest.json"
+             PackageBuildAction="None"
+             PackageCopyToOutput="true" />
+  </ItemGroup>
+</Project>
 ''',
         encoding="utf-8",
     )
-    return nuspec
+    return project
 
 
-def write_package_metadata(staging: Path, nuspec: Path, package_name: str, version: str, language: str) -> list[Path]:
-    """Write the Open Packaging Convention metadata NuGet.org expects."""
-
-    content_types = staging / "[Content_Types].xml"
-    rels = staging / "_rels" / ".rels"
-    core_properties = (
-        staging
-        / "package"
-        / "services"
-        / "metadata"
-        / "core-properties"
-        / f"{uuid.uuid4().hex}.psmdcp"
-    )
-
-    rels.parent.mkdir(parents=True, exist_ok=True)
-    core_properties.parent.mkdir(parents=True, exist_ok=True)
-
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    content_types.write_text(
-        '''<?xml version="1.0" encoding="utf-8"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml" />
-  <Default Extension="psmdcp" ContentType="application/vnd.openxmlformats-package.core-properties+xml" />
-  <Default Extension="dll" ContentType="application/octet" />
-  <Default Extension="dylib" ContentType="application/octet" />
-  <Default Extension="json" ContentType="application/octet" />
-  <Default Extension="md" ContentType="application/octet" />
-  <Default Extension="nuspec" ContentType="application/octet" />
-  <Default Extension="so" ContentType="application/octet" />
-  <Default Extension="targets" ContentType="application/octet" />
-</Types>
-''',
-        encoding="utf-8",
-    )
-    rels.write_text(
-        f'''<?xml version="1.0" encoding="utf-8"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Type="http://schemas.microsoft.com/packaging/2010/07/manifest" Target="/{escape(nuspec.name)}" Id="R{uuid.uuid4().hex[:16].upper()}" />
-  <Relationship Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="/{escape(core_properties.relative_to(staging).as_posix())}" Id="R{uuid.uuid4().hex[:16].upper()}" />
-</Relationships>
-''',
-        encoding="utf-8",
-    )
-    core_properties.write_text(
-        f'''<?xml version="1.0" encoding="utf-8"?>
-<coreProperties xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
-  <dc:creator>natan-sysview</dc:creator>
-  <dc:description>FastParse {escape(language)} language extension native assets.</dc:description>
-  <dc:identifier>{escape(package_name)}</dc:identifier>
-  <version>{escape(version)}</version>
-  <keywords>fastparse tree-sitter parser {escape(language)} native</keywords>
-  <lastModifiedBy>FastParse language package builder</lastModifiedBy>
-  <dcterms:created xsi:type="dcterms:W3CDTF">{now}</dcterms:created>
-  <dcterms:modified xsi:type="dcterms:W3CDTF">{now}</dcterms:modified>
-</coreProperties>
-''',
-        encoding="utf-8",
-    )
-    return [content_types, rels, core_properties]
-
-
-def make_package(
-    staging: Path,
-    nuspec: Path,
-    output_dir: Path,
-    package_name: str,
-    version: str,
-    language: str,
-) -> Path:
+def make_package(staging: Path, project: Path, output_dir: Path, package_name: str, version: str) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     package = output_dir / f"{package_name}.{version}.nupkg"
     if package.exists():
         package.unlink()
-    metadata_files = write_package_metadata(staging, nuspec, package_name, version, language)
-    with zipfile.ZipFile(package, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        for path in metadata_files:
-            zf.write(path, path.relative_to(staging))
-        zf.write(nuspec, nuspec.name)
-        for path in sorted(staging.rglob("*")):
-            if path.is_file() and path != nuspec and path not in metadata_files:
-                zf.write(path, path.relative_to(staging))
+    subprocess.run(
+        [
+            "dotnet",
+            "pack",
+            str(project),
+            "--configuration",
+            "Release",
+            "--output",
+            str(output_dir),
+            f"-p:PackageVersion={version}",
+        ],
+        cwd=staging,
+        check=True,
+    )
+    if not package.is_file():
+        raise AssertionError(f"expected NuGet package was not created: {package}")
     return package
+
+
+def validate_package(package: Path, language: str) -> None:
+    pid = package_id(language)
+    required = {
+        "[Content_Types].xml",
+        "_rels/.rels",
+        f"{pid}.nuspec",
+        "README.md",
+        f"buildTransitive/{pid}.targets",
+        f"contentFiles/any/any/fastparse/languages/{language}/manifest.json",
+        f"runtimes/linux-x64/native/{native_name(language, 'linux')}",
+        f"runtimes/osx-arm64/native/{native_name(language, 'macos')}",
+        f"runtimes/osx-x64/native/{native_name(language, 'macos')}",
+        f"runtimes/win-x64/native/{native_name(language, 'windows')}",
+    }
+    with zipfile.ZipFile(package) as zf:
+        names = set(zf.namelist())
+    missing = sorted(required - names)
+    if missing:
+        raise AssertionError(f"NuGet language package missing entries: {', '.join(missing)}")
 
 
 def main() -> int:
@@ -252,15 +222,9 @@ def main() -> int:
         if missing:
             raise AssertionError(f"missing required RID assets: {', '.join(missing)}")
         write_targets(args.language, staging)
-        nuspec = write_nuspec(args.language, args.version, staging)
-        package = make_package(
-            staging,
-            nuspec,
-            args.output_dir.resolve(),
-            package_id(args.language),
-            args.version,
-            args.language,
-        )
+        project = write_pack_project(args.language, args.version, staging)
+        package = make_package(staging, project, args.output_dir.resolve(), package_id(args.language), args.version)
+        validate_package(package, args.language)
     print(f"NuGet language package: {package}")
     return 0
 
