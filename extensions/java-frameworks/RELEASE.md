@@ -15,42 +15,42 @@ From the lab root:
 ```sh
 python3 scripts/package_language_extension.py \
   --language java-frameworks \
-  --version 0.1.0-preview.31 \
+  --version 0.1.0-preview.32 \
   --dist-dir dist/languages
 
 python3 scripts/package_python_language_wheel.py \
   --language java-frameworks \
-  --version 0.1.0-preview.31 \
+  --version 0.1.0-preview.32 \
   --output-dir dist/python-languages
 
 python3 scripts/package_nuget_language_extension.py \
   --language java-frameworks \
-  --version 0.1.0-preview.31 \
-  --core-version 0.1.0-preview.31 \
-  --archive dist/languages/fastparse-language-java-frameworks-0.1.0-preview.31-macos-arm64.tar.gz \
+  --version 0.1.0-preview.32 \
+  --core-version 0.1.0-preview.32 \
+  --archive dist/languages/fastparse-language-java-frameworks-0.1.0-preview.32-macos-arm64.tar.gz \
   --output-dir dist/nuget-languages
 ```
 
 Local macOS arm64 artifacts:
 
 ```text
-dist/languages/fastparse-language-java-frameworks-0.1.0-preview.31-macos-arm64.tar.gz
-dist/python-languages/fastparse_language_java_frameworks-0.1.0rc31-py3-none-macosx_11_0_arm64.whl
-dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.31.nupkg
+dist/languages/fastparse-language-java-frameworks-0.1.0-preview.32-macos-arm64.tar.gz
+dist/python-languages/fastparse_language_java_frameworks-0.1.0rc32-py3-none-macosx_11_0_arm64.whl
+dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.32.nupkg
 ```
 
 ## Local Validation
 
 ```sh
 python3 scripts/validate_python_language_wheel.py \
-  dist/python/fastparse-0.1.0rc31-py3-none-macosx_15_0_arm64.whl \
-  dist/python-languages/fastparse_language_java_frameworks-0.1.0rc31-py3-none-macosx_11_0_arm64.whl \
+  dist/python/fastparse-0.1.0rc32-py3-none-macosx_15_0_arm64.whl \
+  dist/python-languages/fastparse_language_java_frameworks-0.1.0rc32-py3-none-macosx_11_0_arm64.whl \
   --language java-frameworks
 
 python3 scripts/validate_nuget_language_package.py \
-  --core-package dist/nuget/FastParser.0.1.0-preview.31.nupkg \
-  --language-package dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.31.nupkg \
-  --version 0.1.0-preview.31 \
+  --core-package dist/nuget/FastParser.0.1.0-preview.32.nupkg \
+  --language-package dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.32.nupkg \
+  --version 0.1.0-preview.32 \
   --language java-frameworks
 ```
 

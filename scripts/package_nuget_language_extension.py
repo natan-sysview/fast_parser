@@ -151,6 +151,7 @@ def write_nuspec(language: str, version: str, core_version: str, staging: Path) 
       <packageType name="Dependency" />
     </packageTypes>
     <license type="expression">Apache-2.0</license>
+    <licenseUrl>https://licenses.nuget.org/Apache-2.0</licenseUrl>
     <projectUrl>https://github.com/natan-sysview/fast_parser</projectUrl>
     <repository type="git" url="https://github.com/natan-sysview/fast_parser" />
     <tags>fastparse tree-sitter parser {escape(language)} native</tags>
