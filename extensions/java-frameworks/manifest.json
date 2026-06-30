@@ -1,0 +1,33 @@
+{
+  "extensionKind": "fastparse-language",
+  "language": "java-frameworks",
+  "displayName": "Java Frameworks Experimental",
+  "version": "0.1.0-preview.1",
+  "extensionAbi": 1,
+  "coreAbi": "fastparse-c-api/0.5.0",
+  "binarySchemaVersion": 1,
+  "grammar": {
+    "name": "tree-sitter-java-frameworks",
+    "source": "grammars/tree-sitter-java-frameworks",
+    "revision": "promoted-local",
+    "license": "MIT"
+  },
+  "symbols": {
+    "descriptor": "fastparse_language_extension_descriptor",
+    "treeSitterLanguage": "tree_sitter_java_frameworks"
+  },
+  "normalization": {
+    "default": "auto_safe",
+    "supported": ["auto_safe", "none"]
+  },
+  "queries": {
+    "frameworks": "queries/frameworks.scm"
+  },
+  "platforms": [
+    "linux-x64",
+    "osx-arm64",
+    "osx-x64",
+    "win-x64"
+  ],
+  "status": "preview"
+}

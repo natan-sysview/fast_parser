@@ -10,6 +10,7 @@ include(CTest)
 option(TSMP_BUILD_SHARED "Build TSMP as a shared library" ON)
 option(TSMP_USE_VENDORED_TREE_SITTER "Compile the vendored Tree-sitter runtime" ON)
 set(FASTPARSE_COBOL_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-cobol grammar directory for the experimental COBOL language extension")
+set(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-java-frameworks grammar directory for the experimental Java Frameworks language extension")
 set(FASTPARSE_PYTHON_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-python grammar directory for the experimental Python language extension")
 set(FASTPARSE_RUST_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-rust grammar directory for the experimental Rust language extension")
 
@@ -21,10 +22,18 @@ set(TSMP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(TSMP_GRAMMARS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/grammars")
 set(TSMP_VENDOR_TREE_SITTER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/tree-sitter")
 
+if(NOT FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR AND EXISTS "${TSMP_GRAMMARS_DIR}/tree-sitter-java-frameworks/src/parser.c")
+    set(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR
+        "${TSMP_GRAMMARS_DIR}/tree-sitter-java-frameworks"
+        CACHE PATH "Optional tree-sitter-java-frameworks grammar directory for the experimental Java Frameworks language extension"
+        FORCE)
+endif()
+
 set(TSMP_CORE_SOURCES
     "${TSMP_SOURCE_DIR}/tsmp_api.c"
     "${TSMP_SOURCE_DIR}/tsmp_buffer.c"
     "${TSMP_SOURCE_DIR}/tsmp_languages.c"
+    "${TSMP_SOURCE_DIR}/tsmp_query.c"
     "${TSMP_SOURCE_DIR}/tsmp_render.c"
     "${TSMP_SOURCE_DIR}/tsmp_render_binary.c"
     "${TSMP_SOURCE_DIR}/tsmp_render_csv.c"
@@ -133,6 +142,24 @@ if(FASTPARSE_COBOL_GRAMMAR_DIR)
         PRIVATE
             "${FASTPARSE_COBOL_GRAMMAR_DIR}/src")
     fastparse_configure_language_extension(fastparse_language_cobol "fastparse_language_cobol")
+endif()
+
+if(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR)
+    if(NOT EXISTS "${FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR}/src/parser.c")
+        message(FATAL_ERROR "FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR must point to a tree-sitter-java-frameworks checkout with src/parser.c")
+    endif()
+    set(FASTPARSE_JAVA_FRAMEWORKS_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/extensions/java-frameworks/fastparse_language_java_frameworks.c"
+        "${FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR}/src/parser.c")
+    if(EXISTS "${FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR}/src/scanner.c")
+        list(APPEND FASTPARSE_JAVA_FRAMEWORKS_SOURCES "${FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR}/src/scanner.c")
+    endif()
+    add_library(fastparse_language_java_frameworks SHARED
+        ${FASTPARSE_JAVA_FRAMEWORKS_SOURCES})
+    target_include_directories(fastparse_language_java_frameworks
+        PRIVATE
+            "${FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR}/src")
+    fastparse_configure_language_extension(fastparse_language_java_frameworks "fastparse_language_java_frameworks")
 endif()
 
 if(FASTPARSE_PYTHON_GRAMMAR_DIR)

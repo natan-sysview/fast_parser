@@ -41,6 +41,7 @@
     <None Include="../../../docs/contracts.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/language_extensions.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/output_formats.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../../docs/tree_sitter_queries.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/binary_schema.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/csharp_binding.md" Pack="true" PackagePath="docs/" />
     <None Include="../../../docs/encoding.md" Pack="true" PackagePath="docs/" />
@@ -51,6 +52,8 @@
     <None Include="../../../examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj" Pack="true" PackagePath="examples/csharp/01_parse_string/" />
     <None Include="../../../examples/csharp/02_binary_decode/Program.cs" Pack="true" PackagePath="examples/csharp/02_binary_decode/" />
     <None Include="../../../examples/csharp/02_binary_decode/FastParse.BinaryDecodeExample.csproj" Pack="true" PackagePath="examples/csharp/02_binary_decode/" />
+    <None Include="../../../examples/csharp/04_query/Program.cs" Pack="true" PackagePath="examples/csharp/04_query/" />
+    <None Include="../../../examples/csharp/04_query/FastParse.QueryExample.csproj" Pack="true" PackagePath="examples/csharp/04_query/" />
     <None Include="../../../examples/csharp/nuget/01_parse_string/Program.cs" Pack="true" PackagePath="examples/csharp/nuget/01_parse_string/" />
     <None Include="../../../examples/csharp/nuget/01_parse_string/FastParser.NuGetParseString.csproj" Pack="true" PackagePath="examples/csharp/nuget/01_parse_string/" />
     <None Include="../../../examples/csharp/nuget/02_binary_decode/Program.cs" Pack="true" PackagePath="examples/csharp/nuget/02_binary_decode/" />
@@ -58,6 +61,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(NativeAssetsRoot)' != ''">
-    <None Include="$(NativeAssetsRoot)/runtimes/**" Pack="true" PackagePath="runtimes/%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="$(NativeAssetsRoot)/runtimes/**/*" Pack="true" PackagePath="runtimes/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>

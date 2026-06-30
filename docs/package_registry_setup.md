@@ -16,7 +16,9 @@ GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables
 |---|---|---|
 | `PYPI_PUBLISH` | `true` | Publish the core `fastparse` wheels to PyPI. |
 | `PYPI_LANGUAGE_PYTHON_PUBLISH` | `true` | Publish `fastparse-language-python` wheels to PyPI. |
+| `PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH` | `true` | Publish `fastparse-language-java-frameworks` wheels to PyPI. |
 | `NUGET_LANGUAGE_PYTHON_PUBLISH` | `true` | Publish `FastParser.Language.Python` to nuget.org. |
+| `NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH` | `true` | Publish `FastParser.Language.JavaFrameworks` to nuget.org. |
 
 The core `FastParser` NuGet package is published on tags by the existing NuGet trusted publishing step.
 
@@ -59,6 +61,17 @@ Environment  : any / blank
 
 Important: a pending publisher does not reserve the package name. The first tagged publish creates the project if nobody else has claimed it.
 
+Java Frameworks language extension:
+
+```text
+Project name : fastparse-language-java-frameworks
+Publisher    : GitHub
+Owner        : natan-sysview
+Repository   : fast_parser
+Workflow     : release.yml
+Environment  : any / blank
+```
+
 ## NuGet Trusted Publishing
 
 NuGet needs a trusted publishing policy for each NuGet package ID.
@@ -90,6 +103,16 @@ Package ID       : FastParser.Language.Rust
 Repository owner : natan-sysview
 Repository       : fast_parser
 Workflow file    : release.yml
+    Environment      : any / blank
+```
+
+Java Frameworks language extension:
+
+```text
+Package ID       : FastParser.Language.JavaFrameworks
+Repository owner : natan-sysview
+Repository       : fast_parser
+Workflow file    : release.yml
 Environment      : any / blank
 ```
 
@@ -98,20 +121,22 @@ Environment      : any / blank
 After the registry setup is complete:
 
 ```bash
-git tag v0.1.0-preview.18
-git push origin v0.1.0-preview.18
+git tag v0.1.0-preview.24
+git push origin v0.1.0-preview.24
 ```
 
 GitHub Actions will:
 
 1. Build native core archives for Linux, macOS arm64, macOS x64, and Windows.
 2. Build core NuGet and PyPI packages.
-3. Build Python language extension native archives.
+3. Build Python and Java Frameworks language extension native archives.
 4. Build `fastparse-language-python` wheels.
-5. Build `FastParser.Language.Python`.
-6. Publish enabled packages to their registries.
-7. Run post-publish smoke tests from the public registries.
-8. Attach release assets and `SHA256SUMS.txt` to GitHub Releases.
+5. Build `fastparse-language-java-frameworks` wheels.
+6. Build `FastParser.Language.Python`.
+7. Build `FastParser.Language.JavaFrameworks`.
+8. Publish enabled packages to their registries.
+9. Run post-publish smoke tests from the public registries.
+10. Attach release assets and `SHA256SUMS.txt` to GitHub Releases.
 
 ## Developer Install Commands
 
@@ -119,6 +144,7 @@ Python:
 
 ```bash
 pip install --pre fastparse fastparse-language-python
+pip install --pre fastparse fastparse-language-java-frameworks
 ```
 
 C#:
@@ -126,6 +152,7 @@ C#:
 ```bash
 dotnet add package FastParser --prerelease
 dotnet add package FastParser.Language.Python --prerelease
+dotnet add package FastParser.Language.JavaFrameworks --prerelease
 ```
 
 Minimal Python smoke:
@@ -139,6 +166,25 @@ result = parser.parse_text("def hello(): pass", language="python")
 print(result.node_count)
 ```
 
+Minimal Python Java Frameworks smoke:
+
+```python
+from fastparse import FastParse
+import fastparse_language_java_frameworks as java_frameworks
+
+parser = FastParse()
+parser.load_bundled_language("java-frameworks")
+query = java_frameworks.query_path("frameworks").read_text()
+result = parser.query_text_summary(
+    "import org.springframework.stereotype.Service;\n@Service class Demo {}\n",
+    query,
+    language="java-frameworks",
+    output_format="stats",
+    fields=["capture_name"],
+)
+print(result.node_count)
+```
+
 Minimal C# smoke:
 
 ```csharp
@@ -147,5 +193,18 @@ using FastParse;
 using var parser = new FastParseClient();
 parser.LoadBundledLanguage("python");
 var result = parser.ParseText("def hello(): pass", new ParseOptions { Language = "python" });
+Console.WriteLine(result.NodeCount);
+```
+
+Minimal C# Java Frameworks smoke:
+
+```csharp
+using FastParse;
+
+using var parser = new FastParseClient();
+parser.LoadBundledLanguage("java-frameworks");
+var result = parser.ParseText(
+    "import org.springframework.stereotype.Service;\n@Service class Demo {}\n",
+    new ParseOptions { Language = "java-frameworks" });
 Console.WriteLine(result.NodeCount);
 ```

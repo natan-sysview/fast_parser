@@ -133,6 +133,40 @@ Rules:
 
 Production callers should request only the rules they need once they know the target grammar.
 
+## Tree-sitter Query Contract
+
+Status: `Preview`
+
+Use the query contract when callers know the Tree-sitter structural pattern they want and do not need the full AST.
+
+Native functions:
+
+```text
+fastparse_query
+tsmp_query
+```
+
+Rules:
+
+- Query input is passed in RAM as bytes plus length.
+- Source input is passed in RAM as bytes plus length.
+- FastParse compiles the query, parses the source, executes the query against the root node, and returns matches/captures in memory.
+- Query calls do not read files, write files, create databases, or own worker pools.
+- `TSMP_ERROR_QUERY_COMPILE` reports query syntax, node type, field, capture, structure, or language errors.
+- Capture array order follows Tree-sitter behavior and should not be treated as the query text order.
+- Consumers should select captures by capture name, for example `method.name`.
+
+Output formats:
+
+```text
+JSON      structured matches and captures
+CSV       one row per capture
+BINARY    MessagePack with format marker fastparse-query-binary
+STATS     no output data; node_count = captures, length = matches
+```
+
+Detailed shape and binding examples are documented in [Tree-sitter Query Contract](tree_sitter_queries.md).
+
 ## Field Filter Contract
 
 Status: `Stable` for field names and meanings; `Preview` for detailed `children` shape.

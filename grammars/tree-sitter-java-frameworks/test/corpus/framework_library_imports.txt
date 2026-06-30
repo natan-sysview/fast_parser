@@ -1,0 +1,121 @@
+========================================
+Framework library imports and annotations
+========================================
+
+package demo;
+
+import org.apache.http.client.HttpClient;
+import org.apache.axiom.om.OMElement;
+import javax.mail.Message;
+import javax.crypto.Cipher;
+import com.itextpdf.text.Document;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.nimbusds.jose.JWSObject;
+import org.jose4j.jwe.JsonWebEncryption;
+import org.jasypt.encryption.StringEncryptor;
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
+import org.jfree.util.Log;
+import javax.annotation.PostConstruct;
+import javax.activation.DataHandler;
+import ch.qos.logback.classic.LoggerContext;
+import io.netty.handler.ssl.SslContext;
+import reactor.netty.http.client.HttpClient;
+import com.google.auth.oauth2.GoogleCredentials;
+import org.json.JSONObject;
+import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+public class LibraryExample {
+  @Query("select x from X x where x.id = :id")
+  String find(@Param("id") String id) {
+    return id;
+  }
+
+  @JsonSerialize
+  private String value;
+}
+
+---
+
+(program
+  (package_declaration
+    (identifier))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (class_declaration
+    (modifiers)
+    (identifier)
+    (class_body
+      (method_declaration
+        (modifiers
+          (framework_annotation
+            (framework_annotation_identifier)
+            (annotation_argument_list
+              (string_literal
+                (string_fragment)))))
+        (type_identifier)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (modifiers
+              (framework_annotation
+                (framework_annotation_identifier)
+                (annotation_argument_list
+                  (string_literal
+                    (string_fragment)))))
+            (type_identifier)
+            (identifier)))
+        (block
+          (return_statement
+            (identifier))))
+      (field_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (type_identifier)
+        (variable_declarator
+          (identifier))))))

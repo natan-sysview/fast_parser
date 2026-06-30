@@ -12,6 +12,7 @@ public sealed unsafe class FastParseClient : IDisposable
     private readonly VersionDelegate _version;
     private readonly ParseDelegate _parse;
     private readonly ParseV2Delegate? _parseV2;
+    private readonly QueryDelegate _query;
     private readonly ResultFreeDelegate _resultFree;
     private readonly LoadLanguageExtensionDelegate _loadLanguageExtension;
     private readonly LanguageAvailableDelegate _languageAvailable;
@@ -31,6 +32,7 @@ public sealed unsafe class FastParseClient : IDisposable
         _version = LoadFunction<VersionDelegate>("fastparse_version", "tsmp_version");
         _parse = LoadFunction<ParseDelegate>("fastparse_parse", "tsmp_parse");
         _parseV2 = TryLoadFunction<ParseV2Delegate>("fastparse_parse_v2", "tsmp_parse_v2");
+        _query = LoadFunction<QueryDelegate>("fastparse_query", "tsmp_query");
         _resultFree = LoadFunction<ResultFreeDelegate>("fastparse_result_free", "tsmp_result_free");
         _loadLanguageExtension = LoadRequiredFunction<LoadLanguageExtensionDelegate>("fastparse_load_language_extension");
         _languageAvailable = LoadRequiredFunction<LanguageAvailableDelegate>("fastparse_language_available");
@@ -196,6 +198,62 @@ public sealed unsafe class FastParseClient : IDisposable
     }
 
     /// <summary>
+    /// Parses source bytes, executes a Tree-sitter query, and copies query output bytes into managed memory.
+    /// </summary>
+    /// <param name="source">Source code bytes.</param>
+    /// <param name="query">Tree-sitter query text.</param>
+    /// <param name="options">Query options. Defaults to Java JSON capture output.</param>
+    /// <returns>A full query result containing output bytes.</returns>
+    public ParseResult QueryBytes(ReadOnlySpan<byte> source, string query, QueryOptions? options = null)
+    {
+        var queryBytes = Encoding.UTF8.GetBytes(query);
+        var (data, captureCount, format, _) = QueryNative(source, queryBytes, options ?? QueryOptions.JsonDefault, copyData: true);
+        return new ParseResult(data, captureCount, format);
+    }
+
+    /// <summary>
+    /// Parses source bytes, executes a Tree-sitter query, and returns counts/lengths without copying output bytes.
+    /// </summary>
+    /// <param name="source">Source code bytes.</param>
+    /// <param name="query">Tree-sitter query text.</param>
+    /// <param name="options">Query options. Defaults to Java JSON capture output.</param>
+    /// <returns>A summary result. <see cref="ParseSummary.NodeCount"/> is the capture count.</returns>
+    public ParseSummary QueryBytesSummary(ReadOnlySpan<byte> source, string query, QueryOptions? options = null)
+    {
+        var queryBytes = Encoding.UTF8.GetBytes(query);
+        var (_, captureCount, format, outputLength) = QueryNative(source, queryBytes, options ?? QueryOptions.JsonDefault, copyData: false);
+        return new ParseSummary(outputLength, captureCount, format);
+    }
+
+    /// <summary>
+    /// Encodes source text, executes a Tree-sitter query, and copies query output bytes into managed memory.
+    /// </summary>
+    /// <param name="source">Source code text.</param>
+    /// <param name="query">Tree-sitter query text.</param>
+    /// <param name="options">Query options. Defaults to Java JSON capture output.</param>
+    /// <param name="encoding">Encoding used to convert source text to bytes. Defaults to UTF-8.</param>
+    /// <returns>A full query result containing output bytes.</returns>
+    public ParseResult QueryText(string source, string query, QueryOptions? options = null, Encoding? encoding = null)
+    {
+        encoding ??= Encoding.UTF8;
+        return QueryBytes(encoding.GetBytes(source), query, options);
+    }
+
+    /// <summary>
+    /// Encodes source text, executes a Tree-sitter query, and returns counts/lengths without copying output bytes.
+    /// </summary>
+    /// <param name="source">Source code text.</param>
+    /// <param name="query">Tree-sitter query text.</param>
+    /// <param name="options">Query options. Defaults to Java JSON capture output.</param>
+    /// <param name="encoding">Encoding used to convert source text to bytes. Defaults to UTF-8.</param>
+    /// <returns>A summary result. <see cref="ParseSummary.NodeCount"/> is the capture count.</returns>
+    public ParseSummary QueryTextSummary(string source, string query, QueryOptions? options = null, Encoding? encoding = null)
+    {
+        encoding ??= Encoding.UTF8;
+        return QueryBytesSummary(encoding.GetBytes(source), query, options);
+    }
+
+    /// <summary>
     /// Frees the loaded native library handle.
     /// </summary>
     public void Dispose()
@@ -294,6 +352,72 @@ public sealed unsafe class FastParseClient : IDisposable
             _resultFree(&nativeResult);
             FreeUtf8(language);
             FreeUtf8(includeRules);
+        }
+    }
+
+    private (byte[] Data, ulong CaptureCount, FastParseFormat Format, ulong OutputLength) QueryNative(
+        ReadOnlySpan<byte> source,
+        ReadOnlySpan<byte> query,
+        QueryOptions options,
+        bool copyData)
+    {
+        EnsureNotDisposed();
+
+        var language = StringToUtf8(options.Language);
+        var nativeOptions = new NativeQueryOptions
+        {
+            Language = language,
+            Format = (int)options.Format,
+            Fields = (uint)options.Fields,
+            MaxMatches = options.MaxMatches,
+            MaxCaptures = options.MaxCaptures,
+            IncludePattern = options.IncludePattern ? 1 : 0,
+            Pretty = options.Pretty ? 1 : 0,
+            Normalization = (int)options.Normalization
+        };
+
+        NativeResult nativeResult = default;
+        int status;
+
+        try
+        {
+            fixed (byte* sourcePtr = source)
+            fixed (byte* queryPtr = query)
+            {
+                status = _query(
+                    source.IsEmpty ? null : sourcePtr,
+                    (nuint)source.Length,
+                    query.IsEmpty ? null : queryPtr,
+                    (nuint)query.Length,
+                    &nativeOptions,
+                    &nativeResult);
+            }
+
+            if (status != 0 || nativeResult.Status != 0)
+            {
+                var message = NativeString(nativeResult.ErrorMessage);
+                throw new FastParseException(status, nativeResult.Status, string.IsNullOrWhiteSpace(message) ? "no error detail" : message);
+            }
+
+            var outputLength = nativeResult.Length;
+            var data = Array.Empty<byte>();
+            if (copyData && nativeResult.Data != null && outputLength > 0)
+            {
+                if (outputLength > int.MaxValue)
+                {
+                    throw new FastParseException(status, nativeResult.Status, "native output is too large for a managed byte array");
+                }
+
+                data = new byte[(int)outputLength];
+                Marshal.Copy((nint)nativeResult.Data, data, 0, data.Length);
+            }
+
+            return (data, (ulong)nativeResult.NodeCount, options.Format, (ulong)outputLength);
+        }
+        finally
+        {
+            _resultFree(&nativeResult);
+            FreeUtf8(language);
         }
     }
 
@@ -529,6 +653,15 @@ public sealed unsafe class FastParseClient : IDisposable
         NativeResult* result);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int QueryDelegate(
+        byte* source,
+        nuint sourceLen,
+        byte* query,
+        nuint queryLen,
+        NativeQueryOptions* options,
+        NativeResult* result);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void ResultFreeDelegate(NativeResult* result);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -559,6 +692,19 @@ public sealed unsafe class FastParseClient : IDisposable
         public nint IncludeRules;
         public uint Fields;
         public int IncludeTokens;
+        public int Pretty;
+        public int Normalization;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeQueryOptions
+    {
+        public nint Language;
+        public int Format;
+        public uint Fields;
+        public nuint MaxMatches;
+        public nuint MaxCaptures;
+        public int IncludePattern;
         public int Pretty;
         public int Normalization;
     }

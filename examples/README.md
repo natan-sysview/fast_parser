@@ -14,9 +14,11 @@ examples/
     03_binary_decode/
     04_inventory_to_sqlite/
     05_diagnostics_scan/
+    06_query/
 
   csharp/
     01_parse_string/
+    04_query/
     03_inventory_to_sqlite/
 ```
 
@@ -63,12 +65,24 @@ python3 examples/python/05_diagnostics_scan/diagnostics_scan.py /path/to/java/ro
   --out-db exports/fastparse_python_diagnostics.sqlite
 ```
 
+Run a Tree-sitter query over Java:
+
+```bash
+python3 examples/python/06_query/query_java.py
+```
+
 ## C#
 
 Parse a small Java source:
 
 ```bash
 dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
+```
+
+Run a Tree-sitter query over Java:
+
+```bash
+dotnet run --project examples/csharp/04_query/FastParse.QueryExample.csproj
 ```
 
 Build an exploration SQLite database from the Java inventory:

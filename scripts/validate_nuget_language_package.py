@@ -13,7 +13,9 @@ import zipfile
 from pathlib import Path
 
 
-PROGRAM = r'''using FastParse;
+SOURCE = "https://api.nuget.org/v3/index.json"
+
+PYTHON_PROGRAM = r'''using FastParse;
 
 using var parser = new FastParseClient();
 
@@ -58,12 +60,80 @@ Console.WriteLine(parser.Version);
 Console.WriteLine(parser.LibraryPath);
 '''
 
+JAVA_FRAMEWORKS_PROGRAM = r'''using FastParse;
+
+using var parser = new FastParseClient();
+
+var load = parser.LoadBundledLanguage("java-frameworks");
+if (load.Language != "java-frameworks" || !parser.LanguageAvailable("java-frameworks"))
+{
+    throw new InvalidOperationException("FastParser.Language.JavaFrameworks load smoke failed");
+}
+
+var source = "import org.springframework.stereotype.Service;\n@Service class Demo { void x(){ org.springframework.jdbc.core.JdbcTemplate t; } }\n";
+var json = parser.ParseText(
+    source,
+    new ParseOptions
+    {
+        Language = "java-frameworks",
+        Format = FastParseFormat.Json,
+        Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+    });
+
+if (json.NodeCount == 0 || !json.Text.Contains("program", StringComparison.Ordinal))
+{
+    throw new InvalidOperationException("FastParser.Language.JavaFrameworks JSON smoke failed");
+}
+
+var queryPath = Path.Combine(AppContext.BaseDirectory, "fastparse", "languages", "java-frameworks", "queries", "frameworks.scm");
+if (!File.Exists(queryPath))
+{
+    throw new InvalidOperationException($"Framework query was not copied to output: {queryPath}");
+}
+
+var query = File.ReadAllText(queryPath);
+var captures = parser.QueryText(
+    source,
+    query,
+    new QueryOptions
+    {
+        Language = "java-frameworks",
+        Format = FastParseFormat.Stats,
+        Fields = FastParseField.CaptureName
+    });
+
+if (captures.NodeCount == 0)
+{
+    throw new InvalidOperationException("FastParser.Language.JavaFrameworks query smoke failed");
+}
+
+var diagnostics = parser.ParseText(
+    "class Broken {",
+    new ParseOptions
+    {
+        Language = "java-frameworks",
+        Format = FastParseFormat.Diagnostics
+    });
+
+using var diagnosticsDocument = diagnostics.JsonDocument();
+if (!diagnosticsDocument.RootElement.GetProperty("hasErrors").GetBoolean())
+{
+    throw new InvalidOperationException("FastParser.Language.JavaFrameworks diagnostics smoke failed");
+}
+
+Console.WriteLine("FastParser language NuGet smoke OK");
+Console.WriteLine(parser.Version);
+Console.WriteLine(parser.LibraryPath);
+'''
+
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Validate FastParser.Language.Python from local nupkgs.")
+    parser = argparse.ArgumentParser(description="Validate a FastParser.Language.* package from local nupkgs.")
     parser.add_argument("--core-package", type=Path, required=True)
     parser.add_argument("--language-package", type=Path, required=True)
     parser.add_argument("--version", required=True)
+    parser.add_argument("--language", default="python")
+    parser.add_argument("--require-all-rids", action="store_true")
     return parser.parse_args()
 
 
@@ -80,16 +150,51 @@ def run_command(command: list[str], *, env: dict[str, str]) -> subprocess.Comple
     return completed
 
 
-def validate_package_layout(language_package: Path) -> None:
+def package_language_name(language: str) -> str:
+    return "".join(part.capitalize() for part in language.replace("-", "_").split("_"))
+
+
+def native_language_name(language: str) -> str:
+    return language.strip().lower().replace("-", "_")
+
+
+def native_file(language: str, rid: str) -> str:
+    native = native_language_name(language)
+    if rid.startswith("win-"):
+        return f"fastparse_language_{native}.dll"
+    if rid.startswith("osx-"):
+        return f"libfastparse_language_{native}.dylib"
+    return f"libfastparse_language_{native}.so"
+
+
+def current_rid() -> str:
+    system = platform.system()
+    machine = platform.machine().lower()
+    if machine in {"x86_64", "amd64"}:
+        arch = "x64"
+    elif machine in {"arm64", "aarch64"}:
+        arch = "arm64"
+    else:
+        arch = machine
+    if system == "Darwin":
+        return f"osx-{arch}"
+    if system == "Windows":
+        return f"win-{arch}"
+    return f"linux-{arch}"
+
+
+def validate_package_layout(language_package: Path, language: str, require_all_rids: bool) -> None:
+    package_name = package_language_name(language)
     required = {
         "README.md",
-        "contentFiles/any/any/fastparse/languages/python/manifest.json",
-        "buildTransitive/FastParser.Language.Python.targets",
-        "runtimes/linux-x64/native/libfastparse_language_python.so",
-        "runtimes/osx-arm64/native/libfastparse_language_python.dylib",
-        "runtimes/osx-x64/native/libfastparse_language_python.dylib",
-        "runtimes/win-x64/native/fastparse_language_python.dll",
+        f"contentFiles/any/any/fastparse/languages/{language}/manifest.json",
+        f"buildTransitive/FastParser.Language.{package_name}.targets",
     }
+    rids = ("linux-x64", "osx-arm64", "osx-x64", "win-x64") if require_all_rids else (current_rid(),)
+    for rid in rids:
+        required.add(f"runtimes/{rid}/native/{native_file(language, rid)}")
+    if language == "java-frameworks":
+        required.add(f"contentFiles/any/any/fastparse/languages/{language}/queries/frameworks.scm")
     with zipfile.ZipFile(language_package) as zf:
         names = set(zf.namelist())
     missing = sorted(required - names)
@@ -105,7 +210,7 @@ def main() -> int:
         raise FileNotFoundError(core_package)
     if not language_package.is_file():
         raise FileNotFoundError(language_package)
-    validate_package_layout(language_package)
+    validate_package_layout(language_package, args.language, args.require_all_rids)
 
     print("Local language NuGet smoke environment", flush=True)
     print(f"  Python  : {platform.python_version()} {platform.platform()}", flush=True)
@@ -125,7 +230,7 @@ def main() -> int:
         env["NUGET_PACKAGES"] = str(temp_dir / "global-packages")
         env.pop("FASTPARSE_LIBRARY_PATH", None)
         env.pop("TSMP_LIBRARY_PATH", None)
-        env.pop("FASTPARSE_LANGUAGE_PYTHON_PATH", None)
+        env.pop(f"FASTPARSE_LANGUAGE_{native_language_name(args.language).upper()}_PATH", None)
 
         run_command(
             ["dotnet", "new", "console", "--framework", "net9.0", "--output", str(project_dir)],
@@ -142,7 +247,7 @@ def main() -> int:
                 "add",
                 project,
                 "package",
-                "FastParser.Language.Python",
+                f"FastParser.Language.{package_language_name(args.language)}",
                 "--version",
                 args.version,
                 "--source",
@@ -150,7 +255,8 @@ def main() -> int:
             ],
             env=env,
         )
-        (project_dir / "Program.cs").write_text(PROGRAM, encoding="utf-8")
+        program = JAVA_FRAMEWORKS_PROGRAM if args.language == "java-frameworks" else PYTHON_PROGRAM
+        (project_dir / "Program.cs").write_text(program, encoding="utf-8")
         completed = run_command(["dotnet", "run", "--project", project], env=env)
         if "FastParser language NuGet smoke OK" not in completed.stdout:
             raise AssertionError(f"language NuGet smoke failed:\n{completed.stdout}")

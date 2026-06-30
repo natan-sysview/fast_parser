@@ -156,5 +156,54 @@ int main(void)
     }
     tsmp_result_free(&result);
 
+    const unsigned char query[] =
+        "(method_declaration name: (identifier) @method.name) @method";
+    TsmpQueryOptions query_options = {
+        "java",
+        TSMP_FORMAT_JSON,
+        0,
+        0,
+        0,
+        1,
+        0,
+        TSMP_NORMALIZATION_AUTO_SAFE
+    };
+    status = fastparse_query(source, sizeof(source) - 1, query, sizeof(query) - 1, &query_options, &result);
+    if (status != TSMP_OK || result.status != TSMP_OK) return fail_result("fastparse query json", &result);
+    if (!result.data || result.length == 0 || result.node_count != 2) {
+        fastparse_result_free(&result);
+        fprintf(stderr, "query json contract failed\n");
+        return 1;
+    }
+    if (!contains_bytes(result.data, result.length, "\"name\":\"method.name\"") ||
+        !contains_bytes(result.data, result.length, "\"rule\":\"method_declaration\"") ||
+        !contains_bytes(result.data, result.length, "\"matchCount\":1") ||
+        !contains_bytes(result.data, result.length, "\"captureCount\":2")) {
+        fastparse_result_free(&result);
+        fprintf(stderr, "query json payload did not match expected shape\n");
+        return 1;
+    }
+    fastparse_result_free(&result);
+
+    query_options.format = TSMP_FORMAT_STATS;
+    status = tsmp_query(source, sizeof(source) - 1, query, sizeof(query) - 1, &query_options, &result);
+    if (status != TSMP_OK || result.status != TSMP_OK) return fail_result("query stats", &result);
+    if (result.node_count != 2 || result.length != 1 || result.data != NULL) {
+        tsmp_result_free(&result);
+        fprintf(stderr, "query stats contract failed\n");
+        return 1;
+    }
+    tsmp_result_free(&result);
+
+    const unsigned char bad_query[] = "(missing_node) @bad";
+    query_options.format = TSMP_FORMAT_JSON;
+    status = tsmp_query(source, sizeof(source) - 1, bad_query, sizeof(bad_query) - 1, &query_options, &result);
+    if (status != TSMP_ERROR_QUERY_COMPILE || result.status != TSMP_ERROR_QUERY_COMPILE) {
+        tsmp_result_free(&result);
+        fprintf(stderr, "invalid query should fail during query compilation\n");
+        return 1;
+    }
+    tsmp_result_free(&result);
+
     return 0;
 }

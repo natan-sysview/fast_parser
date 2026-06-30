@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 import re
 import shutil
-import subprocess
 import tarfile
 import tempfile
 import zipfile
@@ -22,11 +21,12 @@ ARCHIVE_RE = re.compile(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build FastParser.Language.<Name>.nupkg.")
-    parser.add_argument("--language", required=True, choices=["python", "rust"])
+    parser.add_argument("--language", required=True)
     parser.add_argument("--version", required=True)
+    parser.add_argument("--core-version")
     parser.add_argument("--archive", action="append", type=Path, default=[])
-    parser.add_argument("--dependency-source", type=Path, help="Optional local NuGet source used to restore FastParser while packing.")
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist" / "nuget-languages")
+    parser.add_argument("--require-all-rids", action="store_true")
     return parser.parse_args()
 
 
@@ -34,16 +34,21 @@ def package_id(language: str) -> str:
     return "FastParser.Language." + "".join(part.capitalize() for part in language.replace("-", "_").split("_"))
 
 
+def native_language_name(language: str) -> str:
+    return language.strip().lower().replace("-", "_")
+
+
 def rid_for(platform_name: str, arch: str) -> str:
     return {"linux": "linux", "macos": "osx", "windows": "win"}[platform_name] + f"-{arch}"
 
 
 def native_name(language: str, platform_name: str) -> str:
+    native = native_language_name(language)
     if platform_name == "windows":
-        return f"fastparse_language_{language}.dll"
+        return f"fastparse_language_{native}.dll"
     if platform_name == "macos":
-        return f"libfastparse_language_{language}.dylib"
-    return f"libfastparse_language_{language}.so"
+        return f"libfastparse_language_{native}.dylib"
+    return f"libfastparse_language_{native}.so"
 
 
 def extract_archive(archive: Path, destination: Path) -> Path:
@@ -91,6 +96,11 @@ def stage_archive(language: str, archive: Path, staging: Path) -> str:
             manifest_target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(manifest, manifest_target)
 
+        queries = root / "queries"
+        if queries.is_dir():
+            query_target = staging / "contentFiles" / "any" / "any" / "fastparse" / "languages" / language / "queries"
+            shutil.copytree(queries, query_target, dirs_exist_ok=True)
+
         readme = root / "README.md"
         if readme.is_file():
             shutil.copy2(readme, staging / "README.md")
@@ -100,125 +110,79 @@ def stage_archive(language: str, archive: Path, staging: Path) -> str:
 def write_targets(language: str, staging: Path) -> None:
     targets_dir = staging / "buildTransitive"
     targets_dir.mkdir(parents=True, exist_ok=True)
+    target_name = "".join(part.capitalize() for part in language.replace("-", "_").split("_"))
     targets = f'''<Project>
-  <Target Name="FastParserLanguage{language.capitalize()}CopyManifest" AfterTargets="Build">
+  <Target Name="FastParserLanguage{target_name}CopyManifest" AfterTargets="Build">
     <ItemGroup>
       <FastParserLanguageManifest Include="$(MSBuildThisFileDirectory)..\\contentFiles\\any\\any\\fastparse\\languages\\{language}\\manifest.json" />
+      <FastParserLanguageQueries Include="$(MSBuildThisFileDirectory)..\\contentFiles\\any\\any\\fastparse\\languages\\{language}\\queries\\**\\*" />
     </ItemGroup>
     <Copy SourceFiles="@(FastParserLanguageManifest)"
           DestinationFolder="$(OutDir)fastparse\\languages\\{language}\\"
           SkipUnchangedFiles="true"
           Condition="Exists('%(FastParserLanguageManifest.Identity)')" />
+    <Copy SourceFiles="@(FastParserLanguageQueries)"
+          DestinationFiles="@(FastParserLanguageQueries->'$(OutDir)fastparse\\languages\\{language}\\queries\\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
   </Target>
 </Project>
 '''
     (targets_dir / f"{package_id(language)}.targets").write_text(targets, encoding="utf-8")
 
 
-def write_pack_project(language: str, version: str, staging: Path) -> Path:
+def write_nuspec(language: str, version: str, core_version: str, staging: Path) -> Path:
     pid = package_id(language)
     readme = staging / "README.md"
     if not readme.exists():
         readme.write_text(f"# {pid}\n\nFastParse {language} language extension.\n", encoding="utf-8")
-    project = staging / f"{pid}.csproj"
-    project.write_text(
+    nuspec = staging / f"{pid}.nuspec"
+    nuspec.write_text(
         f'''<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
-    <PackageId>{escape(pid)}</PackageId>
-    <Version>{escape(version)}</Version>
-    <Authors>natan-sysview</Authors>
-    <Company>natan-sysview</Company>
-    <Description>FastParse {escape(language)} language extension native assets.</Description>
-    <PackageTags>fastparse;tree-sitter;parser;{escape(language)};native</PackageTags>
-    <PackageProjectUrl>https://github.com/natan-sysview/fast_parser</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/natan-sysview/fast_parser</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>Preview FastParse language extension for {escape(language)}.</PackageReleaseNotes>
-    <PackageType>Dependency</PackageType>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <SuppressDependenciesWhenPacking>false</SuppressDependenciesWhenPacking>
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FastParser" Version="{escape(version)}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="/" />
-    <None Include="buildTransitive/{escape(pid)}.targets" Pack="true" PackagePath="buildTransitive/" />
-    <None Include="runtimes/**" Pack="true" PackagePath="runtimes/%(RecursiveDir)%(Filename)%(Extension)" />
-    <Content Include="contentFiles/any/any/fastparse/languages/{escape(language)}/manifest.json"
-             Pack="true"
-             PackagePath="contentFiles/any/any/fastparse/languages/{escape(language)}/manifest.json"
-             PackageBuildAction="None"
-             PackageCopyToOutput="true" />
-  </ItemGroup>
-</Project>
+<package>
+  <metadata>
+    <id>{escape(pid)}</id>
+    <version>{escape(version)}</version>
+    <authors>natan-sysview</authors>
+    <description>FastParse {escape(language)} language extension native assets.</description>
+    <packageTypes>
+      <packageType name="Dependency" />
+    </packageTypes>
+    <license type="expression">Apache-2.0</license>
+    <projectUrl>https://github.com/natan-sysview/fast_parser</projectUrl>
+    <repository type="git" url="https://github.com/natan-sysview/fast_parser" />
+    <tags>fastparse tree-sitter parser {escape(language)} native</tags>
+    <readme>README.md</readme>
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="FastParser" version="{escape(core_version)}" />
+      </group>
+      <group targetFramework="net9.0">
+        <dependency id="FastParser" version="{escape(core_version)}" />
+      </group>
+    </dependencies>
+    <contentFiles>
+      <files include="any/any/fastparse/languages/{escape(language)}/manifest.json" buildAction="None" copyToOutput="true" />
+      <files include="any/any/fastparse/languages/{escape(language)}/queries/**/*.scm" buildAction="None" copyToOutput="true" />
+    </contentFiles>
+  </metadata>
+</package>
 ''',
         encoding="utf-8",
     )
-    return project
+    return nuspec
 
 
-def make_package(
-    staging: Path,
-    project: Path,
-    output_dir: Path,
-    package_name: str,
-    version: str,
-    dependency_source: Path | None,
-) -> Path:
+def make_package(staging: Path, nuspec: Path, output_dir: Path, package_name: str, version: str) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     package = output_dir / f"{package_name}.{version}.nupkg"
     if package.exists():
         package.unlink()
-    command = [
-        "dotnet",
-        "pack",
-        str(project),
-        "--configuration",
-        "Release",
-        "--output",
-        str(output_dir),
-        f"-p:PackageVersion={version}",
-    ]
-    if dependency_source is not None:
-        command.extend(["--source", str(dependency_source)])
-    subprocess.run(
-        command,
-        cwd=staging,
-        check=True,
-    )
-    if not package.is_file():
-        raise AssertionError(f"expected NuGet package was not created: {package}")
+    with zipfile.ZipFile(package, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.write(nuspec, nuspec.name)
+        for path in sorted(staging.rglob("*")):
+            if path.is_file() and path != nuspec:
+                zf.write(path, path.relative_to(staging))
     return package
-
-
-def validate_package(package: Path, language: str) -> None:
-    pid = package_id(language)
-    required = {
-        "[Content_Types].xml",
-        "_rels/.rels",
-        f"{pid}.nuspec",
-        "README.md",
-        f"buildTransitive/{pid}.targets",
-        f"contentFiles/any/any/fastparse/languages/{language}/manifest.json",
-        f"runtimes/linux-x64/native/{native_name(language, 'linux')}",
-        f"runtimes/osx-arm64/native/{native_name(language, 'macos')}",
-        f"runtimes/osx-x64/native/{native_name(language, 'macos')}",
-        f"runtimes/win-x64/native/{native_name(language, 'windows')}",
-    }
-    with zipfile.ZipFile(package) as zf:
-        names = set(zf.namelist())
-    missing = sorted(required - names)
-    if missing:
-        raise AssertionError(f"NuGet language package missing entries: {', '.join(missing)}")
 
 
 def main() -> int:
@@ -230,19 +194,11 @@ def main() -> int:
         seen = {stage_archive(args.language, archive.resolve(), staging) for archive in args.archive}
         required = {"linux-x64", "osx-arm64", "osx-x64", "win-x64"}
         missing = sorted(required - seen)
-        if missing:
+        if args.require_all_rids and missing:
             raise AssertionError(f"missing required RID assets: {', '.join(missing)}")
         write_targets(args.language, staging)
-        project = write_pack_project(args.language, args.version, staging)
-        package = make_package(
-            staging,
-            project,
-            args.output_dir.resolve(),
-            package_id(args.language),
-            args.version,
-            args.dependency_source.resolve() if args.dependency_source else None,
-        )
-        validate_package(package, args.language)
+        nuspec = write_nuspec(args.language, args.version, args.core_version or args.version, staging)
+        package = make_package(staging, nuspec, args.output_dir.resolve(), package_id(args.language), args.version)
     print(f"NuGet language package: {package}")
     return 0
 

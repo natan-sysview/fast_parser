@@ -7,6 +7,7 @@ The binding keeps the same design boundary as the native library:
 - Python owns file I/O.
 - Python passes bytes already loaded in RAM.
 - FastParse returns JSON, CSV, MessagePack binary, diagnostics, or stats in RAM.
+- FastParse can execute Tree-sitter queries and return matches/captures in RAM.
 - Python copies the returned native buffer and frees the native result.
 
 ## Install
@@ -44,6 +45,24 @@ result = parser.parse_bytes(
 
 print(result.node_count)
 print(result.json())
+```
+
+Tree-sitter query output:
+
+```python
+from fastparse import QueryOptions
+
+query_result = parser.query_text(
+    "class Demo { void run() {} }",
+    "(method_declaration name: (identifier) @method.name) @method",
+    QueryOptions(
+        language="java",
+        output_format=OutputFormat.JSON,
+        fields=Field.CAPTURE_NAME | Field.RULE | Field.TEXT | Field.RANGE | Field.BYTE_RANGE,
+    ),
+)
+
+print(query_result.json())
 ```
 
 Binary MessagePack output:

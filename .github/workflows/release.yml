@@ -149,7 +149,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release-artifacts
-          pattern: fastparse-${{ steps.version.outputs.value }}-*
           merge-multiple: true
 
       - name: Build NuGet package
@@ -342,6 +341,63 @@ jobs:
           name: fastparse-language-python-${{ steps.version.outputs.value }}-${{ matrix.platform }}-${{ matrix.arch }}
           path: ${{ matrix.archive_glob }}
 
+  java-frameworks-language-extension:
+    name: Language Extension java-frameworks ${{ matrix.platform }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+            archive_ext: tar.gz
+            archive_glob: dist/languages/*.tar.gz
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+            archive_ext: tar.gz
+            archive_glob: dist/languages/*.tar.gz
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+            archive_ext: tar.gz
+            archive_glob: dist/languages/*.tar.gz
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+            archive_ext: zip
+            archive_glob: dist/languages/*.zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build and package Java Frameworks language extension
+        run: >
+          python scripts/package_language_extension.py
+          --language java-frameworks
+          --version "${{ steps.version.outputs.value }}"
+          --platform ${{ matrix.platform }}
+          --arch ${{ matrix.arch }}
+
+      - name: Upload Java Frameworks language extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-java-frameworks-${{ steps.version.outputs.value }}-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ${{ matrix.archive_glob }}
+
   python-language-wheel:
     name: Python Language Wheel python ${{ matrix.platform }}
     needs: python-wheel
@@ -413,7 +469,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: fastparse-${{ steps.version.outputs.value }}-python-${{ matrix.platform }}
-          path: artifacts/python-core
+          path: dist/python-core
 
       - name: Validate manylinux language wheel
         if: matrix.linux_container
@@ -425,14 +481,14 @@ jobs:
           quay.io/pypa/manylinux2014_x86_64
           /opt/python/cp312-cp312/bin/python
           scripts/validate_python_language_wheel.py
-          "$(find artifacts/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
+          "$(find dist/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
           "$(find dist/python-languages -maxdepth 1 -name 'fastparse_language_python-*.whl' | head -n 1)"
 
       - name: Validate platform language wheel
         if: ${{ !matrix.linux_container }}
         shell: bash
         run: |
-          core_wheel="$(find artifacts/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
+          core_wheel="$(find dist/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
           language_wheel="$(find dist/python-languages -maxdepth 1 -name 'fastparse_language_python-*.whl' | head -n 1)"
           python scripts/validate_python_language_wheel.py "$core_wheel" "$language_wheel"
 
@@ -440,6 +496,107 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fastparse-language-python-${{ steps.version.outputs.value }}-wheel-${{ matrix.platform }}
+          path: dist/python-languages/*.whl
+
+  java-frameworks-language-wheel:
+    name: Python Language Wheel java-frameworks ${{ matrix.platform }}
+    needs: python-wheel
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux-x64
+            platform_tag: manylinux2014_x86_64
+            linux_container: true
+          - runner: macos-15-intel
+            platform: macos-x64
+            platform_tag: macosx_10_15_x86_64
+            linux_container: false
+          - runner: macos-14
+            platform: macos-arm64
+            platform_tag: macosx_11_0_arm64
+            linux_container: false
+          - runner: windows-latest
+            platform: windows-x64
+            platform_tag: win_amd64
+            linux_container: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build manylinux Java Frameworks language wheel
+        if: matrix.linux_container
+        run: >
+          docker run --rm
+          -v "$PWD:/io"
+          -w /io
+          quay.io/pypa/manylinux2014_x86_64
+          /opt/python/cp312-cp312/bin/python
+          scripts/package_python_language_wheel.py
+          --language java-frameworks
+          --version "${{ steps.version.outputs.value }}"
+          --platform-tag "${{ matrix.platform_tag }}"
+          --output-dir /io/dist/python-languages
+
+      - name: Build platform Java Frameworks language wheel
+        if: ${{ !matrix.linux_container }}
+        run: >
+          python scripts/package_python_language_wheel.py
+          --language java-frameworks
+          --version "${{ steps.version.outputs.value }}"
+          --platform-tag "${{ matrix.platform_tag }}"
+
+      - name: Download core Python wheel artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: fastparse-${{ steps.version.outputs.value }}-python-${{ matrix.platform }}
+          path: dist/python-core
+
+      - name: Validate manylinux Java Frameworks language wheel
+        if: matrix.linux_container
+        shell: bash
+        run: >
+          docker run --rm
+          -v "$PWD:/io"
+          -w /io
+          quay.io/pypa/manylinux2014_x86_64
+          /opt/python/cp312-cp312/bin/python
+          scripts/validate_python_language_wheel.py
+          "$(find dist/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
+          "$(find dist/python-languages -maxdepth 1 -name 'fastparse_language_java_frameworks-*.whl' | head -n 1)"
+          --language java-frameworks
+
+      - name: Validate platform Java Frameworks language wheel
+        if: ${{ !matrix.linux_container }}
+        shell: bash
+        run: |
+          core_wheel="$(find dist/python-core -maxdepth 1 -name 'fastparse-*.whl' | head -n 1)"
+          language_wheel="$(find dist/python-languages -maxdepth 1 -name 'fastparse_language_java_frameworks-*.whl' | head -n 1)"
+          python scripts/validate_python_language_wheel.py "$core_wheel" "$language_wheel" --language java-frameworks
+
+      - name: Upload Java Frameworks language wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-java-frameworks-${{ steps.version.outputs.value }}-wheel-${{ matrix.platform }}
           path: dist/python-languages/*.whl
 
   nuget-language-package:
@@ -491,11 +648,7 @@ jobs:
           while IFS= read -r -d '' archive; do
             archives+=(--archive "$archive")
           done < <(find language-artifacts -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' \) -print0)
-          python scripts/package_nuget_language_extension.py \
-            --language python \
-            --version "${{ steps.version.outputs.value }}" \
-            --dependency-source nuget-artifacts \
-            "${archives[@]}"
+          python scripts/package_nuget_language_extension.py --language python --version "${{ steps.version.outputs.value }}" "${archives[@]}"
 
       - name: Validate NuGet language package
         shell: bash
@@ -527,6 +680,90 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fastparse-language-python-${{ steps.version.outputs.value }}-nuget
+          path: dist/nuget-languages/*.nupkg
+
+  nuget-language-java-frameworks-package:
+    name: NuGet Language Package Java Frameworks
+    needs:
+      - java-frameworks-language-extension
+      - nuget-package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download Java Frameworks language extension archives
+        uses: actions/download-artifact@v4
+        with:
+          path: language-artifacts
+          pattern: fastparse-language-java-frameworks-*
+          merge-multiple: true
+
+      - name: Download core NuGet package
+        uses: actions/download-artifact@v4
+        with:
+          path: nuget-artifacts
+          name: fastparse-${{ steps.version.outputs.value }}-nuget
+
+      - name: Build NuGet Java Frameworks language package
+        shell: bash
+        run: |
+          archives=()
+          while IFS= read -r -d '' archive; do
+            archives+=(--archive "$archive")
+          done < <(find language-artifacts -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' \) -print0)
+          python scripts/package_nuget_language_extension.py --language java-frameworks --version "${{ steps.version.outputs.value }}" --require-all-rids "${archives[@]}"
+
+      - name: Validate NuGet Java Frameworks language package
+        shell: bash
+        run: |
+          core_package="$(find nuget-artifacts -maxdepth 1 -name 'FastParser.*.nupkg' ! -name '*.snupkg' | head -n 1)"
+          language_package="dist/nuget-languages/FastParser.Language.JavaFrameworks.${{ steps.version.outputs.value }}.nupkg"
+          python scripts/validate_nuget_language_package.py \
+            --core-package "$core_package" \
+            --language-package "$language_package" \
+            --version "${{ steps.version.outputs.value }}" \
+            --language java-frameworks
+
+      - name: NuGet login
+        id: nuget_login
+        uses: NuGet/login@v1
+        with:
+          user: NATANBARRON
+        if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true'
+
+      - name: Publish NuGet Java Frameworks language package
+        run: >
+          dotnet nuget push
+          "dist/nuget-languages/FastParser.Language.JavaFrameworks.${{ steps.version.outputs.value }}.nupkg"
+          --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+        if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true'
+
+      - name: Upload NuGet Java Frameworks language package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-java-frameworks-${{ steps.version.outputs.value }}-nuget
           path: dist/nuget-languages/*.nupkg
 
   publish-pypi-language-python:
@@ -587,6 +824,64 @@ jobs:
       - name: Validate published PyPI language package
         run: python scripts/validate_published_pypi_language.py --version "${{ steps.version.outputs.value }}"
 
+  publish-pypi-language-java-frameworks:
+    name: Publish PyPI Language Java Frameworks
+    needs: java-frameworks-language-wheel
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true'
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download Java Frameworks language wheels
+        uses: actions/download-artifact@v4
+        with:
+          path: python-language-dist
+          pattern: fastparse-language-java-frameworks-*-wheel-*
+          merge-multiple: true
+
+      - name: Publish Java Frameworks language wheels to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python-language-dist
+
+  published-pypi-language-java-frameworks-smoke:
+    name: Published PyPI Language Java Frameworks Smoke ${{ matrix.platform }}
+    needs: publish-pypi-language-java-frameworks
+    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true'
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux-x64
+          - runner: macos-14
+            platform: macos-arm64
+          - runner: macos-15-intel
+            platform: macos-x64
+          - runner: windows-latest
+            platform: windows-x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate published PyPI Java Frameworks language package
+        run: python scripts/validate_published_pypi_language.py --version "${{ steps.version.outputs.value }}" --language java-frameworks
+
   publish-pypi:
     name: Publish PyPI
     needs: python-wheel
@@ -597,16 +892,11 @@ jobs:
       id-token: write
 
     steps:
-      - name: Resolve version
-        id: version
-        shell: bash
-        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-
       - name: Download Python wheels
         uses: actions/download-artifact@v4
         with:
           path: python-dist
-          pattern: fastparse-${{ steps.version.outputs.value }}-python-*
+          pattern: fastparse-*-python-*
           merge-multiple: true
 
       - name: Publish wheels to PyPI
@@ -730,6 +1020,46 @@ jobs:
       - name: Validate published NuGet language package
         run: python scripts/validate_published_nuget_language.py --version "${{ steps.version.outputs.value }}"
 
+  published-nuget-language-java-frameworks-smoke:
+    name: Published NuGet Language Java Frameworks Smoke ${{ matrix.platform }}-${{ matrix.arch }}
+    needs: nuget-language-java-frameworks-package
+    if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true'
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate published NuGet Java Frameworks language package
+        run: python scripts/validate_published_nuget_language.py --version "${{ steps.version.outputs.value }}" --language java-frameworks
+
   github-release:
     name: Attach To GitHub Release
     needs:
@@ -737,8 +1067,11 @@ jobs:
       - nuget-package
       - python-wheel
       - language-extension
+      - java-frameworks-language-extension
       - python-language-wheel
+      - java-frameworks-language-wheel
       - nuget-language-package
+      - nuget-language-java-frameworks-package
       - published-nuget-smoke
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')

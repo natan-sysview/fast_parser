@@ -16,12 +16,10 @@ from pathlib import Path
 
 
 CORE_PACKAGE = "FastParser"
-LANGUAGE_PACKAGE = "FastParser.Language.Python"
 SOURCE = "https://api.nuget.org/v3/index.json"
 CORE_INDEX_URL = "https://api.nuget.org/v3-flatcontainer/fastparser/index.json"
-LANGUAGE_INDEX_URL = "https://api.nuget.org/v3-flatcontainer/fastparser.language.python/index.json"
 
-PROGRAM = r'''using FastParse;
+PYTHON_PROGRAM = r'''using FastParse;
 
 using var parser = new FastParseClient();
 
@@ -66,6 +64,72 @@ Console.WriteLine(parser.Version);
 Console.WriteLine(parser.LibraryPath);
 '''
 
+JAVA_FRAMEWORKS_PROGRAM = r'''using FastParse;
+
+using var parser = new FastParseClient();
+
+var load = parser.LoadBundledLanguage("java-frameworks");
+if (load.Language != "java-frameworks" || !parser.LanguageAvailable("java-frameworks"))
+{
+    throw new InvalidOperationException("published Java Frameworks language NuGet load smoke failed");
+}
+
+var source = "import org.springframework.stereotype.Service;\n@Service class Demo { void x(){ org.springframework.jdbc.core.JdbcTemplate t; } }\n";
+var json = parser.ParseText(
+    source,
+    new ParseOptions
+    {
+        Language = "java-frameworks",
+        Format = FastParseFormat.Json,
+        Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+    });
+
+if (json.NodeCount == 0 || !json.Text.Contains("program", StringComparison.Ordinal))
+{
+    throw new InvalidOperationException("published Java Frameworks language NuGet JSON smoke failed");
+}
+
+var queryPath = Path.Combine(AppContext.BaseDirectory, "fastparse", "languages", "java-frameworks", "queries", "frameworks.scm");
+if (!File.Exists(queryPath))
+{
+    throw new InvalidOperationException($"Framework query was not copied to output: {queryPath}");
+}
+
+var query = File.ReadAllText(queryPath);
+var captures = parser.QueryTextSummary(
+    source,
+    query,
+    new QueryOptions
+    {
+        Language = "java-frameworks",
+        Format = FastParseFormat.Stats,
+        Fields = FastParseField.CaptureName
+    });
+
+if (captures.NodeCount == 0)
+{
+    throw new InvalidOperationException("published Java Frameworks language NuGet query smoke failed");
+}
+
+var diagnostics = parser.ParseText(
+    "class Broken {",
+    new ParseOptions
+    {
+        Language = "java-frameworks",
+        Format = FastParseFormat.Diagnostics
+    });
+
+using var diagnosticsDocument = diagnostics.JsonDocument();
+if (!diagnosticsDocument.RootElement.GetProperty("hasErrors").GetBoolean())
+{
+    throw new InvalidOperationException("published Java Frameworks language NuGet diagnostics smoke failed");
+}
+
+Console.WriteLine("FastParser published language NuGet smoke OK");
+Console.WriteLine(parser.Version);
+Console.WriteLine(parser.LibraryPath);
+'''
+
 
 def run_command(command: list[str], *, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
     completed = subprocess.run(
@@ -81,11 +145,30 @@ def run_command(command: list[str], *, env: dict[str, str]) -> subprocess.Comple
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Validate FastParser.Language.Python from nuget.org.")
+    parser = argparse.ArgumentParser(description="Validate a FastParser.Language.* package from nuget.org.")
     parser.add_argument("--version", required=True)
+    parser.add_argument("--language", default="python")
     parser.add_argument("--timeout-seconds", type=int, default=900)
     parser.add_argument("--interval-seconds", type=int, default=30)
     return parser.parse_args()
+
+
+def package_language_name(language: str) -> str:
+    return "".join(part.capitalize() for part in language.replace("-", "_").split("_"))
+
+
+def package_id(language: str) -> str:
+    return f"FastParser.Language.{package_language_name(language)}"
+
+
+def package_index_url(language: str) -> str:
+    return f"https://api.nuget.org/v3-flatcontainer/{package_id(language).lower()}/index.json"
+
+
+def smoke_program(language: str) -> str:
+    if language == "java-frameworks":
+        return JAVA_FRAMEWORKS_PROGRAM
+    return PYTHON_PROGRAM
 
 
 def published_versions(index_url: str) -> set[str]:
@@ -114,8 +197,10 @@ def wait_for_version(package_id: str, index_url: str, version: str, timeout_seco
 
 def main() -> int:
     args = parse_args()
+    language_package = package_id(args.language)
+    language_index_url = package_index_url(args.language)
     wait_for_version(CORE_PACKAGE, CORE_INDEX_URL, args.version, args.timeout_seconds, args.interval_seconds)
-    wait_for_version(LANGUAGE_PACKAGE, LANGUAGE_INDEX_URL, args.version, args.timeout_seconds, args.interval_seconds)
+    wait_for_version(language_package, language_index_url, args.version, args.timeout_seconds, args.interval_seconds)
     print("Published language NuGet smoke environment", flush=True)
     print(f"  Python        : {platform.python_version()} {platform.platform()}", flush=True)
     print(f"  Machine       : {platform.machine()}", flush=True)
@@ -128,7 +213,7 @@ def main() -> int:
         env["NUGET_PACKAGES"] = str(Path(temp) / "packages")
         env.pop("FASTPARSE_LIBRARY_PATH", None)
         env.pop("TSMP_LIBRARY_PATH", None)
-        env.pop("FASTPARSE_LANGUAGE_PYTHON_PATH", None)
+        env.pop(f"FASTPARSE_LANGUAGE_{args.language.replace('-', '_').upper()}_PATH", None)
 
         run_command(
             ["dotnet", "new", "console", "--framework", "net9.0", "--output", str(project_dir)],
@@ -140,15 +225,15 @@ def main() -> int:
             env=env,
         )
         run_command(
-            ["dotnet", "add", project, "package", LANGUAGE_PACKAGE, "--version", args.version, "--source", SOURCE],
+            ["dotnet", "add", project, "package", language_package, "--version", args.version, "--source", SOURCE],
             env=env,
         )
-        (project_dir / "Program.cs").write_text(PROGRAM, encoding="utf-8")
+        (project_dir / "Program.cs").write_text(smoke_program(args.language), encoding="utf-8")
         completed = run_command(["dotnet", "run", "--project", project], env=env)
         if "FastParser published language NuGet smoke OK" not in completed.stdout:
             raise AssertionError(f"published language NuGet smoke failed:\n{completed.stdout}")
 
-    print(f"Validated published NuGet language package: {LANGUAGE_PACKAGE} {args.version}")
+    print(f"Validated published NuGet language package: {language_package} {args.version}")
     return 0
 
 

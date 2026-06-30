@@ -33,6 +33,18 @@ int fastparse_parse(
 Parses one source buffer and fills `out_result`.
 
 ```c
+int fastparse_query(
+    const unsigned char *source,
+    size_t source_len,
+    const unsigned char *query,
+    size_t query_len,
+    const TsmpQueryOptions *options,
+    TsmpResult *out_result);
+```
+
+Parses one source buffer, compiles a Tree-sitter query, executes it, and fills `out_result` with matches/captures.
+
+```c
 void fastparse_result_free(TsmpResult *result);
 ```
 
@@ -133,6 +145,25 @@ TsmpOptionsV2 options = {
 int status = fastparse_parse_v2(source, source_len, &options, &result);
 ```
 
+Query options:
+
+```c
+typedef struct {
+    const char *language;
+    TsmpFormat format;
+    unsigned int fields;
+    size_t max_matches;
+    size_t max_captures;
+    int include_pattern;
+    int pretty;
+    TsmpNormalization normalization;
+} TsmpQueryOptions;
+```
+
+Query supports `TSMP_FORMAT_JSON`, `TSMP_FORMAT_CSV`, `TSMP_FORMAT_BINARY`, and `TSMP_FORMAT_STATS`.
+
+For query stats, `result.node_count` is the capture count and `result.length` is the match count.
+
 ## Example: JSON Methods
 
 ```c
@@ -185,6 +216,35 @@ TsmpOptions options = {
 
 The result data is MessagePack bytes. Bindings should copy the buffer before freeing the native result.
 
+## Example: Tree-sitter Query
+
+```c
+const unsigned char query[] =
+    "(method_declaration name: (identifier) @method.name) @method";
+
+TsmpQueryOptions options = {
+    .language = "java",
+    .format = TSMP_FORMAT_JSON,
+    .fields = TSMP_FIELD_CAPTURE_NAME |
+              TSMP_FIELD_RULE |
+              TSMP_FIELD_TEXT |
+              TSMP_FIELD_RANGE |
+              TSMP_FIELD_BYTE_RANGE,
+    .max_matches = 0,
+    .max_captures = 0,
+    .include_pattern = 1,
+    .pretty = 0,
+    .normalization = TSMP_NORMALIZATION_AUTO_SAFE
+};
+
+TsmpResult result = {0};
+int status = fastparse_query(source, source_len, query, sizeof(query) - 1, &options, &result);
+
+fastparse_result_free(&result);
+```
+
+Query output is documented in [Tree-sitter Query Contract](tree_sitter_queries.md).
+
 ## Example: Load COBOL Extension
 
 ```c
@@ -225,6 +285,8 @@ TSMP_ERROR_IO                  4
 TSMP_ERROR_UNSUPPORTED_FORMAT  5
 TSMP_ERROR_OUT_OF_MEMORY       6
 TSMP_ERROR_EXTENSION_LOAD      7
+TSMP_ERROR_QUERY_COMPILE       8
+TSMP_ERROR_QUERY_EXECUTE       9
 ```
 
 ## Diagnostics Format
@@ -248,7 +310,7 @@ TsmpOptions options = {
 
 ## Memory Ownership
 
-Call `fastparse_result_free` exactly once for every initialized result passed to `fastparse_parse`.
+Call `fastparse_result_free` exactly once for every initialized result passed to `fastparse_parse`, `fastparse_parse_v2`, or `fastparse_query`.
 
 Bindings should use this pattern:
 

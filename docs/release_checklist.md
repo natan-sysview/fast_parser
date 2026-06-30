@@ -117,9 +117,13 @@ dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExampl
 - [ ] Attach native binaries when available.
 - [ ] Attach NuGet package and symbols package.
 - [ ] Confirm `fastparse-language-python` trusted publisher exists on PyPI.
+- [ ] Confirm `fastparse-language-java-frameworks` trusted publisher exists on PyPI when publishing Java Frameworks.
 - [ ] Confirm `FastParser.Language.Python` trusted publishing policy exists on NuGet.
+- [ ] Confirm `FastParser.Language.JavaFrameworks` trusted publishing policy exists on NuGet when publishing Java Frameworks.
 - [ ] Enable `PYPI_LANGUAGE_PYTHON_PUBLISH=true` when publishing the Python language extension.
+- [ ] Enable `PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH=true` when publishing the Java Frameworks language extension.
 - [ ] Enable `NUGET_LANGUAGE_PYTHON_PUBLISH=true` when publishing the NuGet language extension.
+- [ ] Enable `NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH=true` when publishing the Java Frameworks NuGet language extension.
 - [ ] Confirm published language extension smoke tests pass on Linux, Windows, macOS arm64, and macOS x64.
 - [ ] Include supported platforms in release notes.
 - [ ] Include known limitations.

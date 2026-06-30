@@ -1,0 +1,190 @@
+========================================
+Framework usage evidence
+========================================
+
+package demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.web.bind.annotation.RestController;
+import javax.persistence.Entity;
+import java.sql.DriverManager;
+import org.apache.axis.client.Service;
+import javax.xml.bind.JAXBContext;
+import net.sf.jasperreports.engine.JasperFillManager;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import io.jsonwebtoken.Jwts;
+import springfox.documentation.spring.web.plugins.Docket;
+import com.thoughtworks.xstream.XStream;
+import oracle.jdbc.OracleDriver;
+import com.microsoft.sqlserver.jdbc.SQLServerDriver;
+import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+
+@RestController
+@Entity(name = "Customer")
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class FrameworkExample {
+  @NotNull
+  private String name;
+
+  @Mock
+  private HttpServletRequest request;
+
+  @Test
+  void run() throws Exception {
+    SpringApplication.run(FrameworkExample.class);
+    DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521/XEPDB1");
+    JAXBContext.newInstance(FrameworkExample.class);
+    JasperFillManager.fillReport("report.jasper", null);
+    Jwts.builder();
+    new XStream();
+    new BouncyCastleProvider();
+  }
+}
+
+---
+
+(program
+  (package_declaration
+    (identifier))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (class_declaration
+    (modifiers
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (element_value_pair
+            (identifier)
+            (string_literal
+              (string_fragment)))))
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (field_access
+            (field_access
+              (identifier)
+              (identifier))
+            (identifier)))))
+    (identifier)
+    (class_body
+      (field_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (field_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (throws
+          (type_identifier))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (class_literal
+                  (type_identifier)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (string_literal
+                  (jdbc_connection_string)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (class_literal
+                  (type_identifier)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (string_literal
+                  (string_fragment))
+                (null_literal))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list)))
+          (expression_statement
+            (object_creation_expression
+              (type_identifier)
+              (argument_list)))
+          (expression_statement
+            (object_creation_expression
+              (type_identifier)
+              (argument_list))))))))

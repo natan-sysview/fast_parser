@@ -17,10 +17,8 @@ from pathlib import Path
 
 
 CORE_PACKAGE = "fastparse"
-LANGUAGE = "python"
-LANGUAGE_PACKAGE = "fastparse-language-python"
 
-PROGRAM = r'''
+PYTHON_PROGRAM = r'''
 import fastparse
 import fastparse_language_python
 from importlib.metadata import version
@@ -61,6 +59,55 @@ print(parser.version)
 print(fastparse_language_python.extension_path())
 '''
 
+JAVA_FRAMEWORKS_PROGRAM = r'''
+import fastparse
+import fastparse_language_java_frameworks
+from importlib.metadata import version
+from fastparse import FastParse
+
+assert fastparse.__version__ == version("fastparse"), (fastparse.__version__, version("fastparse"))
+assert fastparse_language_java_frameworks.__version__ == version("fastparse-language-java-frameworks")
+
+parser = FastParse()
+load = parser.load_bundled_language("java-frameworks")
+assert load.language == "java-frameworks", load
+assert parser.language_available("java-frameworks")
+
+source = "import org.springframework.stereotype.Service;\n@Service class Demo { void x(){ org.springframework.jdbc.core.JdbcTemplate t; } }\n"
+json_result = parser.parse_text(
+    source,
+    language="java-frameworks",
+    output_format="json",
+    fields=["rule", "text", "byte_range"],
+)
+assert json_result.node_count > 0, json_result.node_count
+
+query = fastparse_language_java_frameworks.query_path("frameworks").read_text()
+captures = parser.query_text_summary(
+    source,
+    query,
+    language="java-frameworks",
+    output_format="stats",
+    fields=["capture_name"],
+)
+assert captures.node_count > 0, captures.node_count
+
+diagnostics = parser.parse_text(
+    "class Broken {",
+    language="java-frameworks",
+    output_format="diagnostics",
+)
+quality = diagnostics.json()
+assert quality["hasErrors"] is True, quality
+assert "nodes" not in quality, quality
+
+print("FastParse published PyPI language smoke OK")
+print(fastparse.__version__)
+print(fastparse_language_java_frameworks.__version__)
+print(parser.version)
+print(fastparse_language_java_frameworks.extension_path())
+'''
+
 
 def pypi_version(release_version: str) -> str:
     if "-preview." in release_version:
@@ -73,8 +120,9 @@ def pypi_version(release_version: str) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Validate fastparse-language-python from PyPI.")
+    parser = argparse.ArgumentParser(description="Validate a FastParse language extension from PyPI.")
     parser.add_argument("--version", required=True, help="FastParse release version or PyPI version.")
+    parser.add_argument("--language", default="python")
     parser.add_argument("--timeout-seconds", type=int, default=900)
     parser.add_argument("--interval-seconds", type=int, default=30)
     return parser.parse_args()
@@ -109,7 +157,17 @@ def wait_for_version(package: str, version: str, timeout_seconds: int, interval_
         time.sleep(interval_seconds)
 
 
-def install_from_pypi(python: Path, version: str, timeout_seconds: int, interval_seconds: int) -> None:
+def language_package(language: str) -> str:
+    return f"fastparse-language-{language}"
+
+
+def smoke_program(language: str) -> str:
+    if language == "java-frameworks":
+        return JAVA_FRAMEWORKS_PROGRAM
+    return PYTHON_PROGRAM
+
+
+def install_from_pypi(python: Path, language: str, version: str, timeout_seconds: int, interval_seconds: int) -> None:
     deadline = time.monotonic() + timeout_seconds
     command = [
         str(python),
@@ -121,7 +179,7 @@ def install_from_pypi(python: Path, version: str, timeout_seconds: int, interval
         "--index-url",
         "https://pypi.org/simple",
         f"{CORE_PACKAGE}=={version}",
-        f"{LANGUAGE_PACKAGE}=={version}",
+        f"{language_package(language)}=={version}",
     ]
     while True:
         completed = subprocess.run(
@@ -142,17 +200,18 @@ def install_from_pypi(python: Path, version: str, timeout_seconds: int, interval
 def main() -> int:
     args = parse_args()
     version = pypi_version(args.version)
+    package = language_package(args.language)
     wait_for_version(CORE_PACKAGE, version, args.timeout_seconds, args.interval_seconds)
-    wait_for_version(LANGUAGE_PACKAGE, version, args.timeout_seconds, args.interval_seconds)
+    wait_for_version(package, version, args.timeout_seconds, args.interval_seconds)
 
     with tempfile.TemporaryDirectory(prefix="fastparse-published-pypi-language-") as temp:
         venv_dir = Path(temp) / "venv"
         venv.EnvBuilder(with_pip=True).create(venv_dir)
         python = venv_python(venv_dir)
         subprocess.run([str(python), "-m", "pip", "install", "--upgrade", "pip"], check=True)
-        install_from_pypi(python, version, args.timeout_seconds, args.interval_seconds)
+        install_from_pypi(python, args.language, version, args.timeout_seconds, args.interval_seconds)
         completed = subprocess.run(
-            [str(python), "-c", PROGRAM],
+            [str(python), "-c", smoke_program(args.language)],
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -162,7 +221,7 @@ def main() -> int:
         if "FastParse published PyPI language smoke OK" not in completed.stdout:
             raise AssertionError(f"published PyPI language smoke failed:\n{completed.stdout}")
 
-    print(f"Validated published PyPI language package: {LANGUAGE_PACKAGE} {version}")
+    print(f"Validated published PyPI language package: {package} {version}")
     return 0
 
 

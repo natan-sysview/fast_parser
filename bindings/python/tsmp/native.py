@@ -34,6 +34,8 @@ TSMP_FIELD_BYTE_RANGE = 1 << 5
 TSMP_FIELD_CHILD_COUNT = 1 << 6
 TSMP_FIELD_CHILDREN = 1 << 7
 TSMP_FIELD_DIAGNOSTICS = 1 << 8
+TSMP_FIELD_CAPTURE_NAME = 1 << 9
+TSMP_FIELD_PATTERN_INDEX = 1 << 10
 TSMP_FIELD_ALL = 0xFFFFFFFF
 
 FORMAT_NAMES = {
@@ -57,6 +59,11 @@ FIELD_NAMES = {
     "child_count": TSMP_FIELD_CHILD_COUNT,
     "children": TSMP_FIELD_CHILDREN,
     "diagnostics": TSMP_FIELD_DIAGNOSTICS,
+    "capture_name": TSMP_FIELD_CAPTURE_NAME,
+    "capture": TSMP_FIELD_CAPTURE_NAME,
+    "name": TSMP_FIELD_CAPTURE_NAME,
+    "pattern_index": TSMP_FIELD_PATTERN_INDEX,
+    "pattern": TSMP_FIELD_PATTERN_INDEX,
     "all": TSMP_FIELD_ALL,
 }
 
@@ -89,6 +96,8 @@ class Field(IntFlag):
     CHILD_COUNT = TSMP_FIELD_CHILD_COUNT
     CHILDREN = TSMP_FIELD_CHILDREN
     DIAGNOSTICS = TSMP_FIELD_DIAGNOSTICS
+    CAPTURE_NAME = TSMP_FIELD_CAPTURE_NAME
+    PATTERN_INDEX = TSMP_FIELD_PATTERN_INDEX
     ALL = TSMP_FIELD_ALL
 
 
@@ -147,6 +156,18 @@ class ParseOptions:
     normalization: str | int | Normalization | None = None
 
 
+@dataclass(frozen=True)
+class QueryOptions:
+    language: str = "java"
+    output_format: str | int | OutputFormat = OutputFormat.JSON
+    fields: int | str | Iterable[str] | Field | None = None
+    max_matches: int = 0
+    max_captures: int = 0
+    include_pattern: bool = True
+    pretty: bool = False
+    normalization: str | int | Normalization | None = None
+
+
 class _TsmpOptions(ctypes.Structure):
     _fields_ = [
         ("language", ctypes.c_char_p),
@@ -165,6 +186,19 @@ class _TsmpOptionsV2(ctypes.Structure):
         ("include_rules", ctypes.c_char_p),
         ("fields", ctypes.c_uint),
         ("include_tokens", ctypes.c_int),
+        ("pretty", ctypes.c_int),
+        ("normalization", ctypes.c_int),
+    ]
+
+
+class _TsmpQueryOptions(ctypes.Structure):
+    _fields_ = [
+        ("language", ctypes.c_char_p),
+        ("format", ctypes.c_int),
+        ("fields", ctypes.c_uint),
+        ("max_matches", ctypes.c_size_t),
+        ("max_captures", ctypes.c_size_t),
+        ("include_pattern", ctypes.c_int),
         ("pretty", ctypes.c_int),
         ("normalization", ctypes.c_int),
     ]
@@ -322,6 +356,31 @@ def _merge_options(
     )
 
 
+def _merge_query_options(
+    options: QueryOptions | None,
+    *,
+    language: Any,
+    output_format: Any,
+    fields: Any,
+    max_matches: Any,
+    max_captures: Any,
+    include_pattern: Any,
+    pretty: Any,
+    normalization: Any,
+) -> QueryOptions:
+    base = options or QueryOptions()
+    return QueryOptions(
+        language=base.language if language is _UNSET else language,
+        output_format=base.output_format if output_format is _UNSET else output_format,
+        fields=base.fields if fields is _UNSET else fields,
+        max_matches=base.max_matches if max_matches is _UNSET else int(max_matches),
+        max_captures=base.max_captures if max_captures is _UNSET else int(max_captures),
+        include_pattern=base.include_pattern if include_pattern is _UNSET else bool(include_pattern),
+        pretty=base.pretty if pretty is _UNSET else bool(pretty),
+        normalization=base.normalization if normalization is _UNSET else normalization,
+    )
+
+
 def _native_string(pointer: Any) -> str:
     if not pointer:
         return ""
@@ -346,6 +405,7 @@ class Tsmp:
         self._version_fn = _native_function(self._lib, "fastparse_version", "tsmp_version")
         self._parse_fn = _native_function(self._lib, "fastparse_parse", "tsmp_parse")
         self._parse_v2_fn = getattr(self._lib, "fastparse_parse_v2", None)
+        self._query_fn = _native_function(self._lib, "fastparse_query", "tsmp_query")
         self._free_fn = _native_function(self._lib, "fastparse_result_free", "tsmp_result_free")
         self._load_language_extension_fn = getattr(self._lib, "fastparse_load_language_extension")
         self._language_available_fn = getattr(self._lib, "fastparse_language_available")
@@ -370,6 +430,16 @@ class Tsmp:
                 ctypes.POINTER(_TsmpResult),
             ]
             self._parse_v2_fn.restype = ctypes.c_int
+
+        self._query_fn.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_size_t,
+            ctypes.c_void_p,
+            ctypes.c_size_t,
+            ctypes.POINTER(_TsmpQueryOptions),
+            ctypes.POINTER(_TsmpResult),
+        ]
+        self._query_fn.restype = ctypes.c_int
 
         self._free_fn.argtypes = [ctypes.POINTER(_TsmpResult)]
         self._free_fn.restype = None
@@ -579,6 +649,165 @@ class Tsmp:
         **kwargs: Any,
     ) -> ParseSummary:
         return self.parse_bytes_summary(source.encode(encoding, errors=errors), options, **kwargs)
+
+    def query_bytes(
+        self,
+        source: bytes | bytearray | memoryview,
+        query: str | bytes | bytearray | memoryview,
+        options: QueryOptions | None = None,
+        *,
+        language: str | object = _UNSET,
+        output_format: str | int | OutputFormat | object = _UNSET,
+        fields: int | str | Iterable[str] | Field | object | None = _UNSET,
+        max_matches: int | object = _UNSET,
+        max_captures: int | object = _UNSET,
+        include_pattern: bool | object = _UNSET,
+        pretty: bool | object = _UNSET,
+        normalization: str | int | Normalization | object | None = _UNSET,
+    ) -> ParseResult:
+        merged = _merge_query_options(
+            options,
+            language=language,
+            output_format=output_format,
+            fields=fields,
+            max_matches=max_matches,
+            max_captures=max_captures,
+            include_pattern=include_pattern,
+            pretty=pretty,
+            normalization=normalization,
+        )
+        data, capture_count, format_name, _output_length = self._query_native(
+            source,
+            query,
+            language=merged.language,
+            output_format=merged.output_format,
+            fields=merged.fields,
+            max_matches=merged.max_matches,
+            max_captures=merged.max_captures,
+            include_pattern=merged.include_pattern,
+            pretty=merged.pretty,
+            normalization=merged.normalization,
+            copy_data=True,
+        )
+        return ParseResult(data, capture_count, format_name)
+
+    def query_bytes_summary(
+        self,
+        source: bytes | bytearray | memoryview,
+        query: str | bytes | bytearray | memoryview,
+        options: QueryOptions | None = None,
+        **kwargs: Any,
+    ) -> ParseSummary:
+        merged = _merge_query_options(
+            options,
+            language=kwargs.pop("language", _UNSET),
+            output_format=kwargs.pop("output_format", _UNSET),
+            fields=kwargs.pop("fields", _UNSET),
+            max_matches=kwargs.pop("max_matches", _UNSET),
+            max_captures=kwargs.pop("max_captures", _UNSET),
+            include_pattern=kwargs.pop("include_pattern", _UNSET),
+            pretty=kwargs.pop("pretty", _UNSET),
+            normalization=kwargs.pop("normalization", _UNSET),
+        )
+        if kwargs:
+            unknown = ", ".join(sorted(kwargs))
+            raise TypeError(f"unexpected keyword argument(s): {unknown}")
+        _data, capture_count, format_name, output_length = self._query_native(
+            source,
+            query,
+            language=merged.language,
+            output_format=merged.output_format,
+            fields=merged.fields,
+            max_matches=merged.max_matches,
+            max_captures=merged.max_captures,
+            include_pattern=merged.include_pattern,
+            pretty=merged.pretty,
+            normalization=merged.normalization,
+            copy_data=False,
+        )
+        return ParseSummary(output_length, capture_count, format_name)
+
+    def query_text(
+        self,
+        source: str,
+        query: str,
+        options: QueryOptions | None = None,
+        *,
+        encoding: str = "utf-8",
+        errors: str = "strict",
+        **kwargs: Any,
+    ) -> ParseResult:
+        return self.query_bytes(source.encode(encoding, errors=errors), query, options, **kwargs)
+
+    def query_text_summary(
+        self,
+        source: str,
+        query: str,
+        options: QueryOptions | None = None,
+        *,
+        encoding: str = "utf-8",
+        errors: str = "strict",
+        **kwargs: Any,
+    ) -> ParseSummary:
+        return self.query_bytes_summary(source.encode(encoding, errors=errors), query, options, **kwargs)
+
+    def _query_native(
+        self,
+        source: bytes | bytearray | memoryview,
+        query: str | bytes | bytearray | memoryview,
+        *,
+        language: str,
+        output_format: str | int,
+        fields: int | str | Iterable[str] | None,
+        max_matches: int,
+        max_captures: int,
+        include_pattern: bool,
+        pretty: bool,
+        normalization: str | int | None,
+        copy_data: bool,
+    ) -> tuple[bytes, int, str, int]:
+        source_bytes = source if isinstance(source, bytes) else bytes(source)
+        query_bytes = query.encode("utf-8") if isinstance(query, str) else bytes(query)
+        format_name, format_code = _format_value(output_format)
+        _normalization_name, normalization_code = _normalization_value(normalization)
+        source_pointer = ctypes.c_char_p(source_bytes) if source_bytes else None
+        query_pointer = ctypes.c_char_p(query_bytes) if query_bytes else None
+        options = _TsmpQueryOptions(
+            language.encode("utf-8"),
+            format_code,
+            parse_field_mask(fields),
+            max(0, int(max_matches)),
+            max(0, int(max_captures)),
+            1 if include_pattern else 0,
+            1 if pretty else 0,
+            normalization_code,
+        )
+        result = _TsmpResult()
+        status = self._query_fn(
+            ctypes.cast(source_pointer, ctypes.c_void_p) if source_pointer is not None else None,
+            len(source_bytes),
+            ctypes.cast(query_pointer, ctypes.c_void_p) if query_pointer is not None else None,
+            len(query_bytes),
+            ctypes.byref(options),
+            ctypes.byref(result),
+        )
+
+        try:
+            if status != 0 or result.status != 0:
+                message = _native_string(result.error_message)
+                raise NativeParseError(
+                    f"tsmp_query failed with status {status}/{result.status}: "
+                    f"{message or 'no error detail'}"
+                )
+            output_length = int(result.length)
+            data = (
+                ctypes.string_at(result.data, result.length)
+                if copy_data and result.data and result.length > 0
+                else b""
+            )
+            return data, int(result.node_count), format_name, output_length
+        finally:
+            self._free_fn(ctypes.byref(result))
 
     def parse_result(self, source: bytes | bytearray | memoryview, **kwargs: Any) -> tuple[bytes, int]:
         result = self.parse_bytes(source, **kwargs)

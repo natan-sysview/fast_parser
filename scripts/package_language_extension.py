@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Package a FastParse language extension.")
-    parser.add_argument("--language", required=True, choices=["python", "rust"])
+    parser.add_argument("--language", required=True)
     parser.add_argument("--version", default="0.1.0-preview.1")
     parser.add_argument("--platform", default=default_platform())
     parser.add_argument("--arch", default=default_arch())
@@ -54,15 +54,24 @@ def rid_for(platform_name: str, arch: str) -> str:
 
 
 def library_name(language: str, platform_name: str) -> str:
+    native = native_language_name(language)
     if platform_name == "windows":
-        return f"fastparse_language_{language}.dll"
+        return f"fastparse_language_{native}.dll"
     if platform_name == "macos":
-        return f"libfastparse_language_{language}.dylib"
-    return f"libfastparse_language_{language}.so"
+        return f"libfastparse_language_{native}.dylib"
+    return f"libfastparse_language_{native}.so"
 
 
 def target_name(language: str) -> str:
-    return f"fastparse_language_{language}"
+    return f"fastparse_language_{native_language_name(language)}"
+
+
+def native_language_name(language: str) -> str:
+    return language.strip().lower().replace("-", "_")
+
+
+def cmake_language_key(language: str) -> str:
+    return native_language_name(language).upper()
 
 
 def grammar_dir(language: str) -> Path:
@@ -73,7 +82,7 @@ def build_extension(language: str, build_dir: Path) -> None:
     grammar = grammar_dir(language)
     if not (grammar / "src" / "parser.c").is_file():
         raise FileNotFoundError(f"grammar is not vendored: {grammar}")
-    cmake_var = f"FASTPARSE_{language.upper()}_GRAMMAR_DIR={grammar}"
+    cmake_var = f"FASTPARSE_{cmake_language_key(language)}_GRAMMAR_DIR={grammar}"
     subprocess.run(
         ["cmake", "-S", str(ROOT), "-B", str(build_dir), "-DCMAKE_BUILD_TYPE=Release", f"-D{cmake_var}"],
         cwd=ROOT,

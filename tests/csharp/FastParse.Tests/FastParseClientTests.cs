@@ -173,6 +173,76 @@ public sealed class FastParseClientTests
     }
 
     [Fact]
+    public void QueryTextReturnsTreeSitterCaptures()
+    {
+        using var parser = NewParser();
+        const string query = "(method_declaration name: (identifier) @method.name) @method";
+
+        var result = parser.QueryText(Source, query);
+
+        Assert.Equal(FastParseFormat.Json, result.Format);
+        Assert.Equal(2UL, result.NodeCount);
+        using var document = result.JsonDocument();
+        Assert.Equal("java", document.RootElement.GetProperty("language").GetString());
+        Assert.Equal(1, document.RootElement.GetProperty("matchCount").GetInt32());
+        Assert.Equal(2, document.RootElement.GetProperty("captureCount").GetInt32());
+        var captures = document.RootElement.GetProperty("matches")[0].GetProperty("captures");
+        var methodName = captures.EnumerateArray().Single(capture => capture.GetProperty("name").GetString() == "method.name");
+        Assert.Equal("identifier", methodName.GetProperty("rule").GetString());
+        Assert.Equal("run", methodName.GetProperty("text").GetString());
+        Assert.True(methodName.TryGetProperty("startLine", out _));
+        Assert.True(methodName.TryGetProperty("startByte", out _));
+    }
+
+    [Fact]
+    public void QueryTextHonorsFieldsAndLimits()
+    {
+        using var parser = NewParser();
+        const string query = "(method_declaration name: (identifier) @method.name)";
+
+        var result = parser.QueryText(Source, query, new QueryOptions
+        {
+            Fields = FastParseField.CaptureName | FastParseField.Text,
+            MaxCaptures = 1,
+            IncludePattern = false
+        });
+
+        Assert.Equal(1UL, result.NodeCount);
+        using var document = result.JsonDocument();
+        var capture = document.RootElement.GetProperty("matches")[0].GetProperty("captures")[0];
+        Assert.Equal("method.name", capture.GetProperty("name").GetString());
+        Assert.Equal("run", capture.GetProperty("text").GetString());
+        Assert.False(capture.TryGetProperty("rule", out _));
+        Assert.False(capture.TryGetProperty("patternIndex", out _));
+    }
+
+    [Fact]
+    public void QueryStatsSummaryCountsMatchesAndCaptures()
+    {
+        using var parser = NewParser();
+        const string query = "(method_declaration name: (identifier) @method.name) @method";
+
+        var summary = parser.QueryTextSummary(Source, query, new QueryOptions
+        {
+            Format = FastParseFormat.Stats
+        });
+
+        Assert.Equal(FastParseFormat.Stats, summary.Format);
+        Assert.Equal(2UL, summary.NodeCount);
+        Assert.Equal(1UL, summary.OutputLength);
+    }
+
+    [Fact]
+    public void InvalidQueryThrowsFastParseException()
+    {
+        using var parser = NewParser();
+
+        var error = Assert.Throws<FastParseException>(() => parser.QueryText(Source, "(missing_node) @bad"));
+
+        Assert.Contains("query compile", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void ExplicitNativeLibraryPathLoadsSuccessfully()
     {
         var libraryPath = FindNativeLibrary();

@@ -1,0 +1,11 @@
+audits/
+baselines/
+runs/
+target/
+node_modules/
+__pycache__/
+*.pyc
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.msgpack

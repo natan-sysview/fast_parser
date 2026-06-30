@@ -7,7 +7,7 @@
 
 FastParser is a thin C# binding over the FastParse native C ABI.
 
-It parses source bytes in memory and returns AST data as JSON, CSV, binary MessagePack, or stats. The current native package includes the Java Tree-sitter grammar.
+It parses source bytes in memory and returns AST data as JSON, CSV, binary MessagePack, or stats. It can also execute Tree-sitter queries and return structural matches/captures. The current native package includes the Java Tree-sitter grammar.
 
 ## Install
 
@@ -45,6 +45,30 @@ var result = parser.ParseText(
 Console.WriteLine(result.NodeCount);
 Console.WriteLine(result.Text);
 ```
+
+## Tree-sitter Queries
+
+Use `QueryText` when the grammar pattern is already known and the caller only needs specific captures:
+
+```csharp
+var queryResult = parser.QueryText(
+    "class Demo { void run() {} }",
+    "(method_declaration name: (identifier) @method.name) @method",
+    new QueryOptions
+    {
+        Language = "java",
+        Format = FastParseFormat.Json,
+        Fields = FastParseField.CaptureName |
+                 FastParseField.Rule |
+                 FastParseField.Text |
+                 FastParseField.Range |
+                 FastParseField.ByteRange
+    });
+
+Console.WriteLine(queryResult.Text);
+```
+
+For query stats, `ParseSummary.NodeCount` is the capture count and `ParseSummary.OutputLength` is the match count.
 
 ## Binary Output
 
@@ -133,6 +157,7 @@ AI_AGENT_GUIDE.md
 docs/contracts.md
 docs/language_extensions.md
 docs/output_formats.md
+docs/tree_sitter_queries.md
 docs/binary_schema.md
 docs/csharp_binding.md
 docs/encoding.md

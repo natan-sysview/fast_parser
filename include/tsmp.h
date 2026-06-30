@@ -25,6 +25,8 @@ extern "C" {
 #define TSMP_ERROR_UNSUPPORTED_FORMAT 5
 #define TSMP_ERROR_OUT_OF_MEMORY 6
 #define TSMP_ERROR_EXTENSION_LOAD 7
+#define TSMP_ERROR_QUERY_COMPILE 8
+#define TSMP_ERROR_QUERY_EXECUTE 9
 
 typedef struct TSLanguage TSLanguage;
 typedef const TSLanguage *(*FastParseLanguageFn)(void);
@@ -68,6 +70,8 @@ typedef enum {
     TSMP_FIELD_CHILD_COUNT = 1u << 6,
     TSMP_FIELD_CHILDREN    = 1u << 7,
     TSMP_FIELD_DIAGNOSTICS = 1u << 8,
+    TSMP_FIELD_CAPTURE_NAME = 1u << 9,
+    TSMP_FIELD_PATTERN_INDEX = 1u << 10,
     TSMP_FIELD_ALL         = 0xFFFFFFFFu
 } TsmpFieldMask;
 
@@ -98,6 +102,17 @@ typedef struct {
     char *error_message;
 } TsmpResult;
 
+typedef struct {
+    const char *language;
+    TsmpFormat format;
+    unsigned int fields;       /* 0 = query default fields. */
+    size_t max_matches;        /* 0 = unlimited. */
+    size_t max_captures;       /* 0 = unlimited. */
+    int include_pattern;       /* Include patternIndex when supported by the output format. */
+    int pretty;                /* Reserved for formatted JSON. */
+    TsmpNormalization normalization;
+} TsmpQueryOptions;
+
 TSMP_API const char *tsmp_version(void);
 
 TSMP_API int tsmp_parse(
@@ -110,6 +125,14 @@ TSMP_API int tsmp_parse_v2(
     const unsigned char *source,
     size_t source_len,
     const TsmpOptionsV2 *options,
+    TsmpResult *out_result);
+
+TSMP_API int tsmp_query(
+    const unsigned char *source,
+    size_t source_len,
+    const unsigned char *query,
+    size_t query_len,
+    const TsmpQueryOptions *options,
     TsmpResult *out_result);
 
 TSMP_API void tsmp_result_free(TsmpResult *result);
@@ -127,6 +150,14 @@ TSMP_API int fastparse_parse_v2(
     const unsigned char *source,
     size_t source_len,
     const TsmpOptionsV2 *options,
+    TsmpResult *out_result);
+
+TSMP_API int fastparse_query(
+    const unsigned char *source,
+    size_t source_len,
+    const unsigned char *query,
+    size_t query_len,
+    const TsmpQueryOptions *options,
     TsmpResult *out_result);
 
 TSMP_API void fastparse_result_free(TsmpResult *result);

@@ -36,6 +36,12 @@ public enum FastParseField : uint
     /// <summary>Include Tree-sitter parse diagnostic fields such as isError, isMissing, and hasError.</summary>
     Diagnostics = 1u << 8,
 
+    /// <summary>Include the Tree-sitter query capture name, for example method.name.</summary>
+    CaptureName = 1u << 9,
+
+    /// <summary>Include the matched Tree-sitter query pattern index.</summary>
+    PatternIndex = 1u << 10,
+
     /// <summary>Request all supported fields.</summary>
     All = 0xFFFFFFFFu
 }

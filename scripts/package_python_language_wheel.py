@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build fastparse-language-<language> wheel.")
-    parser.add_argument("--language", required=True, choices=["python", "rust"])
+    parser.add_argument("--language", required=True)
     parser.add_argument("--version", default="0.1.0-preview.1")
     parser.add_argument("--platform-tag", default=default_platform_tag())
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist" / "python-languages")
@@ -60,11 +60,16 @@ def platform_key() -> str:
 
 
 def native_name(language: str) -> str:
+    native = native_language_name(language)
     if platform.system() == "Windows":
-        return f"fastparse_language_{language}.dll"
+        return f"fastparse_language_{native}.dll"
     if platform.system() == "Darwin":
-        return f"libfastparse_language_{language}.dylib"
-    return f"libfastparse_language_{language}.so"
+        return f"libfastparse_language_{native}.dylib"
+    return f"libfastparse_language_{native}.so"
+
+
+def native_language_name(language: str) -> str:
+    return language.strip().lower().replace("-", "_")
 
 
 def build_native(language: str, version: str) -> None:
@@ -83,7 +88,8 @@ def build_native(language: str, version: str) -> None:
 
 
 def write_project(temp: Path, language: str, version: str, platform_tag: str) -> None:
-    package_name = f"fastparse_language_{language}"
+    native_language = native_language_name(language)
+    package_name = f"fastparse_language_{native_language}"
     package_dir = temp / package_name
     native_dir = package_dir / "native" / platform_key()
     native_dir.mkdir(parents=True)
@@ -95,6 +101,11 @@ def write_project(temp: Path, language: str, version: str, platform_tag: str) ->
     shutil.copy2(source_native, native_dir / source_native.name)
     manifest_path = package_dir / "manifest.json"
     shutil.copy2(ROOT / "extensions" / language / "manifest.json", manifest_path)
+    queries_source = ROOT / "extensions" / language / "queries"
+    if queries_source.is_dir():
+        query_package = package_dir / "queries"
+        shutil.copytree(queries_source, query_package)
+        (query_package / "__init__.py").write_text("", encoding="utf-8")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["version"] = version
     manifest["platforms"] = [platform_key()]
@@ -109,6 +120,7 @@ from pathlib import Path
 
 __version__ = "{pep440(version)}"
 LANGUAGE = "{language}"
+NATIVE_LANGUAGE = "{native_language}"
 
 
 def _platform_key() -> str:
@@ -130,12 +142,17 @@ def _platform_key() -> str:
 
 def extension_path() -> Path:
     if platform.system() == "Windows":
-        filename = "fastparse_language_{language}.dll"
+        filename = "fastparse_language_{native_language}.dll"
     elif platform.system() == "Darwin":
-        filename = "libfastparse_language_{language}.dylib"
+        filename = "libfastparse_language_{native_language}.dylib"
     else:
-        filename = "libfastparse_language_{language}.so"
+        filename = "libfastparse_language_{native_language}.so"
     path = resources.files(__package__) / "native" / _platform_key() / filename
+    return Path(str(path))
+
+
+def query_path(name: str = "frameworks") -> Path:
+    path = resources.files(__package__) / "queries" / f"{{name}}.scm"
     return Path(str(path))
 ''',
         encoding="utf-8",
@@ -166,8 +183,9 @@ setup(
     description="FastParse {language} language extension",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    packages=["{package_name}", "{package_name}.native"],
-    package_data={{{package_name!r}: ["manifest.json", "py.typed", "native/*/*"]}},
+    install_requires=["fastparse=={pep440(version)}"],
+    packages=["{package_name}", "{package_name}.native", "{package_name}.queries"],
+    package_data={{{package_name!r}: ["manifest.json", "py.typed", "native/*/*", "queries/*.scm"]}},
     include_package_data=True,
     zip_safe=False,
     cmdclass={{"bdist_wheel": bdist_wheel}},

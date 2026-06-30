@@ -21,6 +21,7 @@ from tsmp import (  # noqa: E402
     Normalization,
     OutputFormat,
     ParseOptions,
+    QueryOptions,
     Tsmp,
     decode_binary,
     default_library_path,
@@ -265,6 +266,71 @@ class TsmpContractTests(unittest.TestCase):
         self.assertEqual(result.output_format, "json")
         self.assertEqual(document["nodes"][0]["rule"], "method_declaration")
         self.assertIn("text", document["nodes"][0])
+
+    def test_python_binding_query_text_returns_captures(self) -> None:
+        result = self.tsmp.query_text(
+            "class Demo { void run() {} }",
+            "(method_declaration name: (identifier) @method.name) @method",
+        )
+        document = result.json()
+
+        self.assertEqual(result.output_format, "json")
+        self.assertEqual(result.node_count, 2)
+        self.assertEqual(document["language"], "java")
+        self.assertEqual(document["matchCount"], 1)
+        self.assertEqual(document["captureCount"], 2)
+        method_name = next(capture for capture in document["matches"][0]["captures"] if capture["name"] == "method.name")
+        self.assertEqual(method_name["rule"], "identifier")
+        self.assertEqual(method_name["text"], "run")
+        self.assertIn("startLine", method_name)
+        self.assertIn("startByte", method_name)
+
+    def test_python_binding_query_options_fields_and_limits(self) -> None:
+        result = self.tsmp.query_text(
+            "class Demo { void run() {} }",
+            "(method_declaration name: (identifier) @method.name)",
+            QueryOptions(
+                fields=Field.CAPTURE_NAME | Field.TEXT,
+                max_captures=1,
+                include_pattern=False,
+            ),
+        )
+        capture = result.json()["matches"][0]["captures"][0]
+
+        self.assertEqual(result.node_count, 1)
+        self.assertEqual(capture["name"], "method.name")
+        self.assertEqual(capture["text"], "run")
+        self.assertNotIn("rule", capture)
+        self.assertNotIn("patternIndex", capture)
+
+    def test_python_binding_query_binary_and_stats(self) -> None:
+        query = "(method_declaration name: (identifier) @method.name) @method"
+        binary = self.tsmp.query_text(
+            "class Demo { void run() {} }",
+            query,
+            output_format=OutputFormat.BINARY,
+        )
+        document = unpack_msgpack(binary.data)
+
+        self.assertEqual(document["format"], "fastparse-query-binary")
+        self.assertEqual(document["language"], "java")
+        self.assertEqual(document["matchCount"], 1)
+        self.assertEqual(document["captureCount"], 2)
+        method_name = next(capture for capture in document["matches"][0]["captures"] if capture["name"] == "method.name")
+        self.assertEqual(method_name["text"], b"run")
+
+        summary = self.tsmp.query_text_summary(
+            "class Demo { void run() {} }",
+            query,
+            output_format=OutputFormat.STATS,
+        )
+        self.assertEqual(summary.output_format, "stats")
+        self.assertEqual(summary.node_count, 2)
+        self.assertEqual(summary.output_length, 1)
+
+    def test_python_binding_invalid_query_raises(self) -> None:
+        with self.assertRaises(NativeParseError):
+            self.tsmp.query_text("class Demo {}", "(missing_node) @bad")
 
     def test_python_binding_parse_text_summary(self) -> None:
         summary = self.tsmp.parse_text_summary(

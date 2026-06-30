@@ -3,10 +3,12 @@ TSMP_1.0 {
         tsmp_version;
         tsmp_parse;
         tsmp_parse_v2;
+        tsmp_query;
         tsmp_result_free;
         fastparse_version;
         fastparse_parse;
         fastparse_parse_v2;
+        fastparse_query;
         fastparse_result_free;
         fastparse_load_language_extension;
         fastparse_language_available;

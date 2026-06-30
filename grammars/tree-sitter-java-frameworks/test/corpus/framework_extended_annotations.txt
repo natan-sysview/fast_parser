@@ -1,0 +1,227 @@
+========================================
+Extended framework annotations
+========================================
+
+package demo;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiResponses;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.format.annotation.DateTimeFormat;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PrePersist;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.ws.ResponseWrapper;
+import javax.ws.rs.core.Context;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import com.google.gson.annotations.SerializedName;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.Length;
+import javax.annotation.PostConstruct;
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
+
+@Api
+@ApiResponses({})
+@Aspect
+@SpringBootTest
+@ComponentScan
+@Validated
+@SuperBuilder
+@XmlType(name = "Example")
+@ToString
+@EnableEncryptableProperties
+public class ExtendedFrameworkExample {
+  @SerializedName("value")
+  @Length(max = 12)
+  private String value;
+
+  @ToString.Exclude
+  @XStreamImplicit
+  private String hidden;
+
+  @PersistenceContext
+  private Object entityManager;
+
+  @Context
+  private Object request;
+
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
+  private Object date;
+
+  @PostConstruct
+  void init() {}
+
+  @Async
+  @ResponseWrapper
+  @PrePersist
+  @GenericGenerator(name = "id")
+  void lifecycle() {}
+}
+
+---
+
+(program
+  (package_declaration
+    (identifier))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (class_declaration
+    (modifiers
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (element_value_array_initializer)))
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (element_value_pair
+            (identifier)
+            (string_literal
+              (string_fragment)))))
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_marker_annotation
+        (framework_annotation_identifier)))
+    (identifier)
+    (class_body
+      (field_declaration
+        (modifiers
+          (framework_annotation
+            (framework_annotation_identifier)
+            (annotation_argument_list
+              (string_literal
+                (string_fragment))))
+          (framework_annotation
+            (framework_annotation_identifier)
+            (annotation_argument_list
+              (element_value_pair
+                (identifier)
+                (decimal_integer_literal)))))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (field_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_scoped_annotation_name
+              (framework_annotation_identifier)
+              (identifier)))
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (field_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (field_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (field_declaration
+        (modifiers
+          (framework_annotation
+            (framework_annotation_identifier)
+            (annotation_argument_list
+              (element_value_pair
+                (identifier)
+                (string_literal
+                  (string_fragment))))))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block))
+      (method_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier))
+          (framework_marker_annotation
+            (framework_annotation_identifier))
+          (framework_marker_annotation
+            (framework_annotation_identifier))
+          (framework_annotation
+            (framework_annotation_identifier)
+            (annotation_argument_list
+              (element_value_pair
+                (identifier)
+                (string_literal
+                  (string_fragment))))))
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block)))))
