@@ -149,6 +149,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release-artifacts
+          pattern: fastparse-${{ steps.version.outputs.value }}-*
           merge-multiple: true
 
       - name: Build NuGet package
@@ -908,7 +909,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: python-dist
-          pattern: fastparse-*-python-*
+          pattern: fastparse-${{ steps.version.outputs.value }}-python-*
           merge-multiple: true
 
       - name: Publish wheels to PyPI
