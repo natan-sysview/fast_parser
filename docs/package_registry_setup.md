@@ -121,8 +121,8 @@ Environment      : any / blank
 After the registry setup is complete:
 
 ```bash
-git tag v0.1.0-preview.27
-git push origin v0.1.0-preview.27
+git tag v0.1.0-preview.28
+git push origin v0.1.0-preview.28
 ```
 
 GitHub Actions will:
