@@ -1,8 +1,8 @@
 {
   "extensionKind": "fastparse-language",
   "language": "java-frameworks",
-  "displayName": "Java Frameworks Experimental",
-  "version": "0.1.0-preview.1",
+  "displayName": "Java Frameworks",
+  "version": "0.1.0",
   "extensionAbi": 1,
   "coreAbi": "fastparse-c-api/0.5.0",
   "binarySchemaVersion": 1,
@@ -29,5 +29,5 @@
     "osx-x64",
     "win-x64"
   ],
-  "status": "preview"
+  "status": "stable"
 }

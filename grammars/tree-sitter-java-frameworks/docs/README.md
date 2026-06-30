@@ -1,8 +1,8 @@
 # tree-sitter-java-frameworks
 
-Experimental Java-derived grammar for detecting framework usage as syntax nodes.
+Java-derived grammar for detecting framework usage as syntax nodes.
 
-This grammar is forked from the local productive Java grammar and should be evolved in the experimental grammar area before promotion.
+This grammar is forked from the local productive Java grammar and is maintained as the official/common framework-detection grammar. Client-specific profiles should live in separate extension grammars.
 
 ## Scope
 
@@ -12,6 +12,7 @@ Implemented catalogs:
 
 - `framework_usage_evidence.md`: safe framework evidence through imports, annotations, and JDBC URL literals.
 - `framework_query_families.md`: family-level query captures for framework imports, annotations, calls, constructors, and literals.
+- `framework_support_matrix.md`: final support matrix by framework family, public corpus coverage, negative contract, and stable-release gate.
 
 Validation workflow:
 

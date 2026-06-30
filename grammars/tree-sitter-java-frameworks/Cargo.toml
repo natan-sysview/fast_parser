@@ -1,7 +1,9 @@
 [package]
 name = "tree-sitter-java-frameworks"
-description = "Experimental Java framework-detection grammar for tree-sitter"
-version = "0.23.5"
+description = "Java framework-detection grammar for tree-sitter"
+version = "0.1.0"
+repository = "https://github.com/natan-sysview/fast_parser"
+homepage = "https://github.com/natan-sysview/fast_parser/tree/main/grammars/tree-sitter-java-frameworks"
 authors = [
   "Ayman Nadeem <aymannadeem@github.com>",
   "Max Brunsfeld <maxbrunsfeld@gmail.com>",

@@ -84,14 +84,14 @@ captures = parser.query_bytes(
 Run the full framework inventory validation from the lab root:
 
 ```sh
-experimental-grammars/tree-sitter-java-frameworks/tools/validate_fastparse_extension.py --workers 12
+grammars/tree-sitter-java-frameworks/tools/validate_fastparse_extension.py --workers 12
 ```
 
 The validator reads source bytes, normalizes only parser input, loads the native extension before parsing in worker threads, uses MessagePack diagnostics, and stores compact evidence in:
 
 ```text
-experimental-grammars/tree-sitter-java-frameworks/runs/java_frameworks_fastparse_validation.sqlite
-experimental-grammars/tree-sitter-java-frameworks/audits/java_frameworks_fastparse_extension_validation.md
+grammars/tree-sitter-java-frameworks/runs/java_frameworks_fastparse_validation.sqlite
+grammars/tree-sitter-java-frameworks/audits/java_frameworks_fastparse_extension_validation.md
 ```
 
 ## Query Asset

@@ -8,6 +8,8 @@ This catalog belongs to the query layer:
 
 `queries/frameworks.scm`
 
+The consolidated public support matrix is documented in `framework_support_matrix.md`.
+
 ## Why Queries Instead Of Grammar For Calls
 
 Framework calls and constructors often use names that are legal Java identifiers and type identifiers:

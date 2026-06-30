@@ -11,7 +11,7 @@ extern const TSLanguage *tree_sitter_java_frameworks(void);
 static const FastParseLanguageDescriptor FASTPARSE_JAVA_FRAMEWORKS_LANGUAGE = {
     1u,
     "java-frameworks",
-    "Java Frameworks Experimental",
+    "Java Frameworks",
     "tree_sitter_java_frameworks",
     tree_sitter_java_frameworks
 };

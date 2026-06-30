@@ -1,6 +1,6 @@
 # tree-sitter-java-frameworks
 
-Experimental Java-derived Tree-sitter grammar for detecting framework usage in Java source code.
+Java-derived Tree-sitter grammar for detecting framework usage in Java source code.
 
 This grammar starts from `tree-sitter-java` and adds conservative framework evidence nodes for syntax that can be recognized locally:
 
@@ -48,6 +48,8 @@ Primary framework evidence nodes:
 - `framework_qualified_annotation_name`
 - `framework_scoped_annotation_name`
 - `jdbc_connection_string`
+
+The family-by-family support contract is documented in `docs/rule-catalogs/framework_support_matrix.md`.
 
 ## Queries
 
@@ -101,13 +103,12 @@ Current local validation evidence is stored under `audits/`.
 
 Latest readiness summary:
 
-- `audits/framework_readiness_summary.md`
+- `docs/rule-catalogs/framework_support_matrix.md`
 
 Latest full inventory validation:
 
-- `audits/framework_inventory_validation.md`
-- `audits/framework_inventory_validation.json`
-- `audits/framework_inventory_validation.msgpack`
+- Private inventory validation is summarized only as aggregate metrics in `docs/rule-catalogs/framework_usage_evidence.md` and `docs/rule-catalogs/framework_query_families.md`.
+- Public registry validation is summarized in `docs/rule-catalogs/framework_support_matrix.md`.
 
 ## Known Limits
 

@@ -104,6 +104,9 @@ Corpus:
 
 - `framework_usage_evidence`: passed.
 - `java_frameworks_smoke`: passed.
+- `framework_extended_annotations`: passed.
+- `framework_library_imports`: passed.
+- `framework_modern_and_negative_annotations`: covers modern Jakarta/Spring Security/JUnit/Mockito/AspectJ annotations and verifies that Java base `@Override` remains a normal Java annotation.
 
 Inventory audit against the private framework Java corpus:
 
@@ -200,3 +203,5 @@ False-negative audit:
 - Query failures: 0.
 
 Decision: stable as a first framework evidence rule. Expand method/constructor and fully-qualified-name coverage through queries first; only promote a shape into grammar if it can be recognized without reserving ordinary Java identifiers.
+
+For the family-by-family support contract, see `framework_support_matrix.md`.

@@ -4,6 +4,29 @@ All notable changes to FastParse will be documented here.
 
 This project follows semantic versioning once the first stable release is published.
 
+## 0.1.0
+
+### Added
+
+- FastParse language extension packaging for `java-frameworks`.
+- Published package support for `fastparse-language-java-frameworks` on PyPI.
+- Published package support for `FastParser.Language.JavaFrameworks` on NuGet.
+- Framework evidence grammar nodes for imports, annotations, and JDBC connection string literals.
+- Framework family query captures for Spring, Spring Security, Hibernate/JPA, JDBC, Axis/Axis2, JAXB, JasperReports, BouncyCastle, JJWT, Springfox/Swagger, XStream, Oracle/SQL Server drivers, Lombok, Jackson/Gson, logging, Apache libraries, Servlet, Bean Validation, JUnit/Mockito, AspectJ, JOSE/Jasypt, and related enterprise Java libraries.
+- Public-safe corpus coverage for framework imports, modern annotations, negative Java annotation behavior, and baseline Java parsing.
+- Public support matrix for Java Frameworks detection under `grammars/tree-sitter-java-frameworks/docs/rule-catalogs/framework_support_matrix.md`.
+
+### Changed
+
+- Release workflow now builds, publishes, and smoke-tests Java Frameworks language packages across Linux x64, Windows x64, macOS x64, and macOS arm64.
+- Language extension NuGet packages now use NuGet-compatible OPC metadata and Apache 2.0 license URL metadata.
+- Documentation now distinguishes grammar-level evidence from query-level framework classification.
+
+### Validation
+
+- `tree-sitter test`: 5/5 corpus cases passing.
+- `v0.1.0-preview.32`: public PyPI and NuGet publication succeeded with post-publish smoke tests on all supported platforms.
+
 ## 0.1.0-preview.8
 
 ### Added

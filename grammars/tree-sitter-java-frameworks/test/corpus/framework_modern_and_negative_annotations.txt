@@ -1,0 +1,185 @@
+========================================
+Modern framework annotations with Java negatives
+========================================
+
+package demo;
+
+import java.util.List;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.persistence.ManyToOne;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.validation.constraints.NotBlank;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.InjectMocks;
+import lombok.extern.slf4j.Slf4j;
+import io.swagger.annotations.ApiOperation;
+import org.aspectj.lang.annotation.Around;
+
+@Slf4j
+@EnableWebSecurity
+@Path("/customers")
+@XmlRootElement(name = "Customer")
+public class ModernFrameworkExample {
+  @NotBlank
+  private String name;
+
+  @ManyToOne
+  private Object parent;
+
+  @InjectMocks
+  private Object service;
+
+  @Override
+  public String toString() {
+    return name;
+  }
+
+  @BeforeEach
+  void setup() {}
+
+  @GET
+  @ApiOperation(value = "read")
+  @PreAuthorize("hasRole('USER')")
+  public String read() {
+    return "ok";
+  }
+
+  @Around("execution(* demo..*(..))")
+  public Object trace() {
+    return null;
+  }
+}
+
+---
+
+(program
+  (package_declaration
+    (identifier))
+  (import_declaration
+    (scoped_identifier
+      (scoped_identifier
+        (identifier)
+        (identifier))
+      (identifier)))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (class_declaration
+    (modifiers
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_marker_annotation
+        (framework_annotation_identifier))
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (string_literal
+            (string_fragment))))
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (element_value_pair
+            (identifier)
+            (string_literal
+              (string_fragment))))))
+    (identifier)
+    (class_body
+      (field_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (field_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (field_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (modifiers
+          (marker_annotation
+            (identifier)))
+        (type_identifier)
+        (identifier)
+        (formal_parameters)
+        (block
+          (return_statement
+            (identifier))))
+      (method_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier)))
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block))
+      (method_declaration
+        (modifiers
+          (framework_marker_annotation
+            (framework_annotation_identifier))
+          (framework_annotation
+            (framework_annotation_identifier)
+            (annotation_argument_list
+              (element_value_pair
+                (identifier)
+                (string_literal
+                  (string_fragment)))))
+          (framework_annotation
+            (framework_annotation_identifier)
+            (annotation_argument_list
+              (string_literal
+                (string_fragment)))))
+        (type_identifier)
+        (identifier)
+        (formal_parameters)
+        (block
+          (return_statement
+            (string_literal
+              (string_fragment)))))
+      (method_declaration
+        (modifiers
+          (framework_annotation
+            (framework_annotation_identifier)
+            (annotation_argument_list
+              (string_literal
+                (string_fragment)))))
+        (type_identifier)
+        (identifier)
+        (formal_parameters)
+        (block
+          (return_statement
+            (null_literal)))))))

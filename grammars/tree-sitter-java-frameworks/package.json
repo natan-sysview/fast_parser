@@ -1,8 +1,13 @@
 {
   "name": "tree-sitter-java-frameworks",
-  "version": "0.23.5",
-  "description": "Experimental Java framework-detection grammar for tree-sitter",
+  "version": "0.1.0",
+  "description": "Java framework-detection grammar for tree-sitter",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/natan-sysview/fast_parser.git",
+    "directory": "grammars/tree-sitter-java-frameworks"
+  },
   "author": {
     "name": "Ayman Nadeem",
     "email": "aymannadeem@github.com"

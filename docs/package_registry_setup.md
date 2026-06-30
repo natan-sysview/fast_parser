@@ -121,8 +121,8 @@ Environment      : any / blank
 After the registry setup is complete:
 
 ```bash
-git tag v0.1.0-preview.32
-git push origin v0.1.0-preview.32
+git tag v0.1.0
+git push origin v0.1.0
 ```
 
 GitHub Actions will:
@@ -143,16 +143,16 @@ GitHub Actions will:
 Python:
 
 ```bash
-pip install --pre fastparse fastparse-language-python
-pip install --pre fastparse fastparse-language-java-frameworks
+pip install fastparse fastparse-language-python
+pip install fastparse fastparse-language-java-frameworks
 ```
 
 C#:
 
 ```bash
-dotnet add package FastParser --prerelease
-dotnet add package FastParser.Language.Python --prerelease
-dotnet add package FastParser.Language.JavaFrameworks --prerelease
+dotnet add package FastParser
+dotnet add package FastParser.Language.Python
+dotnet add package FastParser.Language.JavaFrameworks
 ```
 
 Minimal Python smoke:

@@ -15,42 +15,42 @@ From the lab root:
 ```sh
 python3 scripts/package_language_extension.py \
   --language java-frameworks \
-  --version 0.1.0-preview.32 \
+  --version 0.1.0 \
   --dist-dir dist/languages
 
 python3 scripts/package_python_language_wheel.py \
   --language java-frameworks \
-  --version 0.1.0-preview.32 \
+  --version 0.1.0 \
   --output-dir dist/python-languages
 
 python3 scripts/package_nuget_language_extension.py \
   --language java-frameworks \
-  --version 0.1.0-preview.32 \
-  --core-version 0.1.0-preview.32 \
-  --archive dist/languages/fastparse-language-java-frameworks-0.1.0-preview.32-macos-arm64.tar.gz \
+  --version 0.1.0 \
+  --core-version 0.1.0 \
+  --archive dist/languages/fastparse-language-java-frameworks-0.1.0-macos-arm64.tar.gz \
   --output-dir dist/nuget-languages
 ```
 
 Local macOS arm64 artifacts:
 
 ```text
-dist/languages/fastparse-language-java-frameworks-0.1.0-preview.32-macos-arm64.tar.gz
-dist/python-languages/fastparse_language_java_frameworks-0.1.0rc32-py3-none-macosx_11_0_arm64.whl
-dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.32.nupkg
+dist/languages/fastparse-language-java-frameworks-0.1.0-macos-arm64.tar.gz
+dist/python-languages/fastparse_language_java_frameworks-0.1.0-py3-none-macosx_11_0_arm64.whl
+dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0.nupkg
 ```
 
 ## Local Validation
 
 ```sh
 python3 scripts/validate_python_language_wheel.py \
-  dist/python/fastparse-0.1.0rc32-py3-none-macosx_15_0_arm64.whl \
-  dist/python-languages/fastparse_language_java_frameworks-0.1.0rc32-py3-none-macosx_11_0_arm64.whl \
+  dist/python/fastparse-0.1.0-py3-none-macosx_15_0_arm64.whl \
+  dist/python-languages/fastparse_language_java_frameworks-0.1.0-py3-none-macosx_11_0_arm64.whl \
   --language java-frameworks
 
 python3 scripts/validate_nuget_language_package.py \
-  --core-package dist/nuget/FastParser.0.1.0-preview.32.nupkg \
-  --language-package dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.32.nupkg \
-  --version 0.1.0-preview.32 \
+  --core-package dist/nuget/FastParser.0.1.0.nupkg \
+  --language-package dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0.nupkg \
+  --version 0.1.0 \
   --language java-frameworks
 ```
 
@@ -74,3 +74,12 @@ Before publishing publicly:
 - Query asset is bundled as `queries/frameworks.scm`.
 - Parse/query calls receive source bytes or strings in memory; the extension does not read source files.
 - Use one parser/client per worker and load language extensions before starting high-volume worker threads.
+
+## Stable Release Gate
+
+The first stable tag should be `v0.1.0`. It must pass:
+
+- `tree-sitter test` in `grammars/tree-sitter-java-frameworks`.
+- Query syntax checks for `queries/frameworks.scm`.
+- Local Python and NuGet language package validation.
+- Public registry smoke tests from PyPI and nuget.org on Linux x64, Windows x64, macOS x64, and macOS arm64.
