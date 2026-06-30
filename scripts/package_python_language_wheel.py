@@ -101,10 +101,12 @@ def write_project(temp: Path, language: str, version: str, platform_tag: str) ->
     shutil.copy2(source_native, native_dir / source_native.name)
     manifest_path = package_dir / "manifest.json"
     shutil.copy2(ROOT / "extensions" / language / "manifest.json", manifest_path)
+    query_package = package_dir / "queries"
+    query_package.mkdir()
+    (query_package / "__init__.py").write_text("", encoding="utf-8")
     queries_source = ROOT / "extensions" / language / "queries"
     if queries_source.is_dir():
-        query_package = package_dir / "queries"
-        shutil.copytree(queries_source, query_package)
+        shutil.copytree(queries_source, query_package, dirs_exist_ok=True)
         (query_package / "__init__.py").write_text("", encoding="utf-8")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["version"] = version

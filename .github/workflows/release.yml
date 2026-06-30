@@ -253,6 +253,10 @@ jobs:
           --platform-tag "${{ matrix.platform_tag }}"
           --output-dir /io/dist/python
 
+      - name: Fix manylinux dist permissions
+        if: matrix.linux_container
+        run: sudo chown -R "$USER" dist
+
       - name: Build platform wheel
         if: ${{ !matrix.linux_container }}
         run: >
@@ -457,6 +461,10 @@ jobs:
           --platform-tag "${{ matrix.platform_tag }}"
           --output-dir /io/dist/python-languages
 
+      - name: Fix manylinux language dist permissions
+        if: matrix.linux_container
+        run: sudo chown -R "$USER" dist
+
       - name: Build platform language wheel
         if: ${{ !matrix.linux_container }}
         run: >
@@ -556,6 +564,10 @@ jobs:
           --version "${{ steps.version.outputs.value }}"
           --platform-tag "${{ matrix.platform_tag }}"
           --output-dir /io/dist/python-languages
+
+      - name: Fix manylinux Java Frameworks dist permissions
+        if: matrix.linux_container
+        run: sudo chown -R "$USER" dist
 
       - name: Build platform Java Frameworks language wheel
         if: ${{ !matrix.linux_container }}
