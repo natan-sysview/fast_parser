@@ -617,6 +617,7 @@ jobs:
     needs:
       - language-extension
       - nuget-package
+      - published-nuget-smoke
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -700,6 +701,7 @@ jobs:
     needs:
       - java-frameworks-language-extension
       - nuget-package
+      - published-nuget-smoke
     runs-on: ubuntu-latest
     permissions:
       contents: read
