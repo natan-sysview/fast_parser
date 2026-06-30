@@ -7,11 +7,11 @@ Date: 2026-06-30
 Generated and validated on macOS arm64:
 
 ```text
-dist/languages/fastparse-language-java-frameworks-0.1.0-preview.28-macos-arm64.tar.gz
-dist/python/fastparse-0.1.0rc28-py3-none-macosx_15_0_arm64.whl
-dist/python-languages/fastparse_language_java_frameworks-0.1.0rc28-py3-none-macosx_11_0_arm64.whl
-dist/nuget/FastParser.0.1.0-preview.28.nupkg
-dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.28.nupkg
+dist/languages/fastparse-language-java-frameworks-0.1.0-preview.29-macos-arm64.tar.gz
+dist/python/fastparse-0.1.0rc29-py3-none-macosx_15_0_arm64.whl
+dist/python-languages/fastparse_language_java_frameworks-0.1.0rc29-py3-none-macosx_11_0_arm64.whl
+dist/nuget/FastParser.0.1.0-preview.29.nupkg
+dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.29.nupkg
 ```
 
 ## Package Contents Verified
@@ -28,7 +28,7 @@ The PyPI wheel includes:
 - `fastparse_language_java_frameworks/native/osx-arm64/libfastparse_language_java_frameworks.dylib`
 - `fastparse_language_java_frameworks/manifest.json`
 - `fastparse_language_java_frameworks/queries/frameworks.scm`
-- dependency metadata: `fastparse==0.1.0rc28`
+- dependency metadata: `fastparse==0.1.0rc29`
 
 The NuGet package includes:
 
@@ -43,8 +43,8 @@ Python clean install:
 
 ```text
 python3 scripts/validate_python_language_wheel.py \
-  dist/python/fastparse-0.1.0rc28-py3-none-macosx_15_0_arm64.whl \
-  dist/python-languages/fastparse_language_java_frameworks-0.1.0rc28-py3-none-macosx_11_0_arm64.whl \
+  dist/python/fastparse-0.1.0rc29-py3-none-macosx_15_0_arm64.whl \
+  dist/python-languages/fastparse_language_java_frameworks-0.1.0rc29-py3-none-macosx_11_0_arm64.whl \
   --language java-frameworks
 ```
 
@@ -53,18 +53,18 @@ Result: OK.
 Python dependency-only install:
 
 ```text
-pip install --no-index --find-links dist/python --find-links dist/python-languages fastparse-language-java-frameworks==0.1.0rc28
+pip install --no-index --find-links dist/python --find-links dist/python-languages fastparse-language-java-frameworks==0.1.0rc29
 ```
 
-Result: OK. The extension pulled `fastparse==0.1.0rc28` and loaded with `load_bundled_language("java-frameworks")`.
+Result: OK. The extension pulled `fastparse==0.1.0rc29` and loaded with `load_bundled_language("java-frameworks")`.
 
 NuGet clean consumer:
 
 ```text
 python3 scripts/validate_nuget_language_package.py \
-  --core-package dist/nuget/FastParser.0.1.0-preview.28.nupkg \
-  --language-package dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.28.nupkg \
-  --version 0.1.0-preview.28 \
+  --core-package dist/nuget/FastParser.0.1.0-preview.29.nupkg \
+  --language-package dist/nuget-languages/FastParser.Language.JavaFrameworks.0.1.0-preview.29.nupkg \
+  --version 0.1.0-preview.29 \
   --language java-frameworks
 ```
 

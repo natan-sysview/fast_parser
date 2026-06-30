@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import re
 import shutil
 import tarfile
 import tempfile
+import uuid
 import zipfile
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -138,12 +140,13 @@ def write_nuspec(language: str, version: str, core_version: str, staging: Path) 
     nuspec = staging / f"{pid}.nuspec"
     nuspec.write_text(
         f'''<?xml version="1.0" encoding="utf-8"?>
-<package>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>{escape(pid)}</id>
     <version>{escape(version)}</version>
     <authors>natan-sysview</authors>
     <description>FastParse {escape(language)} language extension native assets.</description>
+    <releaseNotes>Preview FastParse language extension for {escape(language)}.</releaseNotes>
     <packageTypes>
       <packageType name="Dependency" />
     </packageTypes>
@@ -154,15 +157,15 @@ def write_nuspec(language: str, version: str, core_version: str, staging: Path) 
     <readme>README.md</readme>
     <dependencies>
       <group targetFramework="net8.0">
-        <dependency id="FastParser" version="{escape(core_version)}" />
+        <dependency id="FastParser" version="{escape(core_version)}" exclude="Build,Analyzers" />
       </group>
       <group targetFramework="net9.0">
-        <dependency id="FastParser" version="{escape(core_version)}" />
+        <dependency id="FastParser" version="{escape(core_version)}" exclude="Build,Analyzers" />
       </group>
     </dependencies>
     <contentFiles>
-      <files include="any/any/fastparse/languages/{escape(language)}/manifest.json" buildAction="None" copyToOutput="true" />
-      <files include="any/any/fastparse/languages/{escape(language)}/queries/**/*.scm" buildAction="None" copyToOutput="true" />
+      <files include="any/any/fastparse/languages/{escape(language)}/manifest.json" buildAction="Content" copyToOutput="true" />
+      <files include="any/any/fastparse/languages/{escape(language)}/queries/**/*.scm" buildAction="Content" copyToOutput="true" />
     </contentFiles>
   </metadata>
 </package>
@@ -172,16 +175,79 @@ def write_nuspec(language: str, version: str, core_version: str, staging: Path) 
     return nuspec
 
 
+def write_opc_metadata(staging: Path, package_name: str, version: str) -> tuple[Path, Path, Path]:
+    metadata_id = uuid.uuid4().hex
+    created = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+    rels = staging / "_rels" / ".rels"
+    rels.parent.mkdir(parents=True, exist_ok=True)
+    rels.write_text(
+        f'''<?xml version="1.0" encoding="utf-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Type="http://schemas.microsoft.com/packaging/2010/07/manifest" Target="/{escape(package_name)}.nuspec" Id="R{metadata_id[:16]}" />
+  <Relationship Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="/package/services/metadata/core-properties/{metadata_id}.psmdcp" Id="R{metadata_id[16:]}" />
+</Relationships>
+''',
+        encoding="utf-8",
+    )
+
+    content_types = staging / "[Content_Types].xml"
+    content_types.write_text(
+        '''<?xml version="1.0" encoding="utf-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml" />
+  <Default Extension="psmdcp" ContentType="application/vnd.openxmlformats-package.core-properties+xml" />
+  <Default Extension="dll" ContentType="application/octet" />
+  <Default Extension="dylib" ContentType="application/octet" />
+  <Default Extension="so" ContentType="application/octet" />
+  <Default Extension="json" ContentType="application/json" />
+  <Default Extension="md" ContentType="text/markdown" />
+  <Default Extension="scm" ContentType="text/plain" />
+  <Default Extension="targets" ContentType="application/xml" />
+  <Override PartName="/''' + escape(package_name) + '''.nuspec" ContentType="application/octet" />
+</Types>
+''',
+        encoding="utf-8",
+    )
+
+    core_props = staging / "package" / "services" / "metadata" / "core-properties" / f"{metadata_id}.psmdcp"
+    core_props.parent.mkdir(parents=True, exist_ok=True)
+    core_props.write_text(
+        f'''<?xml version="1.0" encoding="utf-8"?>
+<coreProperties xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+  <dc:creator>natan-sysview</dc:creator>
+  <dc:description>FastParse {escape(package_name)} language extension native assets.</dc:description>
+  <dc:identifier>{escape(package_name)}</dc:identifier>
+  <version>{escape(version)}</version>
+  <keywords>fastparse tree-sitter parser native</keywords>
+  <lastModifiedBy>NuGet, Version=6.0.0.0</lastModifiedBy>
+  <dcterms:created xsi:type="dcterms:W3CDTF" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">{created}</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">{created}</dcterms:modified>
+</coreProperties>
+''',
+        encoding="utf-8",
+    )
+    return rels, content_types, core_props
+
+
 def make_package(staging: Path, nuspec: Path, output_dir: Path, package_name: str, version: str) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     package = output_dir / f"{package_name}.{version}.nupkg"
     if package.exists():
         package.unlink()
+    write_opc_metadata(staging, package_name, version)
     with zipfile.ZipFile(package, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.write(nuspec, nuspec.name)
+        for special in ["_rels/.rels", f"{package_name}.nuspec", "[Content_Types].xml"]:
+            path = staging / special
+            if path.is_file():
+                zf.write(path, special)
         for path in sorted(staging.rglob("*")):
-            if path.is_file() and path != nuspec:
-                zf.write(path, path.relative_to(staging))
+            if not path.is_file():
+                continue
+            relative = path.relative_to(staging).as_posix()
+            if relative in {"_rels/.rels", f"{package_name}.nuspec", "[Content_Types].xml"}:
+                continue
+            zf.write(path, relative)
     return package
 
 
