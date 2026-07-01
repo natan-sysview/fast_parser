@@ -156,6 +156,9 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: python-language-dist
+          attestations: false
+          print-hash: true
+          verbose: true
 
   published-pypi-javaswing-smoke:
     name: Published JavaSwing PyPI smoke ${{ matrix.platform }}
