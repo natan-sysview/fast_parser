@@ -123,9 +123,11 @@ JavaSwing language extension:
 Package ID       : FastParser.Language.JavaSwing
 Repository owner : natan-sysview
 Repository       : fast_parser
-Workflow file    : release.yml
+Workflow file    : publish-javaswing-nuget.yml
 Environment      : any / blank
 ```
+
+`release.yml` also supports JavaSwing for future tagged releases. Use `publish-javaswing-nuget.yml` when publishing only the JavaSwing NuGet extension against an already published FastParser core version.
 
 ## Release Flow
 
