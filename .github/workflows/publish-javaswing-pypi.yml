@@ -212,16 +212,30 @@ jobs:
 
               print(f"::add-mask::{api_token}")
               notice("PyPI twine", "Checking wheel metadata")
-              subprocess.check_call([sys.executable, "-m", "twine", "check", *wheels])
+              check = subprocess.run(
+                  [sys.executable, "-m", "twine", "check", *wheels],
+                  check=False,
+                  stderr=subprocess.STDOUT,
+                  stdout=subprocess.PIPE,
+                  text=True,
+              )
+              if check.returncode != 0:
+                  raise RuntimeError(f"twine check failed: {check.stdout}")
 
               notice("PyPI twine", "Uploading JavaSwing wheels")
               env = os.environ.copy()
               env["TWINE_USERNAME"] = "__token__"
               env["TWINE_PASSWORD"] = api_token
-              subprocess.check_call(
+              upload = subprocess.run(
                   [sys.executable, "-m", "twine", "upload", "--non-interactive", "--skip-existing", *wheels],
+                  check=False,
                   env=env,
+                  stderr=subprocess.STDOUT,
+                  stdout=subprocess.PIPE,
+                  text=True,
               )
+              if upload.returncode != 0:
+                  raise RuntimeError(f"twine upload failed: {upload.stdout}")
 
           try:
               main()
