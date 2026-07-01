@@ -16,14 +16,40 @@ on:
         required: true
         default: false
         type: boolean
+  push:
+    tags:
+      - "javaswing-v*"
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
+  resolve-version:
+    name: Resolve JavaSwing release version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      core_version: ${{ steps.resolve.outputs.core_version }}
+      publish: ${{ steps.resolve.outputs.publish }}
+    steps:
+      - name: Resolve version
+        id: resolve
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+            echo "core_version=${{ inputs.core_version }}" >> "$GITHUB_OUTPUT"
+            echo "publish=${{ inputs.publish }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${GITHUB_REF_NAME#javaswing-v}" >> "$GITHUB_OUTPUT"
+            echo "core_version=0.1.0" >> "$GITHUB_OUTPUT"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
   javaswing-language-wheel:
     name: JavaSwing PyPI wheel ${{ matrix.platform }}
+    needs: resolve-version
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -66,8 +92,8 @@ jobs:
           /opt/python/cp312-cp312/bin/python
           scripts/package_python_language_wheel.py
           --language javaswing
-          --version "${{ inputs.version }}"
-          --core-version "${{ inputs.core_version }}"
+          --version "${{ needs.resolve-version.outputs.version }}"
+          --core-version "${{ needs.resolve-version.outputs.core_version }}"
           --platform-tag "${{ matrix.platform_tag }}"
           --output-dir /io/dist/python-languages
 
@@ -80,8 +106,8 @@ jobs:
         run: >
           python scripts/package_python_language_wheel.py
           --language javaswing
-          --version "${{ inputs.version }}"
-          --core-version "${{ inputs.core_version }}"
+          --version "${{ needs.resolve-version.outputs.version }}"
+          --core-version "${{ needs.resolve-version.outputs.core_version }}"
           --platform-tag "${{ matrix.platform_tag }}"
 
       - name: Download published fastparse core wheel
@@ -91,7 +117,7 @@ jobs:
           python -m pip download \
             --only-binary=:all: \
             --dest dist/python-core \
-            "fastparse==${{ inputs.core_version }}"
+            "fastparse==${{ needs.resolve-version.outputs.core_version }}"
 
       - name: Validate JavaSwing language wheel
         shell: bash
@@ -103,14 +129,16 @@ jobs:
       - name: Upload JavaSwing language wheel artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fastparse-language-javaswing-${{ inputs.version }}-wheel-${{ matrix.platform }}
+          name: fastparse-language-javaswing-${{ needs.resolve-version.outputs.version }}-wheel-${{ matrix.platform }}
           path: dist/python-languages/*.whl
 
   publish-pypi-javaswing:
     name: Publish JavaSwing PyPI
-    needs: javaswing-language-wheel
+    needs:
+      - resolve-version
+      - javaswing-language-wheel
     runs-on: ubuntu-latest
-    if: inputs.publish
+    if: needs.resolve-version.outputs.publish == 'true'
     permissions:
       contents: read
       id-token: write
@@ -130,8 +158,10 @@ jobs:
 
   published-pypi-javaswing-smoke:
     name: Published JavaSwing PyPI smoke ${{ matrix.platform }}
-    needs: publish-pypi-javaswing
-    if: inputs.publish
+    needs:
+      - resolve-version
+      - publish-pypi-javaswing
+    if: needs.resolve-version.outputs.publish == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -157,4 +187,4 @@ jobs:
           python-version: "3.12"
 
       - name: Validate published PyPI JavaSwing language package
-        run: python scripts/validate_published_pypi_language.py --version "${{ inputs.version }}" --language javaswing
+        run: python scripts/validate_published_pypi_language.py --version "${{ needs.resolve-version.outputs.version }}" --language javaswing

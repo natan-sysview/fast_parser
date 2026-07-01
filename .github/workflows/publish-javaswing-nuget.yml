@@ -16,14 +16,40 @@ on:
         required: true
         default: false
         type: boolean
+  push:
+    tags:
+      - "javaswing-v*"
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
+  resolve-version:
+    name: Resolve JavaSwing release version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      core_version: ${{ steps.resolve.outputs.core_version }}
+      publish: ${{ steps.resolve.outputs.publish }}
+    steps:
+      - name: Resolve version
+        id: resolve
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+            echo "core_version=${{ inputs.core_version }}" >> "$GITHUB_OUTPUT"
+            echo "publish=${{ inputs.publish }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${GITHUB_REF_NAME#javaswing-v}" >> "$GITHUB_OUTPUT"
+            echo "core_version=0.1.0" >> "$GITHUB_OUTPUT"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
   javaswing-language-extension:
     name: JavaSwing native ${{ matrix.platform }}-${{ matrix.arch }}
+    needs: resolve-version
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -55,19 +81,21 @@ jobs:
         run: >
           python scripts/package_language_extension.py
           --language javaswing
-          --version "${{ inputs.version }}"
+          --version "${{ needs.resolve-version.outputs.version }}"
           --platform ${{ matrix.platform }}
           --arch ${{ matrix.arch }}
 
       - name: Upload JavaSwing language extension artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fastparse-language-javaswing-${{ inputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}
+          name: fastparse-language-javaswing-${{ needs.resolve-version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}
           path: ${{ matrix.archive_glob }}
 
   nuget-javaswing-package:
     name: JavaSwing NuGet package
-    needs: javaswing-language-extension
+    needs:
+      - resolve-version
+      - javaswing-language-extension
     runs-on: ubuntu-latest
 
     steps:
@@ -95,8 +123,8 @@ jobs:
           done < <(find language-artifacts -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' \) -print0)
           python scripts/package_nuget_language_extension.py \
             --language javaswing \
-            --version "${{ inputs.version }}" \
-            --core-version "${{ inputs.core_version }}" \
+            --version "${{ needs.resolve-version.outputs.version }}" \
+            --core-version "${{ needs.resolve-version.outputs.core_version }}" \
             --require-all-rids \
             "${archives[@]}"
 
@@ -108,9 +136,9 @@ jobs:
           from pathlib import Path
           import urllib.request
 
-          version = "${{ inputs.core_version }}".lower()
+          version = "${{ needs.resolve-version.outputs.core_version }}".lower()
           url = f"https://api.nuget.org/v3-flatcontainer/fastparser/{version}/fastparser.{version}.nupkg"
-          out = Path("nuget-artifacts") / f"FastParser.${{ inputs.core_version }}.nupkg"
+          out = Path("nuget-artifacts") / f"FastParser.${{ needs.resolve-version.outputs.core_version }}.nupkg"
           with urllib.request.urlopen(url, timeout=60) as response:
               out.write_bytes(response.read())
           print(out)
@@ -120,11 +148,11 @@ jobs:
         shell: bash
         run: |
           core_package="$(find nuget-artifacts -maxdepth 1 -name 'FastParser.*.nupkg' ! -name '*.snupkg' | head -n 1)"
-          language_package="dist/nuget-languages/FastParser.Language.JavaSwing.${{ inputs.version }}.nupkg"
+          language_package="dist/nuget-languages/FastParser.Language.JavaSwing.${{ needs.resolve-version.outputs.version }}.nupkg"
           python scripts/validate_nuget_language_package.py \
             --core-package "$core_package" \
             --language-package "$language_package" \
-            --version "${{ inputs.version }}" \
+            --version "${{ needs.resolve-version.outputs.version }}" \
             --language javaswing \
             --require-all-rids
 
@@ -133,14 +161,14 @@ jobs:
         uses: NuGet/login@v1
         with:
           user: NATANBARRON
-        if: inputs.publish
+        if: needs.resolve-version.outputs.publish == 'true'
 
       - name: Publish NuGet JavaSwing language package
         shell: bash
         run: |
           set +e
           dotnet nuget push \
-            "dist/nuget-languages/FastParser.Language.JavaSwing.${{ inputs.version }}.nupkg" \
+            "dist/nuget-languages/FastParser.Language.JavaSwing.${{ needs.resolve-version.outputs.version }}.nupkg" \
             --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate \
@@ -150,18 +178,20 @@ jobs:
             python -c 'from pathlib import Path; message = Path("nuget-language-javaswing-push.log").read_text(encoding="utf-8", errors="replace")[-3000:]; message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A"); print(f"::error title=NuGet JavaSwing language publish failed::{message}")'
             exit "$status"
           fi
-        if: inputs.publish
+        if: needs.resolve-version.outputs.publish == 'true'
 
       - name: Upload NuGet JavaSwing package artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fastparse-language-javaswing-${{ inputs.version }}-nuget
+          name: fastparse-language-javaswing-${{ needs.resolve-version.outputs.version }}-nuget
           path: dist/nuget-languages/*.nupkg
 
   published-nuget-javaswing-smoke:
     name: Published JavaSwing NuGet smoke ${{ matrix.platform }}-${{ matrix.arch }}
-    needs: nuget-javaswing-package
-    if: inputs.publish
+    needs:
+      - resolve-version
+      - nuget-javaswing-package
+    if: needs.resolve-version.outputs.publish == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -191,4 +221,4 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Validate published NuGet JavaSwing language package
-        run: python scripts/validate_published_nuget_language.py --version "${{ inputs.version }}" --language javaswing
+        run: python scripts/validate_published_nuget_language.py --version "${{ needs.resolve-version.outputs.version }}" --language javaswing
