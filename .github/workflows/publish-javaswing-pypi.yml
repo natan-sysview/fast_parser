@@ -160,7 +160,10 @@ jobs:
       - name: Publish JavaSwing language wheels to PyPI
         shell: bash
         run: |
-          python -m pip install --upgrade pip twine
+          python -m pip install --upgrade pip twine || {
+            echo "::error title=PyPI publish setup failed::pip could not install twine"
+            exit 1
+          }
           python - <<'PY'
           import json
           import os
@@ -173,41 +176,58 @@ jobs:
           def annotation_escape(value):
               return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
 
-          request_url = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"] + "&audience=pypi"
-          request = urllib.request.Request(
-              request_url,
-              headers={"Authorization": "bearer " + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]},
-          )
-          with urllib.request.urlopen(request, timeout=60) as response:
-              oidc_token = json.load(response)["value"]
+          def notice(title, message):
+              print(f"::notice title={title}::{annotation_escape(message)}")
 
-          mint_request = urllib.request.Request(
-              "https://pypi.org/_/oidc/mint-token",
-              data=json.dumps({"token": oidc_token}).encode("utf-8"),
-              headers={"Content-Type": "application/json"},
-          )
+          def fail(title, message):
+              print(f"::error title={title}::{annotation_escape(message[-3000:])}")
+
+          def main():
+              wheels = sorted(str(path) for path in Path("python-language-dist").glob("*.whl"))
+              notice("PyPI wheels", "\\n".join(wheels))
+              if not wheels:
+                  raise RuntimeError("No JavaSwing wheels found in python-language-dist")
+
+              notice("PyPI OIDC", "Requesting GitHub OIDC token for audience pypi")
+              request_url = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"] + "&audience=pypi"
+              request = urllib.request.Request(
+                  request_url,
+                  headers={"Authorization": "bearer " + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]},
+              )
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  oidc_token = json.load(response)["value"]
+
+              notice("PyPI OIDC", "Minting temporary PyPI upload token")
+              mint_request = urllib.request.Request(
+                  "https://pypi.org/_/oidc/mint-token",
+                  data=json.dumps({"token": oidc_token}).encode("utf-8"),
+                  headers={"Content-Type": "application/json"},
+              )
+              try:
+                  with urllib.request.urlopen(mint_request, timeout=60) as response:
+                      api_token = json.load(response)["token"]
+              except urllib.error.HTTPError as exc:
+                  body = exc.read().decode("utf-8", errors="replace")
+                  raise RuntimeError(f"PyPI token mint failed: HTTP {exc.code} {exc.reason}: {body}") from exc
+
+              print(f"::add-mask::{api_token}")
+              notice("PyPI twine", "Checking wheel metadata")
+              subprocess.check_call([sys.executable, "-m", "twine", "check", *wheels])
+
+              notice("PyPI twine", "Uploading JavaSwing wheels")
+              env = os.environ.copy()
+              env["TWINE_USERNAME"] = "__token__"
+              env["TWINE_PASSWORD"] = api_token
+              subprocess.check_call(
+                  [sys.executable, "-m", "twine", "upload", "--non-interactive", "--skip-existing", *wheels],
+                  env=env,
+              )
+
           try:
-              with urllib.request.urlopen(mint_request, timeout=60) as response:
-                  api_token = json.load(response)["token"]
-          except urllib.error.HTTPError as exc:
-              body = exc.read().decode("utf-8", errors="replace")
-              message = f"HTTP {exc.code} {exc.reason}: {body}"
-              print(f"::error title=PyPI trusted publisher rejected::{annotation_escape(message[-3000:])}")
+              main()
+          except Exception as exc:
+              fail("PyPI JavaSwing publish failed", f"{type(exc).__name__}: {exc}")
               raise
-
-          print(f"::add-mask::{api_token}")
-          wheels = sorted(str(path) for path in Path("python-language-dist").glob("*.whl"))
-          if not wheels:
-              raise SystemExit("No JavaSwing wheels found in python-language-dist")
-
-          subprocess.check_call([sys.executable, "-m", "twine", "check", *wheels])
-          env = os.environ.copy()
-          env["TWINE_USERNAME"] = "__token__"
-          env["TWINE_PASSWORD"] = api_token
-          subprocess.check_call(
-              [sys.executable, "-m", "twine", "upload", "--non-interactive", "--skip-existing", *wheels],
-              env=env,
-          )
           PY
 
   published-pypi-javaswing-smoke:
