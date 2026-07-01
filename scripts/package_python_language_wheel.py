@@ -20,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build fastparse-language-<language> wheel.")
     parser.add_argument("--language", required=True)
     parser.add_argument("--version", default="0.1.0-preview.1")
+    parser.add_argument("--core-version")
     parser.add_argument("--platform-tag", default=default_platform_tag())
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist" / "python-languages")
     parser.add_argument("--skip-build", action="store_true")
@@ -72,6 +73,10 @@ def native_language_name(language: str) -> str:
     return language.strip().lower().replace("-", "_")
 
 
+def default_query_name(language: str) -> str:
+    return "swing" if native_language_name(language) == "javaswing" else "frameworks"
+
+
 def build_native(language: str, version: str) -> None:
     subprocess.run(
         [
@@ -87,7 +92,7 @@ def build_native(language: str, version: str) -> None:
     )
 
 
-def write_project(temp: Path, language: str, version: str, platform_tag: str) -> None:
+def write_project(temp: Path, language: str, version: str, core_version: str, platform_tag: str) -> None:
     native_language = native_language_name(language)
     package_name = f"fastparse_language_{native_language}"
     package_dir = temp / package_name
@@ -154,6 +159,8 @@ def extension_path() -> Path:
 
 
 def query_path(name: str = "frameworks") -> Path:
+    if name == "frameworks":
+        name = "{default_query_name(language)}"
     path = resources.files(__package__) / "queries" / f"{{name}}.scm"
     return Path(str(path))
 ''',
@@ -185,7 +192,7 @@ setup(
     description="FastParse {language} language extension",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    install_requires=["fastparse=={pep440(version)}"],
+    install_requires=["fastparse=={pep440(core_version)}"],
     packages=["{package_name}", "{package_name}.native", "{package_name}.queries"],
     package_data={{{package_name!r}: ["manifest.json", "py.typed", "native/*/*", "queries/*.scm"]}},
     include_package_data=True,
@@ -208,7 +215,7 @@ def main() -> int:
         subprocess.run([sys.executable, "-m", "venv", str(venv)], check=True)
         python = venv / ("Scripts/python.exe" if platform.system() == "Windows" else "bin/python")
         subprocess.run([str(python), "-m", "pip", "install", "setuptools>=61", "wheel"], check=True)
-        write_project(temp, args.language, args.version, args.platform_tag)
+        write_project(temp, args.language, args.version, args.core_version or args.version, args.platform_tag)
         subprocess.run(
             [str(python), "setup.py", "bdist_wheel", "--dist-dir", str(args.output_dir.resolve())],
             cwd=temp,

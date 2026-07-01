@@ -46,6 +46,48 @@ diagnostics = parser.parse_text("class Broken {", language="java-frameworks", ou
 assert diagnostics["hasErrors"]
 print("fastparse-language-java-frameworks wheel smoke OK")
 '''
+    if language == "javaswing":
+        return r'''
+from fastparse import FastParse, OutputFormat, ParseOptions
+import fastparse_language_javaswing as language_package
+
+parser = FastParse()
+load = parser.load_bundled_language("javaswing")
+assert load.language == "javaswing", load
+source = """
+import javax.swing.*;
+class Demo extends JFrame {
+    JButton button = new JButton("OK");
+    void build() {
+        JPanel panel = new JPanel();
+        panel.add(button);
+    }
+}
+"""
+result = parser.parse_text(
+    source,
+    ParseOptions(
+        language="javaswing",
+        output_format=OutputFormat.JSON,
+        include_rules=["javaswing_screen", "javaswing_component_creation", "javaswing_component_field", "javaswing_container_add"],
+        fields=["rule", "text"],
+    ),
+)
+assert result.node_count > 0, result.node_count
+assert "javaswing_" in result.text
+query = language_package.query_path("swing").read_bytes()
+captures = parser.query_text(
+    source,
+    query,
+    language="javaswing",
+    output_format=OutputFormat.STATS,
+    fields=["capture_name"],
+)
+assert captures.node_count > 0, captures.node_count
+diagnostics = parser.parse_text("class Broken {", language="javaswing", output_format=OutputFormat.DIAGNOSTICS).json()
+assert diagnostics["hasErrors"]
+print("fastparse-language-javaswing wheel smoke OK")
+'''
     return r'''
 from fastparse import FastParse, OutputFormat, ParseOptions
 

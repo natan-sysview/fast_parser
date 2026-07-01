@@ -17,6 +17,7 @@ GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables
 | `PYPI_PUBLISH` | `true` | Publish the core `fastparse` wheels to PyPI. |
 | `PYPI_LANGUAGE_PYTHON_PUBLISH` | `true` | Publish `fastparse-language-python` wheels to PyPI. |
 | `PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH` | `true` | Publish `fastparse-language-java-frameworks` wheels to PyPI. |
+| `PYPI_LANGUAGE_JAVASWING_PUBLISH` | `true` | Publish `fastparse-language-javaswing` wheels to PyPI. |
 | `NUGET_LANGUAGE_PYTHON_PUBLISH` | `true` | Publish `FastParser.Language.Python` to nuget.org. |
 | `NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH` | `true` | Publish `FastParser.Language.JavaFrameworks` to nuget.org. |
 | `NUGET_LANGUAGE_JAVASWING_PUBLISH` | `true` | Publish `FastParser.Language.JavaSwing` to nuget.org. |
@@ -72,6 +73,19 @@ Repository   : fast_parser
 Workflow     : release.yml
 Environment  : any / blank
 ```
+
+JavaSwing language extension:
+
+```text
+Project name : fastparse-language-javaswing
+Publisher    : GitHub
+Owner        : natan-sysview
+Repository   : fast_parser
+Workflow     : publish-javaswing-pypi.yml
+Environment  : any / blank
+```
+
+`release.yml` can also be extended for future combined releases. Use `publish-javaswing-pypi.yml` when publishing only the JavaSwing PyPI extension against an already published FastParse core version.
 
 ## NuGet Trusted Publishing
 
@@ -159,6 +173,7 @@ Python:
 ```bash
 pip install fastparse fastparse-language-python
 pip install fastparse fastparse-language-java-frameworks
+pip install fastparse fastparse-language-javaswing
 ```
 
 C#:

@@ -108,6 +108,66 @@ print(parser.version)
 print(fastparse_language_java_frameworks.extension_path())
 '''
 
+JAVASWING_PROGRAM = r'''
+import fastparse
+import fastparse_language_javaswing
+from importlib.metadata import version
+from fastparse import FastParse
+
+assert fastparse.__version__ == version("fastparse"), (fastparse.__version__, version("fastparse"))
+assert fastparse_language_javaswing.__version__ == version("fastparse-language-javaswing")
+
+parser = FastParse()
+load = parser.load_bundled_language("javaswing")
+assert load.language == "javaswing", load
+assert parser.language_available("javaswing")
+
+source = """
+import javax.swing.*;
+class Demo extends JFrame {
+    JButton button = new JButton("OK");
+    void build() {
+        JPanel panel = new JPanel();
+        panel.add(button);
+    }
+}
+"""
+json_result = parser.parse_text(
+    source,
+    language="javaswing",
+    output_format="json",
+    include_rules=["javaswing_screen", "javaswing_component_creation", "javaswing_component_field", "javaswing_container_add"],
+    fields=["rule", "text", "byte_range"],
+)
+assert json_result.node_count > 0, json_result.node_count
+assert "javaswing_" in json_result.text
+
+query = fastparse_language_javaswing.query_path("swing").read_text()
+captures = parser.query_text_summary(
+    source,
+    query,
+    language="javaswing",
+    output_format="stats",
+    fields=["capture_name"],
+)
+assert captures.node_count > 0, captures.node_count
+
+diagnostics = parser.parse_text(
+    "class Broken {",
+    language="javaswing",
+    output_format="diagnostics",
+)
+quality = diagnostics.json()
+assert quality["hasErrors"] is True, quality
+assert "nodes" not in quality, quality
+
+print("FastParse published PyPI language smoke OK")
+print(fastparse.__version__)
+print(fastparse_language_javaswing.__version__)
+print(parser.version)
+print(fastparse_language_javaswing.extension_path())
+'''
+
 
 def pypi_version(release_version: str) -> str:
     if "-preview." in release_version:
@@ -164,6 +224,8 @@ def language_package(language: str) -> str:
 def smoke_program(language: str) -> str:
     if language == "java-frameworks":
         return JAVA_FRAMEWORKS_PROGRAM
+    if language == "javaswing":
+        return JAVASWING_PROGRAM
     return PYTHON_PROGRAM
 
 
