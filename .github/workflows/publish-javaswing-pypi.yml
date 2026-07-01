@@ -227,7 +227,17 @@ jobs:
               env["TWINE_USERNAME"] = "__token__"
               env["TWINE_PASSWORD"] = api_token
               upload = subprocess.run(
-                  [sys.executable, "-m", "twine", "upload", "--non-interactive", "--skip-existing", *wheels],
+                  [
+                      sys.executable,
+                      "-m",
+                      "twine",
+                      "upload",
+                      "--non-interactive",
+                      "--skip-existing",
+                      "--verbose",
+                      "--disable-progress-bar",
+                      *wheels,
+                  ],
                   check=False,
                   env=env,
                   stderr=subprocess.STDOUT,
