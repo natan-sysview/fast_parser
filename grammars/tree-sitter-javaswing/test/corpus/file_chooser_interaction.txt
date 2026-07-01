@@ -1,0 +1,341 @@
+========================================
+File chooser open save and custom dialogs
+========================================
+
+class Example {
+  void init(JFileChooser fileChooser, JPanel panel) {
+    int open = fileChooser.showOpenDialog(null);
+    int save = fileChooser.showSaveDialog(panel);
+    int custom = fileChooser.showDialog(panel, "Crear txt");
+    if (open == JFileChooser.APPROVE_OPTION) {
+      String path = fileChooser.getSelectedFile().getAbsolutePath();
+    }
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_file_chooser_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_file_chooser_interaction
+                  chooser: (identifier)
+                  arguments: (argument_list
+                    (null_literal))))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_file_chooser_interaction
+                  chooser: (identifier)
+                  arguments: (argument_list
+                    (identifier))))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_file_chooser_interaction
+                  chooser: (identifier)
+                  arguments: (argument_list
+                    (identifier)
+                    (string_literal
+                      (string_fragment)))))))
+          (if_statement
+            condition: (parenthesized_expression
+              (binary_expression
+                left: (identifier)
+                right: (javaswing_file_chooser_constant
+                  class: (javaswing_file_chooser_class))))
+            consequence: (block
+              (local_variable_declaration
+                type: (type_identifier)
+                declarator: (variable_declarator
+                  name: (identifier)
+                  value: (method_invocation
+                    object: (method_invocation
+                      (javaswing_file_chooser_interaction
+                        chooser: (identifier)
+                        arguments: (argument_list)))
+                    name: (identifier)
+                    arguments: (argument_list)))))))))))
+
+========================================
+File chooser configuration and constants
+========================================
+
+class Example {
+  void init(JFileChooser fc, FileFilter filter) {
+    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    fc.setAcceptAllFileFilterUsed(false);
+    fc.setFileFilter(filter);
+    fc.setApproveButtonText("Archivo Seleccionado");
+    fc.setDialogType(JFileChooser.SAVE_DIALOG);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_file_chooser_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list
+                  (javaswing_file_chooser_constant
+                    class: (javaswing_file_chooser_class))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list
+                  (false)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list
+                  (javaswing_file_chooser_constant
+                    class: (javaswing_file_chooser_class)))))))))))
+
+========================================
+Selected files and multi selection
+========================================
+
+class Example {
+  void init(JFileChooser chooser) {
+    chooser.setMultiSelectionEnabled(true);
+    chooser.setSelectedFile(new File("salida.xls"));
+    File file = chooser.getSelectedFile();
+    File[] files = chooser.getSelectedFiles();
+    if (chooser.isMultiSelectionEnabled()) {
+      chooser.setSelectedFiles(files);
+    }
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_file_chooser_class)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    type: (type_identifier)
+                    arguments: (argument_list
+                      (string_literal
+                        (string_fragment))))))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_file_chooser_interaction
+                  chooser: (identifier)
+                  arguments: (argument_list)))))
+          (local_variable_declaration
+            type: (array_type
+              element: (type_identifier)
+              dimensions: (dimensions))
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_file_chooser_interaction
+                  chooser: (identifier)
+                  arguments: (argument_list)))))
+          (if_statement
+            condition: (parenthesized_expression
+              (method_invocation
+                (javaswing_file_chooser_interaction
+                  chooser: (identifier)
+                  arguments: (argument_list))))
+            consequence: (block
+              (expression_statement
+                (method_invocation
+                  (javaswing_file_chooser_interaction
+                    chooser: (identifier)
+                    arguments: (argument_list
+                      (identifier))))))))))))
+
+========================================
+Chooser navigation and approval controls
+========================================
+
+class Example {
+  void init(JFileChooser chooser) {
+    chooser.setCurrentDirectory(new File("/tmp"));
+    chooser.changeToParentDirectory();
+    chooser.rescanCurrentDirectory();
+    chooser.approveSelection();
+    chooser.cancelSelection();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_file_chooser_class)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    type: (type_identifier)
+                    arguments: (argument_list
+                      (string_literal
+                        (string_fragment))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list)))))))))
+
+========================================
+Nearby file operations and ambiguous receivers
+========================================
+
+class Example {
+  void init(File file, Backend backend) {
+    File archivo = new File("salida.xls");
+    String path = file.getAbsolutePath();
+    backend.showDialog("not a Swing chooser");
+    backend.getSelectedFile();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                type: (type_identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                object: (identifier)
+                name: (identifier)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_file_chooser_interaction
+                chooser: (identifier)
+                arguments: (argument_list)))))))))

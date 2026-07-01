@@ -1,0 +1,106 @@
+========================================
+Java SwingWorker structure
+========================================
+
+class WorkerExample {
+  void init() {
+    SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
+      protected String doInBackground() throws Exception {
+        return load();
+      }
+
+      protected void done() {
+        refresh();
+      }
+    };
+    worker.execute();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (local_variable_declaration
+            (generic_type
+              (type_identifier)
+              (type_arguments
+                (type_identifier)
+                (type_identifier)))
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_swing_worker_creation
+                  (javaswing_swing_worker_generic_type
+                    (type_identifier)
+                    (type_arguments
+                      (type_identifier)
+                      (type_identifier)))
+                  (argument_list)
+                  (class_body
+                    (javaswing_swing_worker_callback
+                      (modifiers)
+                      (type_identifier)
+                      (formal_parameters)
+                      (throws
+                        (type_identifier))
+                      (block
+                        (return_statement
+                          (method_invocation
+                            (identifier)
+                            (argument_list)))))
+                    (javaswing_swing_worker_callback
+                      (modifiers)
+                      (void_type)
+                      (formal_parameters)
+                      (block
+                        (expression_statement
+                          (method_invocation
+                            (identifier)
+                            (argument_list))))))))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list))))))))
+
+========================================
+Java SwingWorker negatives
+========================================
+
+class WorkerExample {
+  void init() {
+    CustomWorker worker = new CustomWorker();
+    doneLater();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (type_identifier)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list))))))))

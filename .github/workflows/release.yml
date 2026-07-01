@@ -403,6 +403,63 @@ jobs:
           name: fastparse-language-java-frameworks-${{ steps.version.outputs.value }}-${{ matrix.platform }}-${{ matrix.arch }}
           path: ${{ matrix.archive_glob }}
 
+  javaswing-language-extension:
+    name: Language Extension javaswing ${{ matrix.platform }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+            archive_ext: tar.gz
+            archive_glob: dist/languages/*.tar.gz
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+            archive_ext: tar.gz
+            archive_glob: dist/languages/*.tar.gz
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+            archive_ext: tar.gz
+            archive_glob: dist/languages/*.tar.gz
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+            archive_ext: zip
+            archive_glob: dist/languages/*.zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build and package JavaSwing language extension
+        run: >
+          python scripts/package_language_extension.py
+          --language javaswing
+          --version "${{ steps.version.outputs.value }}"
+          --platform ${{ matrix.platform }}
+          --arch ${{ matrix.arch }}
+
+      - name: Upload JavaSwing language extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-javaswing-${{ steps.version.outputs.value }}-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ${{ matrix.archive_glob }}
+
   python-language-wheel:
     name: Python Language Wheel python ${{ matrix.platform }}
     needs: python-wheel
@@ -797,6 +854,99 @@ jobs:
           name: fastparse-language-java-frameworks-${{ steps.version.outputs.value }}-nuget
           path: dist/nuget-languages/*.nupkg
 
+  nuget-language-javaswing-package:
+    name: NuGet Language Package JavaSwing
+    needs:
+      - javaswing-language-extension
+      - nuget-package
+      - published-nuget-smoke
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download JavaSwing language extension archives
+        uses: actions/download-artifact@v4
+        with:
+          path: language-artifacts
+          pattern: fastparse-language-javaswing-*
+          merge-multiple: true
+
+      - name: Download core NuGet package
+        uses: actions/download-artifact@v4
+        with:
+          path: nuget-artifacts
+          name: fastparse-${{ steps.version.outputs.value }}-nuget
+
+      - name: Build NuGet JavaSwing language package
+        shell: bash
+        run: |
+          archives=()
+          while IFS= read -r -d '' archive; do
+            archives+=(--archive "$archive")
+          done < <(find language-artifacts -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' \) -print0)
+          python scripts/package_nuget_language_extension.py --language javaswing --version "${{ steps.version.outputs.value }}" --require-all-rids "${archives[@]}"
+
+      - name: Validate NuGet JavaSwing language package
+        shell: bash
+        run: |
+          core_package="$(find nuget-artifacts -maxdepth 1 -name 'FastParser.*.nupkg' ! -name '*.snupkg' | head -n 1)"
+          language_package="dist/nuget-languages/FastParser.Language.JavaSwing.${{ steps.version.outputs.value }}.nupkg"
+          python scripts/validate_nuget_language_package.py \
+            --core-package "$core_package" \
+            --language-package "$language_package" \
+            --version "${{ steps.version.outputs.value }}" \
+            --language javaswing
+
+      - name: NuGet login
+        id: nuget_login
+        uses: NuGet/login@v1
+        with:
+          user: NATANBARRON
+        if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVASWING_PUBLISH == 'true'
+
+      - name: Publish NuGet JavaSwing language package
+        shell: bash
+        run: |
+          set +e
+          dotnet nuget push \
+            "dist/nuget-languages/FastParser.Language.JavaSwing.${{ steps.version.outputs.value }}.nupkg" \
+            --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate \
+            --force-english-output 2>&1 | tee nuget-language-javaswing-push.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            python -c 'from pathlib import Path; message = Path("nuget-language-javaswing-push.log").read_text(encoding="utf-8", errors="replace")[-3000:]; message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A"); print(f"::error title=NuGet JavaSwing language publish failed::{message}")'
+            exit "$status"
+          fi
+        if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVASWING_PUBLISH == 'true'
+
+      - name: Upload NuGet JavaSwing language package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-javaswing-${{ steps.version.outputs.value }}-nuget
+          path: dist/nuget-languages/*.nupkg
+
   publish-pypi-language-python:
     name: Publish PyPI Language Python
     needs: python-language-wheel
@@ -1096,6 +1246,46 @@ jobs:
       - name: Validate published NuGet Java Frameworks language package
         run: python scripts/validate_published_nuget_language.py --version "${{ steps.version.outputs.value }}" --language java-frameworks
 
+  published-nuget-language-javaswing-smoke:
+    name: Published NuGet Language JavaSwing Smoke ${{ matrix.platform }}-${{ matrix.arch }}
+    needs: nuget-language-javaswing-package
+    if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVASWING_PUBLISH == 'true'
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate published NuGet JavaSwing language package
+        run: python scripts/validate_published_nuget_language.py --version "${{ steps.version.outputs.value }}" --language javaswing
+
   github-release:
     name: Attach To GitHub Release
     needs:
@@ -1104,10 +1294,12 @@ jobs:
       - python-wheel
       - language-extension
       - java-frameworks-language-extension
+      - javaswing-language-extension
       - python-language-wheel
       - java-frameworks-language-wheel
       - nuget-language-package
       - nuget-language-java-frameworks-package
+      - nuget-language-javaswing-package
       - published-nuget-smoke
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')

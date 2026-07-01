@@ -1,0 +1,49 @@
+{
+  "grammars": [
+    {
+      "name": "javaswing",
+      "camelcase": "JavaSwing",
+      "scope": "source.javaswing",
+      "path": ".",
+      "file-types": [
+        "java"
+      ],
+      "highlights": "queries/highlights.scm",
+      "tags": "queries/tags.scm"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0-alpha.1",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for Java Swing source code",
+    "authors": [
+      {
+        "name": "natan-sysview"
+      },
+      {
+        "name": "Ayman Nadeem",
+        "email": "aymannadeem@github.com"
+      },
+      {
+        "name": "Max Brunsfeld",
+        "email": "maxbrunsfeld@gmail.com"
+      },
+      {
+        "name": "Amaan Qureshi",
+        "email": "amaanq12@gmail.com"
+      }
+    ],
+    "links": {
+      "upstream": "https://github.com/tree-sitter/tree-sitter-java",
+      "repository": "https://github.com/natan-sysview/tree-sitter-javaswing"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": false,
+    "node": false,
+    "python": false,
+    "rust": false,
+    "swift": false
+  }
+}

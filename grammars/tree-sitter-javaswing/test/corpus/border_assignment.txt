@@ -1,0 +1,283 @@
+========================================
+Border assignment with official constructors
+========================================
+
+class Example {
+  void init(JPanel panel, JLabel statusLabel) {
+    panel.setBorder(new TitledBorder("Datos"));
+    setBorder(new EmptyBorder(12, 0, 0, 0));
+    statusLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                component: (identifier)
+                arguments: (javaswing_border_arguments
+                  border: (javaswing_border_creation
+                    type: (javaswing_border_type)
+                    arguments: (argument_list
+                      (string_literal
+                        (string_fragment))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                arguments: (javaswing_border_arguments
+                  border: (javaswing_border_creation
+                    type: (javaswing_border_type)
+                    arguments: (argument_list
+                      (decimal_integer_literal)
+                      (decimal_integer_literal)
+                      (decimal_integer_literal)
+                      (decimal_integer_literal)))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                component: (identifier)
+                arguments: (javaswing_border_arguments
+                  border: (javaswing_border_creation
+                    type: (javaswing_border_type)
+                    arguments: (argument_list
+                      (field_access
+                        object: (identifier)
+                        field: (identifier)))))))))))))
+
+========================================
+BorderFactory creation
+========================================
+
+class Example {
+  void init(JPanel panel) {
+    panel.setBorder(BorderFactory.createEtchedBorder());
+    panel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    Border border = BorderFactory.createTitledBorder("Consulta");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                component: (identifier)
+                arguments: (javaswing_border_arguments
+                  border: (javaswing_border_factory_creation
+                    arguments: (argument_list))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                component: (identifier)
+                arguments: (javaswing_border_arguments
+                  border: (javaswing_border_factory_creation
+                    arguments: (argument_list
+                      (decimal_integer_literal)
+                      (decimal_integer_literal)
+                      (decimal_integer_literal)
+                      (decimal_integer_literal)))))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_border_assignment
+                  (javaswing_border_factory_creation
+                    arguments: (argument_list
+                      (string_literal
+                        (string_fragment)))))))))))))
+
+========================================
+Viewport border and expression fallback
+========================================
+
+class Example {
+  void init(JScrollPane scrollPane, JPanel field, Border border) {
+    scrollPane.setViewportBorder(new TitledBorder("Eventos"));
+    field.setBorder(null);
+    field.setBorder(border);
+    this.setBorder(UIManager.getBorder("Panel.border"));
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                scroll_pane: (identifier)
+                arguments: (javaswing_border_arguments
+                  border: (javaswing_border_creation
+                    type: (javaswing_border_type)
+                    arguments: (argument_list
+                      (string_literal
+                        (string_fragment))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                component: (identifier)
+                arguments: (javaswing_border_arguments
+                  border: (null_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                component: (identifier)
+                arguments: (javaswing_border_arguments
+                  border: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                component: (this)
+                arguments: (javaswing_border_arguments
+                  border: (method_invocation
+                    object: (identifier)
+                    name: (identifier)
+                    arguments: (argument_list
+                      (string_literal
+                        (string_fragment)))))))))))))
+
+========================================
+Compound border creation
+========================================
+
+class Example {
+  void init(JPanel panel) {
+    panel.setBorder(new CompoundBorder(
+        BorderFactory.createEtchedBorder(),
+        BorderFactory.createEmptyBorder(5, 5, 5, 5)
+    ));
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                component: (identifier)
+                arguments: (javaswing_border_arguments
+                  border: (javaswing_border_creation
+                    type: (javaswing_border_type)
+                    arguments: (argument_list
+                      (method_invocation
+                        (javaswing_border_assignment
+                          (javaswing_border_factory_creation
+                            arguments: (argument_list))))
+                      (method_invocation
+                        (javaswing_border_assignment
+                          (javaswing_border_factory_creation
+                            arguments: (argument_list
+                              (decimal_integer_literal)
+                              (decimal_integer_literal)
+                              (decimal_integer_literal)
+                              (decimal_integer_literal))))))))))))))))
+
+========================================
+Nearby non-border methods stay generic
+========================================
+
+class Example {
+  void init(Bean bean, JPanel panel) {
+    bean.setBorderValue("not a Swing border setter");
+    Border value = Borders.DIALOG_BORDER;
+    panel.setBorder(Borders.DIALOG_BORDER);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (string_literal
+                  (string_fragment)))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (field_access
+                object: (identifier)
+                field: (identifier))))
+          (expression_statement
+            (method_invocation
+              (javaswing_border_assignment
+                component: (identifier)
+                arguments: (javaswing_border_arguments
+                  border: (field_access
+                    object: (identifier)
+                    field: (identifier)))))))))))

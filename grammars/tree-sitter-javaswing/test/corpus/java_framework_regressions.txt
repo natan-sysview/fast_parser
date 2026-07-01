@@ -1,0 +1,91 @@
+========================================
+Framework Java names are not split by Swing prefixes
+========================================
+
+class ExceptionConsultaGlobalCtas extends java.lang.Exception {
+  void write(Object writer, Object document) {
+    writer.setPageEmpty(false);
+    document.setPageSize(PageSize.A4.rotate());
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (superclass
+      (scoped_type_identifier
+        (scoped_type_identifier
+          (type_identifier)
+          (type_identifier))
+        (type_identifier)))
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (false))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (method_invocation
+                  (field_access
+                    (identifier)
+                    (identifier))
+                  (identifier)
+                  (argument_list))))))))))
+
+========================================
+Text editor setPage remains captured
+========================================
+
+class EditorExample {
+  void init(JEditorPane editor, URL url) {
+    editor.setPage(url);
+    setPage(url);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (javaswing_text_editor_class)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_text_editor_interaction
+                (javaswing_text_editor_set_page_selector)
+                (javaswing_text_editor_set_page_arguments
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_text_editor_interaction
+                (argument_list
+                  (identifier))))))))))

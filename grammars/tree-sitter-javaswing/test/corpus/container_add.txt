@@ -1,0 +1,208 @@
+========================================
+Content pane container add
+========================================
+
+class Example extends JFrame {
+  void init(JPanel panel) {
+    getContentPane().add(panel);
+    this.getContentPane().add(panel);
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_container_add
+                container: (javaswing_content_pane_access
+                  arguments: (argument_list))
+                arguments: (javaswing_container_add_arguments
+                  component: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_container_add
+                container: (javaswing_content_pane_access
+                  object: (this)
+                  arguments: (argument_list))
+                arguments: (javaswing_container_add_arguments
+                  component: (identifier))))))))))
+
+========================================
+Inline Swing component add
+========================================
+
+class Example {
+  void init(JPanel panel) {
+    panel.add(new JButton("Aceptar"));
+    panel.add(new JLabel("Nombre"), BorderLayout.NORTH);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_container_add
+                container: (identifier)
+                arguments: (javaswing_container_add_component_creation_arguments
+                  component: (javaswing_component_creation
+                    type: (javaswing_component_creation_type
+                      (javaswing_component_type))
+                    arguments: (argument_list
+                      (string_literal
+                        (string_fragment))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_container_add
+                container: (identifier)
+                arguments: (javaswing_container_add_component_creation_arguments
+                  component: (javaswing_component_creation
+                    type: (javaswing_component_creation_type
+                      (javaswing_component_type))
+                    arguments: (argument_list
+                      (string_literal
+                        (string_fragment))))
+                  constraints: (field_access
+                    object: (identifier)
+                    field: (identifier)))))))))))
+
+========================================
+Official BorderLayout container add
+========================================
+
+class Example {
+  void init(JPanel panel, JButton button) {
+    panel.add(button, BorderLayout.CENTER);
+    panel.add(button, BorderLayout.SOUTH, 0);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_container_add
+                container: (identifier)
+                arguments: (javaswing_container_add_border_layout_arguments
+                  component: (identifier)
+                  constraints: (javaswing_border_layout_constraint)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_container_add
+                container: (identifier)
+                arguments: (javaswing_container_add_border_layout_arguments
+                  component: (identifier)
+                  constraints: (javaswing_border_layout_constraint)
+                  index: (decimal_integer_literal))))))))))
+
+========================================
+Backend and deferred add calls remain generic
+========================================
+
+class Example {
+  void init(List<Object> registros, Object vo, JPanel panel, JButton button) {
+    registros.add(vo);
+    sortingColumns.add(new Directive(column, status));
+    panel.add(button);
+    panel.add(button, new TableLayoutConstraints(0, 0, 0, 0));
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (generic_type
+              (type_identifier)
+              (type_arguments
+                (type_identifier)))
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (object_creation_expression
+                  type: (type_identifier)
+                  arguments: (argument_list
+                    (identifier)
+                    (identifier))))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier)
+                (object_creation_expression
+                  type: (type_identifier)
+                  arguments: (argument_list
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)))))))))))

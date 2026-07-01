@@ -1,0 +1,180 @@
+========================================
+Text editor declarations and creation
+========================================
+
+class Example {
+  private JEditorPane editorPane = new JEditorPane();
+  private javax.swing.JTextPane textPane;
+
+  void init() {
+    JEditorPane local = new javax.swing.JEditorPane();
+    JTextPane styled = new JTextPane();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (javaswing_text_editor_field
+        (modifiers)
+        (javaswing_text_editor_class)
+        (variable_declarator
+          (identifier)
+          (object_creation_expression
+            (javaswing_text_editor_creation
+              (javaswing_text_editor_class)
+              (argument_list)))))
+      (javaswing_text_editor_field
+        (modifiers)
+        (javaswing_text_editor_class)
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (javaswing_text_editor_local_declaration
+            (javaswing_text_editor_class)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_text_editor_creation
+                  (javaswing_text_editor_class)
+                  (argument_list)))))
+          (javaswing_text_editor_local_declaration
+            (javaswing_text_editor_class)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_text_editor_creation
+                  (javaswing_text_editor_class)
+                  (argument_list))))))))))
+
+========================================
+Text editor content and style methods
+========================================
+
+class Example {
+  void init(JEditorPane editor, JTextPane textPane) {
+    editor.setContentType("text/html");
+    editor.getContentType();
+    textPane.setParagraphAttributes(attributes, true);
+    setParagraphAttributes(attributes, true);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (javaswing_text_editor_class)
+            (identifier))
+          (formal_parameter
+            (javaswing_text_editor_class)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_text_editor_interaction
+                (javaswing_text_editor_selector)
+                (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_text_editor_interaction
+                (javaswing_text_editor_selector)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_text_editor_interaction
+                (javaswing_text_editor_selector)
+                (argument_list
+                  (identifier)
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_text_editor_interaction
+                (argument_list
+                  (identifier)
+                  (true))))))))))
+
+========================================
+Text editor return types are not fields
+========================================
+
+class Example {
+  private JEditorPane editorPane;
+
+  public JEditorPane getEditorPane() {
+    return editorPane;
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (javaswing_text_editor_field
+        (modifiers)
+        (javaswing_text_editor_class)
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (modifiers)
+        (javaswing_text_editor_class)
+        (identifier)
+        (formal_parameters)
+        (block
+          (return_statement
+            (identifier)))))))
+
+========================================
+Generic text methods remain outside text editor rule
+========================================
+
+class Example {
+  void init(JEditorPane editor) {
+    editor.setText(text);
+    editor.getText();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (javaswing_text_editor_class)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list))))))))

@@ -1,0 +1,128 @@
+========================================
+Java Swing GridBagLayout model arrays
+========================================
+
+class GridBagLayoutModelExample {
+  void init(JPanel panel) {
+    ((GridBagLayout) panel.getLayout()).columnWidths = new int[] {0, 10, 0};
+    ((java.awt.GridBagLayout) panel.getLayout()).rowHeights = new int[] {0, 24};
+    ((GridBagLayout) panel.getLayout()).columnWeights = new double[] {0.0, 1.0E-4};
+    ((GridBagLayout) panel.getLayout()).rowWeights = new double[] {0.0, 1.0};
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (javaswing_grid_bag_layout_model
+              (javaswing_grid_bag_layout_model_selector)
+              (array_creation_expression
+                (integral_type)
+                (dimensions)
+                (array_initializer
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (javaswing_grid_bag_layout_model
+              (javaswing_grid_bag_layout_model_selector)
+              (array_creation_expression
+                (integral_type)
+                (dimensions)
+                (array_initializer
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (javaswing_grid_bag_layout_model
+              (javaswing_grid_bag_layout_model_selector)
+              (array_creation_expression
+                (floating_point_type)
+                (dimensions)
+                (array_initializer
+                  (decimal_floating_point_literal)
+                  (decimal_floating_point_literal)))))
+          (expression_statement
+            (javaswing_grid_bag_layout_model
+              (javaswing_grid_bag_layout_model_selector)
+              (array_creation_expression
+                (floating_point_type)
+                (dimensions)
+                (array_initializer
+                  (decimal_floating_point_literal)
+                  (decimal_floating_point_literal))))))))))
+
+========================================
+Java Swing GridBagLayout model negatives
+========================================
+
+class GridBagLayoutModelExample {
+  void init(LayoutModel layout) {
+    layout.columnWidths = new int[] {1, 2};
+    ((CustomGridBagLayout) layout).rowHeights = new int[] {3};
+    ((GridLayout) layout).columnWeights = new double[] {1.0};
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (identifier)
+                (identifier))
+              (array_creation_expression
+                (integral_type)
+                (dimensions)
+                (array_initializer
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (parenthesized_expression
+                  (cast_expression
+                    (type_identifier)
+                    (identifier)))
+                (identifier))
+              (array_creation_expression
+                (integral_type)
+                (dimensions)
+                (array_initializer
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (parenthesized_expression
+                  (cast_expression
+                    (type_identifier)
+                    (identifier)))
+                (identifier))
+              (array_creation_expression
+                (floating_point_type)
+                (dimensions)
+                (array_initializer
+                  (decimal_floating_point_literal))))))))))

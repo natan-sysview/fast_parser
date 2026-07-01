@@ -1,0 +1,353 @@
+========================================
+JOptionPane message confirm input and option dialogs
+========================================
+
+class Example {
+  void init(JFrame frame, Object[] options) {
+    JOptionPane.setDefaultLocale(new Locale("es", "MX"));
+    JOptionPane.showMessageDialog(null, "Guardado correctamente");
+    int answer = JOptionPane.showConfirmDialog(JOptionPane.getFrameForComponent(frame), "Continuar?", "Aviso", JOptionPane.YES_NO_OPTION);
+    String value = JOptionPane.showInputDialog(frame, "Contrato");
+    JOptionPane.showOptionDialog(frame, "Cancelar?", "Aviso", JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (array_type
+              element: (type_identifier)
+              dimensions: (dimensions))
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                (javaswing_option_pane_context_access
+                  class: (javaswing_option_pane_class)
+                  arguments: (argument_list
+                    (object_creation_expression
+                      type: (type_identifier)
+                      arguments: (argument_list
+                        (string_literal
+                          (string_fragment))
+                        (string_literal
+                          (string_fragment)))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                (javaswing_option_pane_dialog
+                  class: (javaswing_option_pane_class)
+                  arguments: (argument_list
+                    (null_literal)
+                    (string_literal
+                      (string_fragment)))))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_dialog_interaction
+                  (javaswing_option_pane_dialog
+                    class: (javaswing_option_pane_class)
+                    arguments: (argument_list
+                      (method_invocation
+                        (javaswing_dialog_interaction
+                          (javaswing_option_pane_context_access
+                            class: (javaswing_option_pane_class)
+                            arguments: (argument_list
+                              (identifier)))))
+                      (string_literal
+                        (string_fragment))
+                      (string_literal
+                        (string_fragment))
+                      (javaswing_option_pane_constant
+                        class: (javaswing_option_pane_class))))))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_dialog_interaction
+                  (javaswing_option_pane_dialog
+                    class: (javaswing_option_pane_class)
+                    arguments: (argument_list
+                      (identifier)
+                      (string_literal
+                        (string_fragment))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                (javaswing_option_pane_dialog
+                  class: (javaswing_option_pane_class)
+                  arguments: (argument_list
+                    (identifier)
+                    (string_literal
+                      (string_fragment))
+                    (string_literal
+                      (string_fragment))
+                    (javaswing_option_pane_constant
+                      class: (javaswing_option_pane_class))
+                    (javaswing_option_pane_constant
+                      class: (javaswing_option_pane_class))
+                    (null_literal)
+                    (identifier)
+                    (array_access
+                      array: (identifier)
+                      index: (decimal_integer_literal))))))))))))
+
+========================================
+Internal and fully qualified JOptionPane dialogs
+========================================
+
+class Example {
+  void init(JDesktopPane desktop, JPanel panel) {
+    JOptionPane.showInternalMessageDialog(desktop, "Proceso terminado");
+    JOptionPane.showInternalConfirmDialog(panel, "Cancelar?");
+    javax.swing.JOptionPane.showMessageDialog(this, "Error");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                (javaswing_option_pane_dialog
+                  class: (javaswing_option_pane_class)
+                  arguments: (argument_list
+                    (identifier)
+                    (string_literal
+                      (string_fragment)))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                (javaswing_option_pane_dialog
+                  class: (javaswing_option_pane_class)
+                  arguments: (argument_list
+                    (identifier)
+                    (string_literal
+                      (string_fragment)))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                (javaswing_option_pane_dialog
+                  class: (javaswing_option_pane_class)
+                  arguments: (argument_list
+                    (this)
+                    (string_literal
+                      (string_fragment))))))))))))
+
+========================================
+JDialog and JOptionPane creation
+========================================
+
+class Example {
+  void init(JFrame owner, Object[] options) {
+    JDialog dialogo = new JDialog(owner, true);
+    JDialog full = new javax.swing.JDialog(owner, "Titulo", true);
+    JOptionPane optionPane = new JOptionPane(options, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (array_type
+              element: (type_identifier)
+              dimensions: (dimensions))
+            name: (identifier)))
+        body: (block
+          (local_variable_declaration
+            type: (javaswing_dialog_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_dialog_creation
+                  type: (javaswing_dialog_creation_type
+                    (javaswing_dialog_type))
+                  arguments: (argument_list
+                    (identifier)
+                    (true))))))
+          (local_variable_declaration
+            type: (javaswing_dialog_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_dialog_creation
+                  type: (javaswing_dialog_creation_type
+                    (javaswing_dialog_type))
+                  arguments: (argument_list
+                    (identifier)
+                    (string_literal
+                      (string_fragment))
+                    (true))))))
+          (local_variable_declaration
+            type: (javaswing_dialog_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_dialog_creation
+                  type: (javaswing_dialog_creation_type
+                    (javaswing_dialog_type))
+                  arguments: (argument_list
+                    (identifier)
+                    (javaswing_option_pane_constant
+                      class: (javaswing_option_pane_class))
+                    (javaswing_option_pane_constant
+                      class: (javaswing_option_pane_class))))))))))))
+
+========================================
+Dialog modality configuration
+========================================
+
+class Example extends JDialog {
+  void init(JDialog dialogo) {
+    this.setModal(true);
+    dialogo.setModal(true);
+    dialogo.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+    setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    superclass: (superclass
+      (javaswing_dialog_type))
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_dialog_type)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                dialog: (this)
+                arguments: (argument_list
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                dialog: (identifier)
+                arguments: (argument_list
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                dialog: (identifier)
+                arguments: (argument_list
+                  (field_access
+                    object: (field_access
+                      object: (identifier)
+                      field: (identifier))
+                    field: (identifier))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_dialog_interaction
+                arguments: (argument_list
+                  (field_access
+                    object: (field_access
+                      object: (identifier)
+                      field: (identifier))
+                    field: (identifier)))))))))))
+
+========================================
+Nearby lifecycle and client dialogs remain generic
+========================================
+
+class Example {
+  void init(Component component, JFrame frame) {
+    component.setVisible(true);
+    frame.dispose();
+    DialogoAltaCodigoRespuesta dialogo = new DialogoAltaCodigoRespuesta(frame);
+    dialogo.setVisible(true);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_window_lifecycle
+                window: (identifier)
+                arguments: (argument_list
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_window_lifecycle
+                window: (identifier)
+                arguments: (argument_list))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                type: (type_identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_window_lifecycle
+                window: (identifier)
+                arguments: (argument_list
+                  (true))))))))))

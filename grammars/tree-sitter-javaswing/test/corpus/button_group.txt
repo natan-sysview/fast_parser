@@ -1,0 +1,114 @@
+========================================
+Button group declarations and creation
+========================================
+
+class Example {
+  private ButtonGroup reportGroup = new ButtonGroup();
+  javax.swing.ButtonGroup qualifiedGroup = new javax.swing.ButtonGroup();
+
+  void init() {
+    ButtonGroup localGroup = new ButtonGroup();
+    ButtonGroup delayed = null;
+    delayed = new ButtonGroup();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_button_group_field
+        (modifiers)
+        type: (javaswing_button_group_class)
+        declarator: (variable_declarator
+          name: (identifier)
+          value: (object_creation_expression
+            (javaswing_button_group_creation
+              type: (javaswing_button_group_class)
+              arguments: (argument_list)))))
+      (javaswing_button_group_field
+        type: (javaswing_button_group_class)
+        declarator: (variable_declarator
+          name: (identifier)
+          value: (object_creation_expression
+            (javaswing_button_group_creation
+              type: (javaswing_button_group_class)
+              arguments: (argument_list)))))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_button_group_local_declaration
+            type: (javaswing_button_group_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_button_group_creation
+                  type: (javaswing_button_group_class)
+                  arguments: (argument_list)))))
+          (javaswing_button_group_local_declaration
+            type: (javaswing_button_group_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (null_literal)))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                (javaswing_button_group_creation
+                  type: (javaswing_button_group_class)
+                  arguments: (argument_list))))))))))
+
+========================================
+Button group memberships remain generic add calls
+========================================
+
+class Example {
+  void init(ButtonGroup reportGroup, JPanel panel, JRadioButton radioExcel, JRadioButton radioPdf) {
+    reportGroup.add(radioExcel);
+    reportGroup.add(radioPdf);
+    panel.add(radioExcel);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_button_group_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_selectable_button_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_selectable_button_class)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier)))))))))

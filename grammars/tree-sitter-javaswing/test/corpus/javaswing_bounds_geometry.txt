@@ -1,0 +1,119 @@
+========================================
+Java Swing bounds geometry calls
+========================================
+
+class BoundsExample extends JPanel {
+  void init(JFrame frame, JDialog dialog, JButton button) {
+    setSize(800, 600);
+    frame.setBounds(10, 20, 320, 200);
+    dialog.setLocation(40, 50);
+    button.setSize(new Dimension(120, 32));
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (javaswing_dialog_type)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_bounds_geometry
+                (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_bounds_geometry
+                (identifier)
+                (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_bounds_geometry
+                (identifier)
+                (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_bounds_geometry
+                (identifier)
+                (argument_list
+                  (object_creation_expression
+                    (javaswing_dimension_creation
+                      (javaswing_dimension_class)
+                      (argument_list
+                        (decimal_integer_literal)
+                        (decimal_integer_literal)))))))))))))
+
+========================================
+Java Swing bounds geometry negatives
+========================================
+
+class BoundsExample {
+  void init(JPanel panel) {
+    panel.setPreferredSize(new Dimension(200, 80));
+    panel.setLocationRelativeTo(null);
+    metrics.setSizeLabel("large");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (object_creation_expression
+                    (javaswing_dimension_creation
+                      (javaswing_dimension_class)
+                      (argument_list
+                        (decimal_integer_literal)
+                        (decimal_integer_literal))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (null_literal)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (string_literal
+                  (string_fragment))))))))))

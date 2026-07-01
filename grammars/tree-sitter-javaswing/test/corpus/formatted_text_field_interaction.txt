@@ -1,0 +1,137 @@
+========================================
+Formatted text field declarations and creation
+========================================
+
+class Example {
+  private JFormattedTextField amountField = new JFormattedTextField();
+  public javax.swing.JFormattedTextField seriesField;
+
+  void init() {
+    JFormattedTextField temp = new javax.swing.JFormattedTextField(formatter);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_formatted_text_field_field
+        (modifiers)
+        type: (javaswing_formatted_text_field_class)
+        declarator: (variable_declarator
+          name: (identifier)
+          value: (object_creation_expression
+            (javaswing_formatted_text_field_creation
+              type: (javaswing_formatted_text_field_class)
+              arguments: (argument_list)))))
+      (javaswing_formatted_text_field_field
+        (modifiers)
+        type: (javaswing_formatted_text_field_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_formatted_text_field_local_declaration
+            type: (javaswing_formatted_text_field_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_formatted_text_field_creation
+                  type: (javaswing_formatted_text_field_class)
+                  arguments: (argument_list
+                    (identifier)))))))))))
+
+========================================
+Formatted text field focus lost behavior
+========================================
+
+class Example {
+  void configure() {
+    amountField.setFocusLostBehavior(JFormattedTextField.COMMIT);
+    if (amountField.getFocusLostBehavior() == javax.swing.JFormattedTextField.REVERT) {
+    }
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_formatted_text_field_interaction
+                formatted_text_field: (identifier)
+                arguments: (javaswing_formatted_text_field_focus_lost_arguments
+                  behavior: (javaswing_formatted_text_field_focus_lost_constant
+                    class: (javaswing_formatted_text_field_class))))))
+          (if_statement
+            condition: (parenthesized_expression
+              (binary_expression
+                left: (method_invocation
+                  (javaswing_formatted_text_field_interaction
+                    formatted_text_field: (identifier)
+                    arguments: (javaswing_formatted_text_field_focus_lost_arguments)))
+                right: (javaswing_formatted_text_field_focus_lost_constant
+                  class: (javaswing_formatted_text_field_class))))
+            consequence: (block)))))))
+
+========================================
+Client formatter and generic values remain generic
+========================================
+
+class Example {
+  void edit(JSxNumberTextField custom, Field field, Object value) {
+    custom.commitEdit();
+    field.setValue(value);
+    field.getValue();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list))))))))

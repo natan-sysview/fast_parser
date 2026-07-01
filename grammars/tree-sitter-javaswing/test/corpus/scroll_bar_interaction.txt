@@ -1,0 +1,173 @@
+========================================
+Scroll bar declarations and creation
+========================================
+
+class Example {
+  private JScrollBar verticalBar = new JScrollBar();
+  private javax.swing.JScrollBar horizontalBar;
+
+  void init() {
+    JScrollBar local = new javax.swing.JScrollBar();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_scroll_bar_field
+        (modifiers)
+        type: (javaswing_scroll_bar_class)
+        declarator: (variable_declarator
+          name: (identifier)
+          value: (object_creation_expression
+            (javaswing_scroll_bar_creation
+              type: (javaswing_scroll_bar_class)
+              arguments: (argument_list)))))
+      (javaswing_scroll_bar_field
+        (modifiers)
+        type: (javaswing_scroll_bar_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_scroll_bar_local_declaration
+            type: (javaswing_scroll_bar_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_scroll_bar_creation
+                  type: (javaswing_scroll_bar_class)
+                  arguments: (argument_list))))))))))
+
+========================================
+Scroll pane scrollbar access
+========================================
+
+class Example {
+  void init(JScrollPane scrollPane) {
+    scrollPane.getVerticalScrollBar();
+    vista.getPnlResultadosBusqueda().getHorizontalScrollBar();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_bar_access
+                selector: (javaswing_scroll_bar_access_selector)
+                arguments: (javaswing_empty_argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_bar_access
+                selector: (javaswing_scroll_bar_access_selector)
+                arguments: (javaswing_empty_argument_list)))))))))
+
+========================================
+Scroll bar increment interactions
+========================================
+
+class Example {
+  void init(int block) {
+    vista.getPnlResultadosBusqueda().getVerticalScrollBar().setUnitIncrement(16);
+    horizontalBar.setBlockIncrement(block);
+    horizontalBar.getUnitIncrement();
+    scrollPane.getHorizontalScrollBar().getBlockIncrement();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (integral_type)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_bar_increment_interaction
+                selector: (javaswing_scroll_bar_increment_selector)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_bar_increment_interaction
+                selector: (javaswing_scroll_bar_increment_selector)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_bar_increment_interaction
+                selector: (javaswing_scroll_bar_increment_selector)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_bar_increment_interaction
+                selector: (javaswing_scroll_bar_increment_selector)
+                arguments: (argument_list)))))))))
+
+========================================
+Generic scrollbar value methods remain outside rule
+========================================
+
+class Example {
+  void init() {
+    scrollBar.setValue(value);
+    scrollBar.getValue();
+    scrollBar.setMaximum(maximum);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier)))))))))

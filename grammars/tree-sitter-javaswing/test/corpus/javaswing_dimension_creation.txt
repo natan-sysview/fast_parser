@@ -1,0 +1,198 @@
+========================================
+Java Swing Dimension creation in size setters
+========================================
+
+class SizePanel extends JPanel {
+  void init(JPanel panel, JTable table) {
+    panel.setPreferredSize(new Dimension(700, 32));
+    panel.setMinimumSize(new Dimension(650, 60));
+    table.setPreferredScrollableViewportSize(new Dimension(450, 200));
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (object_creation_expression
+                    (javaswing_dimension_creation
+                      (javaswing_dimension_class)
+                      (argument_list
+                        (decimal_integer_literal)
+                        (decimal_integer_literal))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (object_creation_expression
+                    (javaswing_dimension_creation
+                      (javaswing_dimension_class)
+                      (argument_list
+                        (decimal_integer_literal)
+                        (decimal_integer_literal))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (object_creation_expression
+                    (javaswing_dimension_creation
+                      (javaswing_dimension_class)
+                      (argument_list
+                        (decimal_integer_literal)
+                        (decimal_integer_literal)))))))))))))
+
+========================================
+Java Swing Dimension fields locals and returns
+========================================
+
+class SizePanel extends JPanel {
+  private static final Dimension MINIMUM_SIZE = new Dimension(985, 500);
+
+  Dimension preferred() {
+    Dimension local = new Dimension(1140, 495);
+    return new Dimension(1140, 550);
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (field_declaration
+        (modifiers)
+        (javaswing_dimension_class)
+        (variable_declarator
+          (identifier)
+          (object_creation_expression
+            (javaswing_dimension_creation
+              (javaswing_dimension_class)
+              (argument_list
+                (decimal_integer_literal)
+                (decimal_integer_literal))))))
+      (method_declaration
+        (javaswing_dimension_class)
+        (identifier)
+        (formal_parameters)
+        (block
+          (local_variable_declaration
+            (javaswing_dimension_class)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_dimension_creation
+                  (javaswing_dimension_class)
+                  (argument_list
+                    (decimal_integer_literal)
+                    (decimal_integer_literal))))))
+          (return_statement
+            (object_creation_expression
+              (javaswing_dimension_creation
+                (javaswing_dimension_class)
+                (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal))))))))))
+
+========================================
+Java Swing Dimension fully qualified
+========================================
+
+class SizePanel {
+  void init(JPanel content) {
+    content.setPreferredSize(new java.awt.Dimension(1140, 550));
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (object_creation_expression
+                    (javaswing_dimension_creation
+                      (javaswing_dimension_class)
+                      (argument_list
+                        (decimal_integer_literal)
+                        (decimal_integer_literal)))))))))))))
+
+========================================
+Java Swing Dimension negatives
+========================================
+
+class SizePanel {
+  void init(JPanel content, Dimension size) {
+    content.setPreferredSize(size);
+    Dimension copy = content.getPreferredSize();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (javaswing_dimension_class)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (identifier)))))
+          (local_variable_declaration
+            (javaswing_dimension_class)
+            (variable_declarator
+              (identifier)
+              (method_invocation
+                (identifier)
+                (identifier)
+                (argument_list)))))))))

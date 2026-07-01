@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release"
+        required: true
+        default: "v0.1.0-alpha.1"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: GitHub prerelease
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate release candidate
+        run: npm run ci:check
+
+      - name: Check generated artifacts
+        run: git diff --exit-code -- grammar.js tree-sitter.json src/parser.c src/grammar.json src/node-types.json
+
+      - name: Resolve release notes
+        id: notes
+        shell: bash
+        run: |
+          tag="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
+          version="${tag#v}"
+          notes="docs/releases/${version}.md"
+          if [[ ! -f "$notes" && "$version" == *"-"* ]]; then
+            notes="docs/releases/${version//-/.}.md"
+          fi
+          if [[ ! -f "$notes" && "$version" == 0.1.0-alpha* ]]; then
+            notes="docs/releases/0.1.0-alpha.md"
+          fi
+          if [[ ! -f "$notes" ]]; then
+            echo "Release notes file not found for $tag" >&2
+            exit 1
+          fi
+          echo "file=$notes" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
+          gh release view "$tag" >/dev/null 2>&1 && \
+            gh release edit "$tag" \
+              --title "$tag" \
+              --notes-file "${{ steps.notes.outputs.file }}" \
+              --prerelease || \
+            gh release create "$tag" \
+              --title "$tag" \
+              --notes-file "${{ steps.notes.outputs.file }}" \
+              --prerelease

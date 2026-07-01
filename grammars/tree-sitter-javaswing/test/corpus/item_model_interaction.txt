@@ -1,0 +1,314 @@
+========================================
+Swing item model declarations and creation
+========================================
+
+class Example {
+  private DefaultComboBoxModel comboModel = new DefaultComboBoxModel();
+  javax.swing.DefaultListModel listModel = new javax.swing.DefaultListModel();
+
+  void init() {
+    DefaultComboBoxModel localModel = null;
+    localModel = new DefaultComboBoxModel(new String[] {"A", "B"});
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (field_declaration
+        (modifiers)
+        type: (javaswing_item_model_class)
+        declarator: (variable_declarator
+          name: (identifier)
+          value: (object_creation_expression
+            (javaswing_item_model_creation
+              type: (javaswing_item_model_class)
+              arguments: (argument_list)))))
+      (javaswing_item_model_field
+        type: (javaswing_item_model_class)
+        declarator: (variable_declarator
+          name: (identifier)
+          value: (object_creation_expression
+            (javaswing_item_model_creation
+              type: (javaswing_item_model_class)
+              arguments: (argument_list)))))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_item_model_local_declaration
+            type: (javaswing_item_model_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (null_literal)))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                (javaswing_item_model_creation
+                  type: (javaswing_item_model_class)
+                  arguments: (argument_list
+                    (array_creation_expression
+                      type: (type_identifier)
+                      dimensions: (dimensions)
+                      value: (array_initializer
+                        (string_literal
+                          (string_fragment))
+                        (string_literal
+                          (string_fragment))))))))))))))
+
+========================================
+Swing item model mutations
+========================================
+
+class Example {
+  void init(DefaultComboBoxModel comboModel, DefaultListModel listModel, Object item) {
+    comboModel.addElement(item);
+    comboModel.insertElementAt("Todos", 0);
+    comboModel.removeElement(item);
+    comboModel.removeElementAt(0);
+    Object first = comboModel.getElementAt(0);
+    int index = comboModel.getIndexOf(item);
+    listModel.addElement(item);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_item_model_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_item_model_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_item_model_interaction
+                  model: (identifier)
+                  arguments: (argument_list
+                    (decimal_integer_literal))))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_item_model_interaction
+                  model: (identifier)
+                  arguments: (argument_list
+                    (identifier))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (identifier))))))))))
+
+========================================
+Combo box item methods
+========================================
+
+class Example {
+  void init(JComboBox combo, Object value) {
+    combo.addItem(value);
+    combo.insertItemAt("Todas", 0);
+    combo.removeItem(value);
+    combo.removeItemAt(0);
+    combo.removeAllItems();
+    Object item = combo.getItemAt(0);
+    int count = combo.getItemCount();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_combo_box_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_item_model_interaction
+                  model: (identifier)
+                  arguments: (argument_list
+                    (decimal_integer_literal))))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_item_model_interaction
+                  model: (identifier)
+                  arguments: (argument_list))))))))))
+
+========================================
+Ambiguous selection and model setters remain outside item model interaction
+========================================
+
+class Example {
+  void init(JComboBox combo, JTabbedPane tabs, DefaultComboBoxModel model) {
+    combo.setSelectedItem("A");
+    Object selected = combo.getSelectedItem();
+    combo.setSelectedIndex(0);
+    int index = combo.getSelectedIndex();
+    combo.setModel(model);
+    model.removeAllElements();
+    tabs.setSelectedIndex(0);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_combo_box_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_tabbed_pane_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_item_model_class)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                combo_box: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_combo_box_interaction
+                  combo_box: (identifier)
+                  arguments: (argument_list)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                object: (identifier)
+                name: (identifier)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal))))))))))

@@ -1,0 +1,100 @@
+========================================
+Java Swing window lifecycle calls
+========================================
+
+class WindowLifecycleExample extends JFrame {
+  void open(JFrame frame, JDialog dialog) {
+    pack();
+    frame.setVisible(true);
+    dialog.dispose();
+    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (javaswing_dialog_type)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_window_lifecycle
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_window_lifecycle
+                (identifier)
+                (argument_list
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_window_lifecycle
+                (identifier)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_window_lifecycle
+                (argument_list
+                  (field_access
+                    (identifier)
+                    (identifier)))))))))))
+
+========================================
+Java Swing window lifecycle negatives
+========================================
+
+class WindowLifecycleExample {
+  void init(JPanel panel, Model model) {
+    panel.repaint();
+    model.setVisibleFlag(true);
+    lifecycle.packData();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list)))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (true))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list))))))))

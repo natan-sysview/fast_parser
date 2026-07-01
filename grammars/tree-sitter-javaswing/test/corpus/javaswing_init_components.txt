@@ -1,0 +1,179 @@
+========================================
+Java Swing init components
+========================================
+
+class DesignerPanel extends JPanel {
+  DesignerPanel() {
+    initComponents();
+  }
+
+  private void initComponents() {
+    // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+    JButton acceptButton = new JButton("Accept");
+    add(acceptButton, BorderLayout.CENTER);
+    // JFormDesigner - End of component initialization  //GEN-END:initComponents
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (constructor_declaration
+        (identifier)
+        (formal_parameters)
+        (constructor_body
+          (expression_statement
+            (method_invocation
+              (javaswing_init_components_call
+                (javaswing_init_components_name)
+                (javaswing_empty_argument_list))))))
+      (javaswing_init_components
+        (modifiers)
+        (void_type)
+        (javaswing_init_components_name)
+        (block
+          (line_comment)
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_component_creation
+                  (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  (argument_list
+                    (string_literal
+                      (string_fragment)))))))
+          (expression_statement
+            (method_invocation
+              (argument_list
+                (identifier)
+                (field_access
+                  (identifier)
+                  (identifier)))))
+          (line_comment))))))
+
+========================================
+Java Swing init components public and this call
+========================================
+
+class RangePanel extends JPanel {
+  RangePanel() {
+    this.initComponents();
+  }
+
+  public void initComponents()
+  {
+    JLabel label = new JLabel("Range");
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (constructor_declaration
+        (identifier)
+        (formal_parameters)
+        (constructor_body
+          (expression_statement
+            (method_invocation
+              (this)
+              (identifier)
+              (argument_list)))))
+      (javaswing_init_components
+        (modifiers)
+        (void_type)
+        (javaswing_init_components_name)
+        (block
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_component_creation
+                  (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  (argument_list
+                    (string_literal
+                      (string_fragment))))))))))))
+
+========================================
+Java Swing init components negatives
+========================================
+
+class BackendInit {
+  void initializeServices() {
+    service.start();
+  }
+
+  void initData(String value) {
+    value = value;
+  }
+
+  int initComponents() {
+    return 0;
+  }
+
+  void callOther(Screen other) {
+    other.initComponents();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list)))))
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (assignment_expression
+              (identifier)
+              (identifier)))))
+      (method_declaration
+        (integral_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (return_statement
+            (decimal_integer_literal))))
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list))))))))

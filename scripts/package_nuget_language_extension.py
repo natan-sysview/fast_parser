@@ -33,6 +33,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def package_id(language: str) -> str:
+    if native_language_name(language) == "javaswing":
+        return "FastParser.Language.JavaSwing"
     return "FastParser.Language." + "".join(part.capitalize() for part in language.replace("-", "_").split("_"))
 
 

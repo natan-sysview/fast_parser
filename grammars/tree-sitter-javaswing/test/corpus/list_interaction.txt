@@ -1,0 +1,180 @@
+========================================
+List declarations and creation
+========================================
+
+class Example {
+  public JList jlist1Sucursales = new JList();
+  private javax.swing.JList jlist2Sucursales;
+
+  void init() {
+    JList local = new JList();
+    this.jlist2Sucursales = new javax.swing.JList(model);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_list_field
+        (modifiers)
+        type: (javaswing_list_class)
+        declarator: (variable_declarator
+          name: (identifier)
+          value: (object_creation_expression
+            (javaswing_list_creation
+              type: (javaswing_list_class)
+              arguments: (argument_list)))))
+      (javaswing_list_field
+        (modifiers)
+        type: (javaswing_list_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_list_local_declaration
+            type: (javaswing_list_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_list_creation
+                  type: (javaswing_list_class)
+                  arguments: (argument_list)))))
+          (expression_statement
+            (assignment_expression
+              left: (field_access
+                object: (this)
+                field: (identifier))
+              right: (object_creation_expression
+                (javaswing_list_creation
+                  type: (javaswing_list_class)
+                  arguments: (argument_list
+                    (identifier)))))))))))
+
+========================================
+List selected value getters
+========================================
+
+class Example {
+  void transfer() {
+    listModeSucursal2.addElement(jlist1Sucursales.getSelectedValue());
+    listModeSucursal1.removeElement(dialog.jlist2Sucursales.getSelectedValuesList());
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (method_invocation
+                    (javaswing_list_selection_interaction
+                      selector: (javaswing_list_selection_selector)
+                      arguments: (argument_list)))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_item_model_interaction
+                model: (identifier)
+                arguments: (argument_list
+                  (method_invocation
+                    (javaswing_list_selection_interaction
+                      selector: (javaswing_list_selection_selector)
+                      arguments: (argument_list))))))))))))
+
+========================================
+List return methods are not fields
+========================================
+
+class Example {
+  private JList list;
+
+  public JList getList() {
+    return list;
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_list_field
+        (modifiers)
+        type: (javaswing_list_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        (modifiers)
+        type: (javaswing_list_class)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (return_statement
+            (identifier)))))))
+
+========================================
+Nearby selection index methods remain outside list rule
+========================================
+
+class Example {
+  void init(JList list, JComboBox combo, JTabbedPane tabs) {
+    list.getSelectedIndex();
+    combo.setSelectedIndex(0);
+    tabs.setSelectedIndex(1);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_list_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_combo_box_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_tabbed_pane_class)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal))))))))))

@@ -1,0 +1,71 @@
+{
+  "name": "tree-sitter-javaswing",
+  "version": "0.1.0-alpha.1",
+  "description": "Tree-sitter grammar for Java Swing source code",
+  "license": "MIT",
+  "author": {
+    "name": "natan-sysview"
+  },
+  "contributors": [
+    {
+      "name": "Max Brunsfeld",
+      "email": "maxbrunsfeld@gmail.com"
+    },
+    {
+      "name": "Amaan Qureshi",
+      "email": "amaanq12@gmail.com"
+    }
+  ],
+  "keywords": [
+    "incremental",
+    "parsing",
+    "tree-sitter",
+    "java",
+    "swing",
+    "javaswing"
+  ],
+  "files": [
+    "grammar.js",
+    "tree-sitter.json",
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "SECURITY.md",
+    "scripts/**",
+    "examples/**",
+    "docs/demo.md",
+    "docs/dependency-policy.md",
+    "docs/nodes.md",
+    "docs/parser-list.md",
+    "docs/publication.md",
+    "docs/releases/**",
+    "queries/*",
+    "src/**",
+    "test/corpus/**"
+  ],
+  "devDependencies": {
+    "tree-sitter-cli": "0.25.10"
+  },
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test",
+    "metadata:check": "node scripts/check-release.mjs",
+    "metadata:check:public": "node scripts/check-release.mjs --strict-public",
+    "parse:check": "node scripts/smoke-parse.mjs",
+    "query:check": "node scripts/check-queries.mjs",
+    "example:parse": "tree-sitter parse --quiet examples/swing-showcase.java",
+    "demo": "node scripts/demo.mjs",
+    "ci:check": "npm run metadata:check:public && npm run generate && npm test && npm run parse:check && npm run query:check && npm run example:parse && npm run pack:check && npm run audit:check",
+    "pack:check": "npm pack --dry-run",
+    "audit:check": "npm audit --audit-level=high"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natan-sysview/tree-sitter-javaswing.git"
+  },
+  "bugs": {
+    "url": "https://github.com/natan-sysview/tree-sitter-javaswing/issues"
+  },
+  "homepage": "https://github.com/natan-sysview/tree-sitter-javaswing#readme"
+}

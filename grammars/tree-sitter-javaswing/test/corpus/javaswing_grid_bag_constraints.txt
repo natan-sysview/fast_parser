@@ -1,0 +1,249 @@
+========================================
+Java Swing GridBagConstraints inline add
+========================================
+
+class GridBagPanel extends JPanel {
+  void init(JPanel panel, JButton button) {
+    panel.add(button, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+        new Insets(0, 0, 5, 0), 0, 0));
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list
+                (identifier)
+                (object_creation_expression
+                  (javaswing_grid_bag_constraints_creation
+                    (javaswing_grid_bag_constraints_class)
+                    (argument_list
+                      (decimal_integer_literal)
+                      (decimal_integer_literal)
+                      (decimal_integer_literal)
+                      (decimal_integer_literal)
+                      (decimal_floating_point_literal)
+                      (decimal_floating_point_literal)
+                      (javaswing_grid_bag_constraints_constant)
+                      (javaswing_grid_bag_constraints_constant)
+                      (object_creation_expression
+                        (javaswing_insets_creation
+                          (javaswing_insets_class)
+                          (argument_list
+                            (decimal_integer_literal)
+                            (decimal_integer_literal)
+                            (decimal_integer_literal)
+                            (decimal_integer_literal))))
+                      (decimal_integer_literal)
+                      (decimal_integer_literal))))))))))))
+
+========================================
+Java Swing GridBagConstraints declarations and assignments
+========================================
+
+class GridBagPanel extends JPanel {
+  private GridBagConstraints constraints;
+
+  void init() {
+    GridBagConstraints c = null;
+    c = new GridBagConstraints();
+    c.gridx = 0;
+    c.gridy = 1;
+    c.weightx = 1.0;
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.anchor = GridBagConstraints.LINE_END;
+    c.insets = new Insets(0, 0, 5, 0);
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (javaswing_grid_bag_constraints_field
+        (modifiers)
+        (javaswing_grid_bag_constraints_class)
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (javaswing_grid_bag_constraints_local_declaration
+            (javaswing_grid_bag_constraints_class)
+            (variable_declarator
+              (identifier)
+              (null_literal)))
+          (expression_statement
+            (assignment_expression
+              (identifier)
+              (object_creation_expression
+                (javaswing_grid_bag_constraints_creation
+                  (javaswing_grid_bag_constraints_class)
+                  (argument_list)))))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (identifier)
+                (identifier))
+              (decimal_integer_literal)))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (identifier)
+                (identifier))
+              (decimal_integer_literal)))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (identifier)
+                (identifier))
+              (decimal_floating_point_literal)))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (identifier)
+                (identifier))
+              (javaswing_grid_bag_constraints_constant)))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (identifier)
+                (identifier))
+              (javaswing_grid_bag_constraints_constant)))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (identifier)
+                (identifier))
+              (object_creation_expression
+                (javaswing_insets_creation
+                  (javaswing_insets_class)
+                  (argument_list
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)))))))))))
+
+========================================
+Java Swing GridBagConstraints fully qualified
+========================================
+
+class GridBagPanel {
+  void init() {
+    java.awt.GridBagConstraints c = new java.awt.GridBagConstraints();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (javaswing_grid_bag_constraints_local_declaration
+            (javaswing_grid_bag_constraints_class)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_grid_bag_constraints_creation
+                  (javaswing_grid_bag_constraints_class)
+                  (argument_list))))))))))
+
+========================================
+Java Swing GridBagConstraints negatives
+========================================
+
+class GenericAssignments {
+  void init(JPanel panel, JButton button, Object constraints, Paint paint, Model model, GridBagLayout layout) {
+    panel.add(button, constraints);
+    layout.setConstraints(button, constraints);
+    paint.fill = color;
+    model.insets = value;
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list
+                (identifier)
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (identifier)
+                (identifier))))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (identifier)
+                (identifier))
+              (identifier)))
+          (expression_statement
+            (assignment_expression
+              (field_access
+                (identifier)
+                (identifier))
+              (identifier))))))))

@@ -1,0 +1,120 @@
+========================================
+Java Swing action structure creation
+========================================
+
+class ActionStructureExample {
+  void init(JButton button) {
+    Action save = new AbstractAction("Save") {
+      public void actionPerformed(ActionEvent event) {
+        save();
+      }
+    };
+    button.setAction(new javax.swing.AbstractAction() {
+      public void actionPerformed(ActionEvent event) {
+        cancel();
+      }
+    });
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_action_structure
+                  (javaswing_action_class)
+                  (argument_list
+                    (string_literal
+                      (string_fragment)))
+                  (class_body
+                    (javaswing_event_handler
+                      (modifiers)
+                      (void_type)
+                      (javaswing_event_handler_name)
+                      (javaswing_event_handler_parameters
+                        (javaswing_event_parameter
+                          (javaswing_event_type)
+                          (identifier)))
+                      (block
+                        (expression_statement
+                          (method_invocation
+                            (identifier)
+                            (argument_list))))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (object_creation_expression
+                    (javaswing_action_structure
+                      (javaswing_action_class)
+                      (argument_list)
+                      (class_body
+                        (javaswing_event_handler
+                          (modifiers)
+                          (void_type)
+                          (javaswing_event_handler_name)
+                          (javaswing_event_handler_parameters
+                            (javaswing_event_parameter
+                              (javaswing_event_type)
+                              (identifier)))
+                          (block
+                            (expression_statement
+                              (method_invocation
+                                (identifier)
+                                (argument_list)))))))))))))))))
+
+========================================
+Java Swing action structure negatives
+========================================
+
+class ActionStructureExample {
+  void init() {
+    Action custom = new CustomAction();
+    action.putValue(Action.NAME, "Save");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (type_identifier)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_action_metadata
+                (identifier)
+                (javaswing_action_put_value_arguments
+                  (field_access
+                    (identifier)
+                    (identifier))
+                  (string_literal
+                    (string_fragment)))))))))))

@@ -1,0 +1,33 @@
+{
+  "extensionKind": "fastparse-language",
+  "language": "javaswing",
+  "displayName": "Java Swing",
+  "version": "0.1.0",
+  "extensionAbi": 1,
+  "coreAbi": "fastparse-c-api/0.5.0",
+  "binarySchemaVersion": 1,
+  "grammar": {
+    "name": "tree-sitter-javaswing",
+    "source": "https://github.com/natan-sysview/tree-sitter-javaswing",
+    "revision": "0.1.0-alpha.1",
+    "license": "MIT"
+  },
+  "symbols": {
+    "descriptor": "fastparse_language_extension_descriptor",
+    "treeSitterLanguage": "tree_sitter_javaswing"
+  },
+  "normalization": {
+    "default": "auto_safe",
+    "supported": ["auto_safe", "none"]
+  },
+  "queries": {
+    "swing": "queries/swing.scm"
+  },
+  "platforms": [
+    "linux-x64",
+    "osx-arm64",
+    "osx-x64",
+    "win-x64"
+  ],
+  "status": "preview"
+}

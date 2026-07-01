@@ -1,0 +1,262 @@
+========================================
+Table auto resize mode
+========================================
+
+class Example {
+  void init(JTable table) {
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+    table.setColumnModel(columnModel);
+    table.setTableHeader(header);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                table: (identifier)
+                arguments: (javaswing_table_auto_resize_arguments
+                  mode: (javaswing_table_auto_resize_constant)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                table: (identifier)
+                arguments: (javaswing_table_auto_resize_arguments
+                  mode: (javaswing_table_auto_resize_constant)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                table: (identifier)
+                arguments: (javaswing_table_column_model_arguments
+                  column_model: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                table: (identifier)
+                arguments: (javaswing_table_header_arguments
+                  header: (identifier))))))))))
+
+========================================
+Table column access and configuration
+========================================
+
+class Example {
+  void init(JTable table, TableColumnModel columnModel, TableColumn column) {
+    table.getColumn("Cancelar").setMinWidth(80);
+    table.getColumnModel().getColumn(0).setPreferredWidth(120);
+    column.setPreferredWidth(width);
+    column.setHeaderRenderer(renderer);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                column: (method_invocation
+                  object: (identifier)
+                  name: (identifier)
+                  arguments: (argument_list
+                    (string_literal
+                      (string_fragment))))
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                column: (method_invocation
+                  object: (method_invocation
+                    object: (identifier)
+                    name: (identifier)
+                    arguments: (argument_list))
+                  name: (identifier)
+                  arguments: (argument_list
+                    (decimal_integer_literal)))
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                column: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier))))))))))
+
+========================================
+Table header and column model operations
+========================================
+
+class Example {
+  void init(JTable table, JTableHeader header, TableColumn column) {
+    table.getTableHeader().setReorderingAllowed(false);
+    table.getTableHeader().getDefaultRenderer();
+    table.getColumnModel().moveColumn(0, 1);
+    table.getColumnModel().setColumnMargin(2);
+    table.getColumnModel().removeColumn(column);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                header: (method_invocation
+                  object: (identifier)
+                  name: (identifier)
+                  arguments: (argument_list))
+                arguments: (argument_list
+                  (false)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (method_invocation
+                  object: (identifier)
+                  name: (identifier)
+                  arguments: (argument_list))
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                column_model: (method_invocation
+                  object: (identifier)
+                  name: (identifier)
+                  arguments: (argument_list))
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                column_model: (method_invocation
+                  object: (identifier)
+                  name: (identifier)
+                  arguments: (argument_list))
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (identifier)
+                name: (identifier)
+                arguments: (argument_list))
+              name: (identifier)
+              arguments: (argument_list
+                (identifier)))))))))
+
+========================================
+Nearby custom helpers remain generic
+========================================
+
+class Example {
+  void init(Grid grid, JDialog dialog) {
+    grid.setColumnWidth(0, 110);
+    grid.setColumnClass(0, String.class);
+    grid.getColumnHeader().setReorderingAllowed(false);
+    dialog.setResizable(false);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_dialog_type)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (decimal_integer_literal)
+                (decimal_integer_literal))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (decimal_integer_literal)
+                (class_literal
+                  (type_identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                header: (method_invocation
+                  object: (identifier)
+                  name: (identifier)
+                  arguments: (argument_list))
+                arguments: (argument_list
+                  (false)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (false))))))))))

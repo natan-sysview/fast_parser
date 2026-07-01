@@ -1,0 +1,327 @@
+========================================
+Action keyboard focus and mouse handlers
+========================================
+
+class Example implements ActionListener, KeyListener, FocusListener, MouseListener {
+  public void actionPerformed(ActionEvent e) {
+    aceptar();
+  }
+
+  public void keyPressed(KeyEvent e) {}
+  public void keyReleased(KeyEvent e) {}
+  public void keyTyped(KeyEvent e) {}
+  public void focusGained(FocusEvent e) {}
+  public void focusLost(FocusEvent e) {}
+  public void mouseClicked(MouseEvent event) {}
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    interfaces: (super_interfaces
+      (type_list
+        (type_identifier)
+        (type_identifier)
+        (type_identifier)
+        (type_identifier)))
+    body: (class_body
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              name: (identifier)
+              arguments: (argument_list)))))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block)))))
+
+========================================
+Window table document and property handlers
+========================================
+
+class Example implements WindowListener, TableModelListener, DocumentListener, PropertyChangeListener {
+  public void windowClosing(WindowEvent e) {}
+  public void tableChanged(TableModelEvent e) {}
+  public void insertUpdate(DocumentEvent e) {}
+  public void removeUpdate(DocumentEvent e) {}
+  public void changedUpdate(DocumentEvent e) {}
+  public void propertyChange(PropertyChangeEvent e) {}
+  public void caretUpdate(CaretEvent e) {}
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    interfaces: (super_interfaces
+      (type_list
+        (type_identifier)
+        (type_identifier)
+        (type_identifier)
+        (type_identifier)))
+    body: (class_body
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block)))))
+
+========================================
+Fully qualified event handler parameters
+========================================
+
+class Example {
+  public void actionPerformed(java.awt.event.ActionEvent e) {}
+  public void propertyChange(java.beans.PropertyChangeEvent e) {}
+  public void valueChanged(javax.swing.event.ListSelectionEvent e) {}
+  public void treeExpanded(javax.swing.event.TreeExpansionEvent e) {}
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block))
+      (javaswing_event_handler
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_event_handler_name)
+        parameters: (javaswing_event_handler_parameters
+          event: (javaswing_event_parameter
+            type: (javaswing_event_type)
+            name: (identifier)))
+        body: (block)))))
+
+========================================
+Anonymous class handler declarations
+========================================
+
+class Example {
+  void init(JButton button) {
+    button.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        aceptar();
+      }
+    });
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    type: (type_identifier)
+                    arguments: (argument_list)
+                    (class_body
+                      (javaswing_event_handler
+                        (modifiers)
+                        type: (void_type)
+                        name: (javaswing_event_handler_name)
+                        parameters: (javaswing_event_handler_parameters
+                          event: (javaswing_event_parameter
+                            type: (javaswing_event_type)
+                            name: (identifier)))
+                        body: (block
+                          (expression_statement
+                            (method_invocation
+                              name: (identifier)
+                              arguments: (argument_list))))))))))))))))
+
+========================================
+Invalid handler-like methods remain generic
+========================================
+
+class Example {
+  public boolean mouseClicked(MouseEvent e) { return false; }
+  public void accionPerformed(ActionEvent e) {}
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        (modifiers)
+        type: (boolean_type)
+        name: (javaswing_event_handler_name)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (return_statement
+            (false))))
+      (method_declaration
+        (modifiers)
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block)))))

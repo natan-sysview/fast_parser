@@ -1,0 +1,263 @@
+========================================
+Split pane component region assignment
+========================================
+
+class Example {
+  void init(JSplitPane splitPane1, JScrollPane scrollPane1, JPanel panelMain) {
+    splitPane1.setLeftComponent(scrollPane1);
+    splitPane1.setRightComponent(panelMain);
+    divPanel.setTopComponent(pnlOrden);
+    divPanel.setBottomComponent(pnlInstruccionesMensajeria);
+    this.cuentasPanel.getSplitGeneral().setBottomComponent(tabBeneficiarioCheque);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_split_pane_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (method_invocation
+                  object: (field_access
+                    object: (this)
+                    field: (identifier))
+                  name: (identifier)
+                  arguments: (argument_list))
+                arguments: (argument_list
+                  (identifier))))))))))
+
+========================================
+Split pane divider behavior and orientation
+========================================
+
+class Example {
+  void init(JSplitPane divPanel) {
+    divPanel.setDividerLocation(1000);
+    divPanel.setOrientation(JSplitPane.VERTICAL_SPLIT);
+    divPanel.setOneTouchExpandable(true);
+    divPanel.setResizeWeight(0.4);
+    int location = divPanel.getDividerLocation();
+    double weight = divPanel.getResizeWeight();
+    boolean oneTouch = divPanel.isOneTouchExpandable();
+    divPanel.resetToPreferredSizes();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_split_pane_class)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (javaswing_split_pane_constant
+                    class: (javaswing_split_pane_class))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (decimal_floating_point_literal)))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_split_pane_interaction
+                  split_pane: (identifier)
+                  arguments: (argument_list)))))
+          (local_variable_declaration
+            type: (floating_point_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_split_pane_interaction
+                  split_pane: (identifier)
+                  arguments: (argument_list)))))
+          (local_variable_declaration
+            type: (boolean_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_split_pane_interaction
+                  split_pane: (identifier)
+                  arguments: (argument_list)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list)))))))))
+
+========================================
+Split pane constants and fully qualified forms
+========================================
+
+class Example {
+  void init(JSplitPane splitPane1) {
+    int horizontal = JSplitPane.HORIZONTAL_SPLIT;
+    int vertical = javax.swing.JSplitPane.VERTICAL_SPLIT;
+    splitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_split_pane_class)
+            name: (identifier)))
+        body: (block
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (javaswing_split_pane_constant
+                class: (javaswing_split_pane_class))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (javaswing_split_pane_constant
+                class: (javaswing_split_pane_class))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (javaswing_split_pane_constant
+                    class: (javaswing_split_pane_class)))))))))))
+
+========================================
+Nearby split pane factories and generic methods remain generic
+========================================
+
+class Example {
+  void init(Factory factory, JPanel left, JPanel right) {
+    factory.createStrippedSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, right, 0.31);
+    splitPane1.add(left);
+    splitPane1.remove(right);
+    backend.setDivider("north");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (javaswing_split_pane_constant
+                  class: (javaswing_split_pane_class))
+                (identifier)
+                (identifier)
+                (decimal_floating_point_literal))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (string_literal
+                  (string_fragment))))))))))

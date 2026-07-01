@@ -632,6 +632,11 @@ public sealed unsafe class FastParseClient : IDisposable
     private static string ToPackageLanguageName(string language)
     {
         var canonical = CanonicalLanguageName(language);
+        if (canonical == "javaswing")
+        {
+            return "JavaSwing";
+        }
+
         return string.Join('.', canonical.Split('_', StringSplitOptions.RemoveEmptyEntries).Select(part => char.ToUpperInvariant(part[0]) + part[1..]));
     }
 

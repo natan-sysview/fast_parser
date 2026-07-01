@@ -1,0 +1,215 @@
+========================================
+Table selection flags
+========================================
+
+class Example {
+  void init(JTable table) {
+    table.setRowSelectionAllowed(true);
+    table.setColumnSelectionAllowed(false);
+    table.setCellSelectionEnabled(false);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_flag_arguments
+                  enabled: (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_flag_arguments
+                  enabled: (false)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_flag_arguments
+                  enabled: (false))))))))))
+
+========================================
+Selection mode constants
+========================================
+
+class Example {
+  void init(JTable table, JList list, JTree tree) {
+    table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    list.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+    tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    tree.getSelectionModel().setSelectionMode(javax.swing.tree.TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_list_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_mode_arguments
+                  mode: (javaswing_selection_mode_constant)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_mode_arguments
+                  mode: (javaswing_selection_mode_constant)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (javaswing_selection_model_access
+                  selector: (javaswing_selection_model_access_selector)
+                  arguments: (argument_list))
+                arguments: (javaswing_selection_mode_arguments
+                  mode: (javaswing_selection_mode_constant)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (javaswing_selection_model_access
+                  selector: (javaswing_selection_model_access_selector)
+                  arguments: (argument_list))
+                arguments: (javaswing_selection_mode_arguments
+                  mode: (javaswing_selection_mode_constant))))))))))
+
+========================================
+Selection model assignment and access
+========================================
+
+class Example {
+  void init(JTable table, JList list, ListSelectionModel model) {
+    table.setSelectionModel(model);
+    list.getSelectionModel();
+    setSelectionModel(model);
+    getSelectionModel();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_list_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_model_arguments
+                  model: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model_access
+                selector: (javaswing_selection_model_access_selector)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                arguments: (javaswing_selection_model_arguments
+                  model: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                arguments: (argument_list)))))))))
+
+========================================
+Generic selection-like receivers are captured for review
+========================================
+
+class Example {
+  void init(Service service, Object mode) {
+    service.setSelectionMode(mode);
+    service.setRowSelectionAllowed(flag);
+    domain.setSelectionModel(model);
+    service.getSelectionModel(arg);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_mode_arguments
+                  mode: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_flag_arguments
+                  enabled: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_model_arguments
+                  model: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model_access
+                selector: (javaswing_selection_model_access_selector)
+                arguments: (argument_list
+                  (identifier))))))))))

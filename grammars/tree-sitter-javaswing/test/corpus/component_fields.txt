@@ -1,0 +1,214 @@
+==================
+Official Swing component fields
+==================
+
+class Components {
+  private JPanel panel;
+  public JLabel label;
+  protected JScrollPane scrollPane;
+  private final JTable dataTable;
+  private static JTable tabla = null;
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        declarator: (variable_declarator
+          name: (identifier)
+          value: (null_literal))))))
+
+==================
+Generic array and multiple Swing fields
+==================
+
+class Inputs {
+  private JComboBox<String> combo;
+  private JButton aceptar, cancelar;
+  private JButton[] botones;
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_combo_box_field
+        (modifiers)
+        type: (javaswing_combo_box_reference_type
+          (javaswing_combo_box_generic_type
+            type: (javaswing_combo_box_class)
+            (type_arguments
+              (type_identifier))))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        declarator: (variable_declarator
+          name: (identifier))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_array_type
+            element: (javaswing_component_type)
+            dimensions: (dimensions)))
+        declarator: (variable_declarator
+          name: (identifier))))))
+
+==================
+Swing return types and parameters are not fields
+==================
+
+class Accessors {
+  public JButton getBotonAceptar() {
+    return botonAceptar;
+  }
+
+  public void crearArchivoExcel(JTable tablaToExcel) {
+    JButton local = new JButton();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (return_statement
+            (identifier))))
+      (method_declaration
+        (modifiers)
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_component_creation
+                  type: (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  arguments: (argument_list))))))))))
+
+==================
+Non official and ambiguous fields remain generic
+==================
+
+class NonOfficial {
+  private List datos;
+  private java.lang.String nombre;
+  private java.util.List<String> valores;
+  private javax.swing.JButton boton;
+  private java.awt.Button aceptar;
+  public ELDateField fecha;
+  public DsGrid tablaCheques;
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (field_declaration
+        (modifiers)
+        type: (type_identifier)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (field_declaration
+        (modifiers)
+        type: (scoped_type_identifier
+          (scoped_type_identifier
+            (type_identifier)
+            (type_identifier))
+          (type_identifier))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (field_declaration
+        (modifiers)
+        type: (generic_type
+          (scoped_type_identifier
+            (scoped_type_identifier
+              (type_identifier)
+              (type_identifier))
+            (type_identifier))
+          (type_arguments
+            (type_identifier)))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (field_declaration
+        (modifiers)
+        type: (scoped_type_identifier
+          (scoped_type_identifier
+            (type_identifier)
+            (type_identifier))
+          (type_identifier))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (field_declaration
+        (modifiers)
+        type: (scoped_type_identifier
+          (scoped_type_identifier
+            (type_identifier)
+            (type_identifier))
+          (type_identifier))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (field_declaration
+        (modifiers)
+        type: (type_identifier)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (field_declaration
+        (modifiers)
+        type: (type_identifier)
+        declarator: (variable_declarator
+          name: (identifier))))))

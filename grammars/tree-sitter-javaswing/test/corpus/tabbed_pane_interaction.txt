@@ -1,0 +1,335 @@
+========================================
+Tabbed pane add and insert tabs
+========================================
+
+class Example {
+  void init(JTabbedPane tabbedPane, JPanel panel, Icon icon, JPanel detailPanel) {
+    tabbedPane.addTab("General", panel);
+    tabbedPane.addTab("Reporte", icon, panel, "Tooltip");
+    tabbedPane.insertTab("Detalle", icon, detailPanel, "Detalle", 1);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_tabbed_pane_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))
+                  (identifier)
+                  (identifier)
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))
+                  (identifier)
+                  (identifier)
+                  (string_literal
+                    (string_fragment))
+                  (decimal_integer_literal))))))))))
+
+========================================
+Tabbed pane selected component methods
+========================================
+
+class Example {
+  void init(JTabbedPane tabPaneAsignacion, JPanel panel) {
+    tabPaneAsignacion.setSelectedComponent(panel);
+    Component selected = tabPaneAsignacion.getSelectedComponent();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_tabbed_pane_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_tabbed_pane_interaction
+                  tabbed_pane: (identifier)
+                  arguments: (argument_list))))))))))
+
+========================================
+Tabbed pane appearance and metadata methods
+========================================
+
+class Example {
+  void init(JTabbedPane ventana, JTabbedPane tabbedPane1, JLabel label) {
+    ventana.setTitleAt(0, VENTANA_NOMBRE);
+    tabbedPane1.setEnabledAt(1, false);
+    ventana.setTabComponentAt(0, label);
+    ventana.setToolTipTextAt(0, "Ayuda");
+    String title = ventana.getTitleAt(0);
+    boolean enabled = ventana.isEnabledAt(1);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_tabbed_pane_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_tabbed_pane_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (false)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (string_literal
+                    (string_fragment))))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_tabbed_pane_interaction
+                  tabbed_pane: (identifier)
+                  arguments: (argument_list
+                    (decimal_integer_literal))))))
+          (local_variable_declaration
+            type: (boolean_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_tabbed_pane_interaction
+                  tabbed_pane: (identifier)
+                  arguments: (argument_list
+                    (decimal_integer_literal)))))))))))
+
+========================================
+Tabbed pane lookup and layout constants
+========================================
+
+class Example {
+  void init(JTabbedPane tabbedPane, JPanel panel) {
+    int byTitle = tabbedPane.indexOfTab("General");
+    int byComponent = tabbedPane.indexOfComponent(panel);
+    tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+    tabbedPane.setTabPlacement(javax.swing.JTabbedPane.TOP);
+    int policy = tabbedPane.getTabLayoutPolicy();
+    int placement = tabbedPane.getTabPlacement();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_tabbed_pane_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_tabbed_pane_interaction
+                  tabbed_pane: (identifier)
+                  arguments: (argument_list
+                    (string_literal
+                      (string_fragment)))))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_tabbed_pane_interaction
+                  tabbed_pane: (identifier)
+                  arguments: (argument_list
+                    (identifier))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (javaswing_tabbed_pane_constant
+                    class: (javaswing_tabbed_pane_class))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_tabbed_pane_interaction
+                tabbed_pane: (identifier)
+                arguments: (argument_list
+                  (javaswing_tabbed_pane_constant
+                    class: (javaswing_tabbed_pane_class))))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_tabbed_pane_interaction
+                  tabbed_pane: (identifier)
+                  arguments: (argument_list)))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                (javaswing_tabbed_pane_interaction
+                  tabbed_pane: (identifier)
+                  arguments: (argument_list))))))))))
+
+========================================
+Nearby generic methods stay generic
+========================================
+
+class Example {
+  void init(Object backend, JComboBox combo, JPanel panel) {
+    backend.addTable("x", panel);
+    backend.removeAll();
+    combo.setSelectedIndex(0);
+    int index = combo.getSelectedIndex();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_combo_box_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (string_literal
+                  (string_fragment))
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (local_variable_declaration
+            type: (integral_type)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                object: (identifier)
+                name: (identifier)
+                arguments: (argument_list)))))))))

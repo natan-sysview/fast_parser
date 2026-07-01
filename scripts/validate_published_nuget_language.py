@@ -130,6 +130,83 @@ Console.WriteLine(parser.Version);
 Console.WriteLine(parser.LibraryPath);
 '''
 
+JAVASWING_PROGRAM = r'''using FastParse;
+
+using var parser = new FastParseClient();
+
+var load = parser.LoadBundledLanguage("javaswing");
+if (load.Language != "javaswing" || !parser.LanguageAvailable("javaswing"))
+{
+    throw new InvalidOperationException("published JavaSwing language NuGet load smoke failed");
+}
+
+var source = """
+import javax.swing.*;
+class Demo extends JFrame {
+    JButton button = new JButton("OK");
+    void build() {
+        JPanel panel = new JPanel();
+        panel.add(button);
+    }
+}
+""";
+
+var json = parser.ParseText(
+    source,
+    new ParseOptions
+    {
+        Language = "javaswing",
+        Format = FastParseFormat.Json,
+        IncludeRules = "javaswing_screen|javaswing_component_creation|javaswing_component_field|javaswing_container_add",
+        Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+    });
+
+if (json.NodeCount == 0 || !json.Text.Contains("javaswing_", StringComparison.Ordinal))
+{
+    throw new InvalidOperationException("published JavaSwing language NuGet JSON smoke failed");
+}
+
+var queryPath = Path.Combine(AppContext.BaseDirectory, "fastparse", "languages", "javaswing", "queries", "swing.scm");
+if (!File.Exists(queryPath))
+{
+    throw new InvalidOperationException($"Swing query was not copied to output: {queryPath}");
+}
+
+var query = File.ReadAllText(queryPath);
+var captures = parser.QueryTextSummary(
+    source,
+    query,
+    new QueryOptions
+    {
+        Language = "javaswing",
+        Format = FastParseFormat.Stats,
+        Fields = FastParseField.CaptureName
+    });
+
+if (captures.NodeCount == 0)
+{
+    throw new InvalidOperationException("published JavaSwing language NuGet query smoke failed");
+}
+
+var diagnostics = parser.ParseText(
+    "class Broken {",
+    new ParseOptions
+    {
+        Language = "javaswing",
+        Format = FastParseFormat.Diagnostics
+    });
+
+using var diagnosticsDocument = diagnostics.JsonDocument();
+if (!diagnosticsDocument.RootElement.GetProperty("hasErrors").GetBoolean())
+{
+    throw new InvalidOperationException("published JavaSwing language NuGet diagnostics smoke failed");
+}
+
+Console.WriteLine("FastParser published language NuGet smoke OK");
+Console.WriteLine(parser.Version);
+Console.WriteLine(parser.LibraryPath);
+'''
+
 
 def run_command(command: list[str], *, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
     completed = subprocess.run(
@@ -154,6 +231,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def package_language_name(language: str) -> str:
+    if language.strip().lower().replace("-", "_") == "javaswing":
+        return "JavaSwing"
     return "".join(part.capitalize() for part in language.replace("-", "_").split("_"))
 
 
@@ -168,6 +247,8 @@ def package_index_url(language: str) -> str:
 def smoke_program(language: str) -> str:
     if language == "java-frameworks":
         return JAVA_FRAMEWORKS_PROGRAM
+    if language == "javaswing":
+        return JAVASWING_PROGRAM
     return PYTHON_PROGRAM
 
 

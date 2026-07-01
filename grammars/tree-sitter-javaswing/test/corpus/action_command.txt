@@ -1,0 +1,181 @@
+========================================
+Action command assignment and reads
+========================================
+
+class Example {
+  void init(JButton button, JMenuItem item) {
+    button.setActionCommand("ACEPTAR");
+    item.setActionCommand(COMMAND_SALIR);
+    setActionCommand("BUSCAR");
+
+    if ("ACEPTAR".equals(e.getActionCommand())) {
+      aceptar();
+    }
+
+    switch (e.getActionCommand()) {
+      case "SALIR":
+        salir();
+    }
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_action_command
+                component: (identifier)
+                arguments: (javaswing_action_command_arguments
+                  command: (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_action_command
+                component: (identifier)
+                arguments: (javaswing_action_command_arguments
+                  command: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_action_command
+                arguments: (javaswing_action_command_arguments
+                  command: (string_literal
+                    (string_fragment))))))
+          (if_statement
+            condition: (parenthesized_expression
+              (method_invocation
+                object: (string_literal
+                  (string_fragment))
+                name: (identifier)
+                arguments: (argument_list
+                  (method_invocation
+                    (javaswing_action_command
+                      event: (identifier)
+                      arguments: (javaswing_empty_argument_list))))))
+            consequence: (block
+              (expression_statement
+                (method_invocation
+                  name: (identifier)
+                  arguments: (argument_list)))))
+          (switch_expression
+            condition: (parenthesized_expression
+              (method_invocation
+                (javaswing_action_command
+                  event: (identifier)
+                  arguments: (javaswing_empty_argument_list))))
+            body: (switch_block
+              (switch_block_statement_group
+                (switch_label
+                  (string_literal
+                    (string_fragment)))
+                (expression_statement
+                  (method_invocation
+                    name: (identifier)
+                    arguments: (argument_list)))))))))))
+
+========================================
+Action metadata putValue calls remain generic
+========================================
+
+class Example {
+  void init(Action action, Object orden) {
+    action.putValue(Action.NAME, "Cancelar");
+    action.putValue(Action.ACTION_COMMAND_KEY, "CANCELAR");
+    action.putValue("ordenSpei", orden);
+    action.putValue(Constants.PROPERTY_ID_CUENTAS_RETIRO, id);
+    action.getValue(Action.NAME);
+    action.getValue("sample");
+    datos.setActionCommandInterno("NO_ES_SWING");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_action_metadata
+                action: (identifier)
+                arguments: (javaswing_action_put_value_arguments
+                  key: (field_access
+                    object: (identifier)
+                    field: (identifier))
+                  value: (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_action_metadata
+                action: (identifier)
+                arguments: (javaswing_action_put_value_arguments
+                  key: (field_access
+                    object: (identifier)
+                    field: (identifier))
+                  value: (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_action_metadata
+                action: (identifier)
+                arguments: (javaswing_action_put_value_arguments
+                  key: (string_literal
+                    (string_fragment))
+                  value: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_action_metadata
+                action: (identifier)
+                arguments: (javaswing_action_put_value_arguments
+                  key: (field_access
+                    object: (identifier)
+                    field: (identifier))
+                  value: (identifier)))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (field_access
+                  object: (identifier)
+                  field: (identifier)))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (string_literal
+                  (string_fragment)))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (string_literal
+                  (string_fragment))))))))))

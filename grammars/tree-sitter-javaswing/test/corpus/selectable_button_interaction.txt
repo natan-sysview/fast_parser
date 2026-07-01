@@ -1,0 +1,166 @@
+========================================
+Selectable button declarations and creation
+========================================
+
+class Example {
+  private JCheckBox chkActivo = new JCheckBox();
+  public JRadioButton rdbPesos;
+  private javax.swing.JCheckBox chkFullName;
+
+  void init() {
+    JToggleButton toggle = new javax.swing.JToggleButton("Modo");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (javaswing_selectable_button_field
+        (modifiers)
+        (javaswing_selectable_button_class)
+        (variable_declarator
+          (identifier)
+          (object_creation_expression
+            (javaswing_selectable_button_creation
+              (javaswing_selectable_button_class)
+              (argument_list)))))
+      (javaswing_selectable_button_field
+        (modifiers)
+        (javaswing_selectable_button_class)
+        (variable_declarator
+          (identifier)))
+      (javaswing_selectable_button_field
+        (modifiers)
+        (javaswing_selectable_button_class)
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (javaswing_selectable_button_local_declaration
+            (javaswing_selectable_button_class)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_selectable_button_creation
+                  (javaswing_selectable_button_class)
+                  (argument_list
+                    (string_literal
+                      (string_fragment))))))))))))
+
+========================================
+Selectable button selected-state interactions
+========================================
+
+class Example {
+  void update() {
+    chkActivo.setSelected(true);
+    if (rdbPesos.isSelected()) {
+      toolbar.getToggle().doClick();
+    }
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_selectable_button_interaction
+                (javaswing_selectable_button_selector)
+                (javaswing_selectable_button_arguments
+                  (true)))))
+          (if_statement
+            (parenthesized_expression
+              (method_invocation
+                (javaswing_selectable_button_interaction
+                  (javaswing_selectable_button_selector)
+                  (javaswing_selectable_button_arguments))))
+            (block
+              (expression_statement
+                (method_invocation
+                  (javaswing_selectable_button_interaction
+                    (javaswing_selectable_button_selector)
+                    (javaswing_selectable_button_arguments)))))))))))
+
+========================================
+Backend selectable-looking classes stay generic structurally
+========================================
+
+class Example {
+  private ChkRecibe chkRecibe;
+
+  void create() {
+    ChkRecibe custom = new ChkRecibe();
+    custom.isSelected();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (field_declaration
+        (modifiers)
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (type_identifier)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selectable_button_interaction
+                (javaswing_selectable_button_selector)
+                (javaswing_selectable_button_arguments)))))))))
+
+========================================
+Direct selectable button subclasses
+========================================
+
+class ChkRecibe extends JCheckBox implements ActionListener {
+}
+
+class RadioOption extends javax.swing.JRadioButton {
+}
+
+---
+
+(program
+  (javaswing_selectable_button_class_declaration
+    name: (identifier)
+    superclass: (javaswing_selectable_button_superclass
+      type: (javaswing_selectable_button_class))
+    interfaces: (super_interfaces
+      (type_list
+        (type_identifier)))
+    body: (class_body))
+  (class_declaration
+    name: (identifier)
+    superclass: (superclass
+      (javaswing_selectable_button_class))
+    body: (class_body)))

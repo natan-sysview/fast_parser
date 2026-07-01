@@ -1,0 +1,104 @@
+========================================
+Java Swing root pane structure calls
+========================================
+
+class RootPaneExample extends JFrame {
+  void init(JPanel content, JButton ok) {
+    setContentPane(content);
+    this.getRootPane().setDefaultButton(ok);
+    frame.getRootPane().putClientProperty("id", "main");
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_root_pane_structure
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_root_pane_extended
+                (method_invocation
+                  (javaswing_root_pane_structure
+                    (this)
+                    (argument_list)))
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (method_invocation
+                (javaswing_root_pane_structure
+                  (identifier)
+                  (argument_list)))
+              (identifier)
+              (argument_list
+                (string_literal
+                  (string_fragment))
+                (string_literal
+                  (string_fragment))))))))))
+
+========================================
+Java Swing root pane structure negatives
+========================================
+
+class RootPaneExample {
+  void init(JPanel content, JMenuBar menuBar) {
+    getContentPane().add(content);
+    setJMenuBar(menuBar);
+    rootPaneModel.getRootPaneName();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_container_add
+                (javaswing_content_pane_access
+                  (argument_list))
+                (javaswing_container_add_arguments
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_menu_structure
+                (javaswing_menu_bar_arguments
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list))))))))

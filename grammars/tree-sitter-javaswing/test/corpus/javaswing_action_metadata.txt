@@ -1,0 +1,135 @@
+========================================
+Java Swing Action metadata
+========================================
+
+class ActionMetadataExample {
+  void init(Action action) {
+    action.putValue(Action.NAME, "Save");
+    action.putValue(Action.ACTION_COMMAND_KEY, "SAVE");
+    action.putValue("clientKey", value);
+    Object name = action.getValue(Action.NAME);
+    Object description = action.getValue("clientKey");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_action_metadata
+                (identifier)
+                (javaswing_action_put_value_arguments
+                  (field_access
+                    (identifier)
+                    (identifier))
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_action_metadata
+                (identifier)
+                (javaswing_action_put_value_arguments
+                  (field_access
+                    (identifier)
+                    (identifier))
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_action_metadata
+                (identifier)
+                (javaswing_action_put_value_arguments
+                  (string_literal
+                    (string_fragment))
+                  (identifier)))))
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (method_invocation
+                (identifier)
+                (identifier)
+                (argument_list
+                  (field_access
+                    (identifier)
+                    (identifier))))))
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (method_invocation
+                (identifier)
+                (identifier)
+                (argument_list
+                  (string_literal
+                    (string_fragment)))))))))))
+
+========================================
+Java Swing Action metadata negatives
+========================================
+
+class ActionMetadataExample {
+  void init(JTable table, Map map) {
+    table.getValueAt(0, 1);
+    model.setValueAt(value, 0, 1);
+    map.put("key", value);
+    getValue();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (decimal_integer_literal)
+                (decimal_integer_literal))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                (identifier)
+                (argument_list
+                  (identifier)
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (string_literal
+                  (string_fragment))
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list))))))))

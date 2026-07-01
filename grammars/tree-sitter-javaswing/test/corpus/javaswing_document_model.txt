@@ -1,0 +1,105 @@
+========================================
+Java Swing text document model
+========================================
+
+class DocumentModelExample {
+  void init(JTextField field, JEditorPane editor) {
+    PlainDocument document = new PlainDocument();
+    field.setDocument(document);
+    editor.setDocument(new javax.swing.text.PlainDocument());
+    editor.getDocument();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (javaswing_text_input_class)
+            (identifier))
+          (formal_parameter
+            (javaswing_text_editor_class)
+            (identifier)))
+        (block
+          (local_variable_declaration
+            (javaswing_document_class)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_document_creation
+                  (javaswing_document_class)
+                  (argument_list)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_document_model
+                (javaswing_document_model_selector)
+                (javaswing_document_model_arguments
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_document_model
+                (javaswing_document_model_selector)
+                (javaswing_document_model_arguments
+                  (object_creation_expression
+                    (javaswing_document_creation
+                      (javaswing_document_class)
+                      (argument_list)))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_document_model
+                (javaswing_get_document_selector)
+                (javaswing_get_document_arguments)))))))))
+
+========================================
+Java Swing text document model negatives
+========================================
+
+class DocumentModelExample {
+  void init(Object datos) {
+    datos.setDocumento("sample");
+    pdfDocument.setPageSize(PageSize.A4);
+    document.getDocumentName();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (string_literal
+                  (string_fragment)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (field_access
+                  (identifier)
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list))))))))

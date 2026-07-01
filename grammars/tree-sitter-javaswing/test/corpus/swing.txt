@@ -1,0 +1,196 @@
+==================
+Swing view skeleton
+==================
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
+
+public class PanelComprobanteCDVista extends JPanel {
+    private JPanel pnlComprobante;
+    private JButton btnPDF;
+
+    public PanelComprobanteCDVista() {
+        initComponents();
+    }
+
+    private void initComponents() {
+        pnlComprobante = new JPanel();
+        btnPDF = new JButton();
+        setLayout(new java.awt.BorderLayout());
+        add(pnlComprobante);
+    }
+
+    public JButton getBtnPDF() {
+        return btnPDF;
+    }
+}
+
+---
+
+(program
+  (import_declaration
+    (scoped_identifier
+      scope: (scoped_identifier
+        scope: (identifier)
+        name: (identifier))
+      name: (identifier)))
+  (import_declaration
+    (scoped_identifier
+      scope: (scoped_identifier
+        scope: (identifier)
+        name: (identifier))
+      name: (identifier)))
+  (javaswing_screen
+    (modifiers)
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (constructor_declaration
+        (modifiers)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (constructor_body
+          (expression_statement
+            (method_invocation
+              (javaswing_init_components_call
+                name: (javaswing_init_components_name)
+                arguments: (javaswing_empty_argument_list))))))
+      (javaswing_init_components
+        (modifiers)
+        type: (void_type)
+        name: (javaswing_init_components_name)
+        body: (block
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                (javaswing_component_creation
+                  type: (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  arguments: (argument_list)))))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                (javaswing_component_creation
+                  type: (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  arguments: (argument_list)))))
+          (expression_statement
+            (method_invocation
+              arguments: (argument_list
+                (object_creation_expression
+                  type: (scoped_type_identifier
+                    (scoped_type_identifier
+                      (type_identifier)
+                      (type_identifier))
+                    (type_identifier))
+                  arguments: (argument_list)))))
+          (expression_statement
+            (method_invocation
+              arguments: (argument_list
+                (identifier))))))
+      (method_declaration
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (return_statement
+            (identifier)))))))
+
+==================
+Swing listener wiring
+==================
+
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+
+public class DialogComprobanteCD extends JDialog {
+    private JButton btnPDF;
+
+    private void wire() {
+        btnPDF.addActionListener(aceptar());
+    }
+
+    public ActionListener aceptar() {
+        return e -> dispose();
+    }
+}
+
+---
+
+(program
+  (import_declaration
+    (scoped_identifier
+      scope: (scoped_identifier
+        scope: (scoped_identifier
+          scope: (identifier)
+          name: (identifier))
+        name: (identifier))
+      name: (identifier)))
+  (import_declaration
+    (scoped_identifier
+      scope: (scoped_identifier
+        scope: (identifier)
+        name: (identifier))
+      name: (identifier)))
+  (import_declaration
+    (scoped_identifier
+      scope: (scoped_identifier
+        scope: (identifier)
+        name: (identifier))
+      name: (identifier)))
+  (class_declaration
+    (modifiers)
+    name: (identifier)
+    superclass: (superclass
+      (javaswing_dialog_type))
+    body: (class_body
+      (javaswing_component_field
+        (modifiers)
+        type: (javaswing_component_reference_type
+          (javaswing_component_type))
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        (modifiers)
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (method_invocation
+                    name: (identifier)
+                    arguments: (argument_list))))))))
+      (method_declaration
+        (modifiers)
+        type: (type_identifier)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (return_statement
+            (lambda_expression
+              parameters: (identifier)
+              body: (method_invocation
+                (javaswing_window_lifecycle
+                  arguments: (argument_list))))))))))

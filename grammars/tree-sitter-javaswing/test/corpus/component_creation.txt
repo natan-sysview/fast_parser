@@ -1,0 +1,223 @@
+==================
+Swing component creations in assignments
+==================
+
+class Components {
+  void init() {
+    panel = new JPanel();
+    button = new JButton("Aceptar");
+    scroll = new JScrollPane();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                (javaswing_component_creation
+                  type: (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  arguments: (argument_list)))))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                (javaswing_component_creation
+                  type: (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  arguments: (argument_list
+                    (string_literal
+                      (string_fragment)))))))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                (javaswing_component_creation
+                  type: (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  arguments: (argument_list))))))))))
+
+==================
+Swing component creations in locals and arguments
+==================
+
+class Locals {
+  Object build() {
+    JTable table = new JTable(20, 3);
+    panel.add(new JLabel("Nombre"));
+    return new JPanel();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (type_identifier)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_component_creation
+                  type: (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  arguments: (argument_list
+                    (decimal_integer_literal)
+                    (decimal_integer_literal))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_container_add
+                container: (identifier)
+                arguments: (javaswing_container_add_component_creation_arguments
+                  component: (javaswing_component_creation
+                    type: (javaswing_component_creation_type
+                      (javaswing_component_type))
+                    arguments: (argument_list
+                      (string_literal
+                        (string_fragment))))))))
+          (return_statement
+            (object_creation_expression
+              (javaswing_component_creation
+                type: (javaswing_component_creation_type
+                  (javaswing_component_type))
+                arguments: (argument_list)))))))))
+
+==================
+Generic and anonymous Swing component creations
+==================
+
+class Advanced {
+  void init() {
+    combo = new JComboBox<String>();
+    button = new JButton() {
+      public String getText() {
+        return "Aceptar";
+      }
+    };
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                (javaswing_combo_box_creation
+                  type: (javaswing_combo_box_creation_type
+                    (javaswing_combo_box_generic_type
+                      type: (javaswing_combo_box_class)
+                      (type_arguments
+                        (type_identifier))))
+                  arguments: (argument_list)))))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                (javaswing_component_creation
+                  type: (javaswing_component_creation_type
+                    (javaswing_component_type))
+                  arguments: (argument_list)
+                  (class_body
+                    (method_declaration
+                      (modifiers)
+                      type: (type_identifier)
+                      name: (identifier)
+                      parameters: (formal_parameters)
+                      body: (block
+                        (return_statement
+                          (string_literal
+                            (string_fragment)))))))))))))))
+
+==================
+Non Swing creations remain generic
+==================
+
+class OtherObjects {
+  void init() {
+    value = new String("x");
+    name = new java.lang.String("x");
+    grid = new DsGrid();
+    dates = new ELDateField();
+    buttons = new JButton[2];
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                type: (type_identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                type: (scoped_type_identifier
+                  (scoped_type_identifier
+                    (type_identifier)
+                    (type_identifier))
+                  (type_identifier))
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                type: (type_identifier)
+                arguments: (argument_list))))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (object_creation_expression
+                type: (type_identifier)
+                arguments: (argument_list))))
+          (expression_statement
+            (assignment_expression
+              left: (identifier)
+              right: (array_creation_expression
+                type: (javaswing_component_creation_type
+                  (javaswing_component_type))
+                dimensions: (dimensions_expr
+                  (decimal_integer_literal))))))))))

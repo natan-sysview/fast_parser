@@ -1,0 +1,185 @@
+==================
+Official Swing screens
+==================
+
+public class LoginDialog extends JDialog {
+}
+
+class MainFrame extends javax.swing.JFrame {
+}
+
+class WorkPanel extends JPanel {
+}
+
+---
+
+(program
+  (javaswing_screen
+    (modifiers)
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body))
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body))
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body)))
+
+==================
+Official AWT screens
+==================
+
+public class LegacyWindow extends Window {
+}
+
+class DrawingSurface extends java.awt.Canvas {
+}
+
+---
+
+(program
+  (javaswing_screen
+    (modifiers)
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body))
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body)))
+
+==================
+Official Swing component is not a screen
+==================
+
+class ActionButton extends JButton {
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    superclass: (superclass
+      (type_identifier))
+    body: (class_body)))
+
+==================
+Additional official screen containers
+==================
+
+class ChildFrame extends JInternalFrame {
+}
+
+class Tabs extends JTabbedPane {
+}
+
+class Split extends JSplitPane {
+}
+
+class ToolbarSurface extends JToolBar {
+}
+
+class Desktop extends JDesktopPane {
+}
+
+---
+
+(program
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body))
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body))
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body))
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body))
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body)))
+
+==================
+Fully qualified AWT screens
+==================
+
+class MainWindow extends java.awt.Frame {
+}
+
+class ChooserDialog extends java.awt.FileDialog {
+}
+
+class LegacyPanel extends java.awt.Panel {
+}
+
+---
+
+(program
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body))
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body))
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body)))
+
+==================
+Additional official components are not screens
+==================
+
+class DataTable extends JTable {
+}
+
+class InputField extends JTextField {
+}
+
+class ChoiceBox extends JComboBox {
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    superclass: (superclass
+      (type_identifier))
+    body: (class_body))
+  (class_declaration
+    name: (identifier)
+    superclass: (superclass
+      (javaswing_text_input_class))
+    body: (class_body))
+  (class_declaration
+    name: (identifier)
+    superclass: (superclass
+      (javaswing_combo_box_class))
+    body: (class_body)))

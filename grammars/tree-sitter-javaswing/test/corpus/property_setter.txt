@@ -1,0 +1,307 @@
+========================================
+Component text state and appearance setters
+========================================
+
+class Example {
+  void init(JButton button, JTextField field, JLabel label) {
+    button.setText("Aceptar");
+    button.setAction(accionAceptar);
+    button.setMnemonic('a');
+    field.setEditable(false);
+    label.setForeground(Color.WHITE);
+    label.setHorizontalAlignment(SwingConstants.CENTER);
+    field.setToolTipText("Capture el importe");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_text_input_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (character_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (false)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (field_access
+                    object: (identifier)
+                    field: (identifier))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (field_access
+                    object: (identifier)
+                    field: (identifier))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment)))))))))))
+
+========================================
+Model view and table setters
+========================================
+
+class Example {
+  void init(JComboBox combo, JTable table, JScrollPane scrollPane) {
+    combo.setModel(new DefaultComboBoxModel(items));
+    combo.setPrototypeDisplayValue("");
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    TableColumn actionColumn = table.getColumn("Accion");
+    actionColumn.setCellRenderer(renderer);
+    actionColumn.setCellEditor(editor);
+    table.setColumnSelectionAllowed(false);
+    table.setPreferredScrollableViewportSize(new Dimension(600, 200));
+    scrollPane.setViewportView(table);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_combo_box_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    (javaswing_item_model_creation
+                      type: (javaswing_item_model_class)
+                      arguments: (argument_list
+                        (identifier))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                combo_box: (identifier)
+                arguments: (argument_list
+                  (string_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_column_model
+                table: (identifier)
+                arguments: (javaswing_table_auto_resize_arguments
+                  mode: (javaswing_table_auto_resize_constant)))))
+          (local_variable_declaration
+            type: (type_identifier)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (method_invocation
+                object: (identifier)
+                name: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_selection_model
+                component: (identifier)
+                arguments: (javaswing_selection_flag_arguments
+                  enabled: (false)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    (javaswing_dimension_creation
+                      type: (javaswing_dimension_class)
+                      arguments: (argument_list
+                        (decimal_integer_literal)
+                        (decimal_integer_literal))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                scroll_pane: (identifier)
+                arguments: (javaswing_viewport_view_arguments
+                  view: (identifier))))))))))
+
+========================================
+Window and unqualified setters
+========================================
+
+class Example extends JFrame {
+  void init() {
+    setTitle("Consulta");
+    this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    setSize(300, 200);
+    setLocationRelativeTo(null);
+    setVisible(true);
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_window_lifecycle
+                window: (this)
+                arguments: (argument_list
+                  (field_access
+                    object: (identifier)
+                    field: (identifier))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_bounds_geometry
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                arguments: (argument_list
+                  (null_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_window_lifecycle
+                arguments: (argument_list
+                  (true))))))))))
+
+========================================
+Backend setters remain generic
+========================================
+
+class Example {
+  void init(Object vo, PreparedStatement statement, Object res) {
+    vo.setCveDivisa(sCveDivisa);
+    statement.setString(1, value);
+    res.setRegistros(null);
+    bean.setValue(value);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (decimal_integer_literal)
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (null_literal))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier)))))))))

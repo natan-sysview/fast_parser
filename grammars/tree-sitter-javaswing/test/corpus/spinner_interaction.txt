@@ -1,0 +1,253 @@
+========================================
+Spinner declarations and creation
+========================================
+
+class Example {
+  private JSpinner spinHora;
+  private javax.swing.JSpinner spinMinuto;
+
+  void init() {
+    JSpinner local = new JSpinner();
+    this.spinHora = new javax.swing.JSpinner();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_spinner_field
+        (modifiers)
+        type: (javaswing_spinner_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (javaswing_spinner_field
+        (modifiers)
+        type: (javaswing_spinner_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_spinner_local_declaration
+            type: (javaswing_spinner_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_spinner_creation
+                  type: (javaswing_spinner_class)
+                  arguments: (argument_list)))))
+          (expression_statement
+            (assignment_expression
+              left: (field_access
+                object: (this)
+                field: (identifier))
+              right: (object_creation_expression
+                (javaswing_spinner_creation
+                  type: (javaswing_spinner_class)
+                  arguments: (argument_list))))))))))
+
+========================================
+Spinner model declarations and creation
+========================================
+
+class Example {
+  private SpinnerNumberModel hourModel;
+  private javax.swing.SpinnerListModel listModel;
+
+  void init() {
+    SpinnerNumberModel model = new SpinnerNumberModel(13, 13, 19, 1);
+    SpinnerDateModel dates = new javax.swing.SpinnerDateModel();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_spinner_model_field
+        (modifiers)
+        type: (javaswing_spinner_model_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (javaswing_spinner_model_field
+        (modifiers)
+        type: (javaswing_spinner_model_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_spinner_model_local_declaration
+            type: (javaswing_spinner_model_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_spinner_model_creation
+                  type: (javaswing_spinner_model_class)
+                  arguments: (argument_list
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)
+                    (decimal_integer_literal))))))
+          (javaswing_spinner_model_local_declaration
+            type: (javaswing_spinner_model_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_spinner_model_creation
+                  type: (javaswing_spinner_model_class)
+                  arguments: (argument_list))))))))))
+
+========================================
+Spinner model wiring
+========================================
+
+class Example {
+  void init(JSpinner spinHora, JSpinner spinMinuto) {
+    spinHora.setModel(new SpinnerNumberModel(13, 13, 19, 1));
+    spinMinuto.setModel(new javax.swing.SpinnerNumberModel(0, 0, 59, 1));
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_spinner_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_spinner_class)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    (javaswing_spinner_model_creation
+                      type: (javaswing_spinner_model_class)
+                      arguments: (argument_list
+                        (decimal_integer_literal)
+                        (decimal_integer_literal)
+                        (decimal_integer_literal)
+                        (decimal_integer_literal))))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    (javaswing_spinner_model_creation
+                      type: (javaswing_spinner_model_class)
+                      arguments: (argument_list
+                        (decimal_integer_literal)
+                        (decimal_integer_literal)
+                        (decimal_integer_literal)
+                        (decimal_integer_literal)))))))))))))
+
+========================================
+Nearby model and value calls remain generic
+========================================
+
+class Example {
+  void init(Builder builder, JSpinner spinner, Object value) {
+    builder.setModel(new CustomModel());
+    spinner.setValue(value);
+    spinner.getValue();
+    spinner.getModel();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_spinner_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    type: (type_identifier)
+                    arguments: (argument_list))))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list))))))))
+
+========================================
+Spinner return methods are not fields
+========================================
+
+class Example {
+  public JSpinner getSpinHora() {
+    return spinHora;
+  }
+
+  private JSpinner spinHora;
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        (modifiers)
+        type: (javaswing_spinner_class)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (return_statement
+            (identifier))))
+      (javaswing_spinner_field
+        (modifiers)
+        type: (javaswing_spinner_class)
+        declarator: (variable_declarator
+          name: (identifier))))))

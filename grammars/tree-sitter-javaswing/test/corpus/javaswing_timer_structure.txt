@@ -1,0 +1,105 @@
+========================================
+Java Swing Timer structure
+========================================
+
+class TimerStructureExample {
+  void init(ActionListener listener) {
+    Timer timer = new Timer(500, listener);
+    javax.swing.Timer other = new javax.swing.Timer(1000, listener);
+    new Timer(250, event -> refresh()).start();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (local_variable_declaration
+            (javaswing_timer_class)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_timer_structure
+                  (javaswing_timer_class)
+                  (argument_list
+                    (decimal_integer_literal)
+                    (identifier))))))
+          (local_variable_declaration
+            (javaswing_timer_class)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_timer_structure
+                  (javaswing_timer_class)
+                  (argument_list
+                    (decimal_integer_literal)
+                    (identifier))))))
+          (expression_statement
+            (method_invocation
+              (object_creation_expression
+                (javaswing_timer_structure
+                  (javaswing_timer_class)
+                  (argument_list
+                    (decimal_integer_literal)
+                    (lambda_expression
+                      (identifier)
+                      (method_invocation
+                        (identifier)
+                        (argument_list))))))
+              (identifier)
+              (argument_list))))))))
+
+========================================
+Java Swing Timer structure negatives
+========================================
+
+class TimerStructureExample {
+  void init() {
+    java.util.Timer timer = new java.util.Timer();
+    TimerTask task = new TimerTask();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (local_variable_declaration
+            (scoped_type_identifier
+              (scoped_type_identifier
+                (type_identifier)
+                (type_identifier))
+              (type_identifier))
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (scoped_type_identifier
+                  (scoped_type_identifier
+                    (type_identifier)
+                    (type_identifier))
+                  (type_identifier))
+                (argument_list))))
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (type_identifier)
+                (argument_list)))))))))

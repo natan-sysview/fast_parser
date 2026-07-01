@@ -1,0 +1,127 @@
+========================================
+Java Swing keyboard bindings
+========================================
+
+class KeyboardBindingsExample {
+  void init(JComponent component, Action action) {
+    KeyStroke enter = KeyStroke.getKeyStroke("ENTER");
+    Object key = "submit";
+    component.getInputMap(JComponent.WHEN_FOCUSED).put(enter, key);
+    component.getActionMap().put(key, action);
+    javax.swing.KeyStroke.getKeyStroke("ESCAPE");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (method_invocation
+                (javaswing_keyboard_bindings
+                  (javaswing_key_stroke_selector)
+                  (argument_list
+                    (string_literal
+                      (string_fragment)))))))
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (string_literal
+                (string_fragment))))
+          (expression_statement
+            (method_invocation
+              (method_invocation
+                (javaswing_keyboard_bindings
+                  (identifier)
+                  (argument_list
+                    (field_access
+                      (identifier)
+                      (identifier)))))
+              (identifier)
+              (argument_list
+                (identifier)
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              (method_invocation
+                (javaswing_keyboard_bindings
+                  (identifier)
+                  (argument_list)))
+              (identifier)
+              (argument_list
+                (identifier)
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              (javaswing_keyboard_bindings
+                (javaswing_key_stroke_selector)
+                (argument_list
+                  (string_literal
+                    (string_fragment)))))))))))
+
+========================================
+Java Swing keyboard bindings negatives
+========================================
+
+class KeyboardBindingsExample {
+  void init(Map map, Object key, Object action) {
+    map.put(key, action);
+    keyboard.getInputMapper();
+    keyboard.getActionMapper();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (identifier)
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list)))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list))))))))

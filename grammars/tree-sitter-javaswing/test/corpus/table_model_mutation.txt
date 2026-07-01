@@ -1,0 +1,338 @@
+========================================
+Table cell value mutation
+========================================
+
+class Example {
+  void fill(JTable table, TableModel model, Object value, int row, int column) {
+    table.setValueAt(value, row, column);
+    model.setValueAt("Total", row, 0);
+    consultaVta.getGrid().setValueAt(sNomTitular, i, 0);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (integral_type)
+            name: (identifier))
+          (formal_parameter
+            type: (integral_type)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (identifier)
+                  (identifier)
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))
+                  (identifier)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (method_invocation
+                  object: (identifier)
+                  name: (identifier)
+                  arguments: (argument_list))
+                arguments: (argument_list
+                  (identifier)
+                  (identifier)
+                  (decimal_integer_literal))))))))))
+
+========================================
+DefaultTableModel row and column mutation
+========================================
+
+class Example {
+  void fill(DefaultTableModel model, JTable table, Object[] rowData) {
+    model.setRowCount(0);
+    model.setColumnCount(8);
+    model.addRow(rowData);
+    model.insertRow(0, rowData);
+    model.removeRow(1);
+    model.moveRow(0, 1, 2);
+    model.addColumn("Importe");
+    model.setColumnIdentifiers(columns);
+    ((DefaultTableModel) table.getModel()).setDataVector(data, columns);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (array_type
+              element: (type_identifier)
+              dimensions: (dimensions))
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                table_model: (parenthesized_expression
+                  (cast_expression
+                    type: (type_identifier)
+                    value: (method_invocation
+                      object: (identifier)
+                      name: (identifier)
+                      arguments: (argument_list))))
+                arguments: (argument_list
+                  (identifier)
+                  (identifier))))))))))
+
+========================================
+AbstractTableModel notifications
+========================================
+
+class Example extends AbstractTableModel {
+  void changed(int row, int column) {
+    fireTableDataChanged();
+    fireTableRowsInserted(0, 1);
+    fireTableRowsUpdated(0, 1);
+    fireTableRowsDeleted(0, 1);
+    fireTableCellUpdated(row, column);
+    fireTableStructureChanged();
+    newRowsAdded(event);
+    rowsRemoved(event);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    superclass: (superclass
+      (type_identifier))
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (integral_type)
+            name: (identifier))
+          (formal_parameter
+            type: (integral_type)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                arguments: (argument_list
+                  (decimal_integer_literal)
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                arguments: (argument_list
+                  (identifier)
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_table_model_mutation
+                arguments: (argument_list
+                  (identifier))))))))))
+
+========================================
+Custom grid and backend setters remain generic
+========================================
+
+class Example {
+  void init(Object grid, PreparedStatement statement, Object bean) {
+    grid.setColumnWidth(0, 110);
+    grid.setColumnClass(1, String.class);
+    grid.setSorted(true);
+    grid.setNumClicksToSort(1);
+    grid.getColumnProperties(0).setFormat(format);
+    statement.setString(1, value);
+    bean.setValue(value);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (decimal_integer_literal)
+                (decimal_integer_literal))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (decimal_integer_literal)
+                (class_literal
+                  (type_identifier)))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (true))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (decimal_integer_literal))))
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (identifier)
+                name: (identifier)
+                arguments: (argument_list
+                  (decimal_integer_literal)))
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (decimal_integer_literal)
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier)))))))))

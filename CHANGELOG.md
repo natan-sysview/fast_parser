@@ -9,8 +9,10 @@ This project follows semantic versioning once the first stable release is publis
 ### Added
 
 - FastParse language extension packaging for `java-frameworks`.
+- FastParse language extension packaging for `javaswing`.
 - Published package support for `fastparse-language-java-frameworks` on PyPI.
 - Published package support for `FastParser.Language.JavaFrameworks` on NuGet.
+- Release workflow support for `FastParser.Language.JavaSwing` on NuGet.
 - Framework evidence grammar nodes for imports, annotations, and JDBC connection string literals.
 - Framework family query captures for Spring, Spring Security, Hibernate/JPA, JDBC, Axis/Axis2, JAXB, JasperReports, BouncyCastle, JJWT, Springfox/Swagger, XStream, Oracle/SQL Server drivers, Lombok, Jackson/Gson, logging, Apache libraries, Servlet, Bean Validation, JUnit/Mockito, AspectJ, JOSE/Jasypt, and related enterprise Java libraries.
 - Public-safe corpus coverage for framework imports, modern annotations, negative Java annotation behavior, and baseline Java parsing.
@@ -19,6 +21,7 @@ This project follows semantic versioning once the first stable release is publis
 ### Changed
 
 - Release workflow now builds, publishes, and smoke-tests Java Frameworks language packages across Linux x64, Windows x64, macOS x64, and macOS arm64.
+- Release workflow now builds, publishes, and smoke-tests the JavaSwing NuGet language package across Linux x64, Windows x64, macOS x64, and macOS arm64.
 - Language extension NuGet packages now use NuGet-compatible OPC metadata and Apache 2.0 license URL metadata.
 - Documentation now distinguishes grammar-level evidence from query-level framework classification.
 

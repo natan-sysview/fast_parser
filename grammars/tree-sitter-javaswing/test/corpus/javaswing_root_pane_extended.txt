@@ -1,0 +1,109 @@
+========================================
+Java Swing root pane extended structure
+========================================
+
+class RootPaneExtendedExample extends JFrame {
+  void init(JButton ok, Component glass, JLayeredPane layered) {
+    getRootPane().setDefaultButton(ok);
+    setGlassPane(glass);
+    this.getGlassPane();
+    setLayeredPane(layered);
+    this.getLayeredPane();
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    (identifier)
+    (javaswing_screen_superclass
+      (javaswing_screen_type))
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_root_pane_extended
+                (method_invocation
+                  (javaswing_root_pane_structure
+                    (argument_list)))
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_root_pane_extended
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_root_pane_extended
+                (this)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_root_pane_extended
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_root_pane_extended
+                (this)
+                (argument_list)))))))))
+
+========================================
+Java Swing root pane extended negatives
+========================================
+
+class RootPaneExtendedExample {
+  void init(Model model) {
+    model.setDefaultButtonName("ok");
+    pane.getLayeredPaneName();
+    pane.setGlassPaneEnabled(true);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (string_literal
+                  (string_fragment)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list)))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (true)))))))))

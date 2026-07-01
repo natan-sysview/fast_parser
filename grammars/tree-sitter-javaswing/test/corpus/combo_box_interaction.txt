@@ -1,0 +1,317 @@
+========================================
+Combo box declarations and creation
+========================================
+
+class Example {
+  private JComboBox<String> currencyCombo = new JComboBox<String>();
+  public javax.swing.JComboBox statusCombo;
+
+  void init(Object[] items) {
+    JComboBox local = new javax.swing.JComboBox(items);
+    JComboBox[] combos = new JComboBox[2];
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (javaswing_combo_box_field
+        (modifiers)
+        (javaswing_combo_box_reference_type
+          (javaswing_combo_box_generic_type
+            (javaswing_combo_box_class)
+            (type_arguments
+              (type_identifier))))
+        (variable_declarator
+          (identifier)
+          (object_creation_expression
+            (javaswing_combo_box_creation
+              (javaswing_combo_box_creation_type
+                (javaswing_combo_box_generic_type
+                  (javaswing_combo_box_class)
+                  (type_arguments
+                    (type_identifier))))
+              (argument_list)))))
+      (javaswing_combo_box_field
+        (modifiers)
+        (javaswing_combo_box_reference_type
+          (javaswing_combo_box_class))
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (array_type
+              (type_identifier)
+              (dimensions))
+            (identifier)))
+        (block
+          (javaswing_combo_box_local_declaration
+            (javaswing_combo_box_reference_type
+              (javaswing_combo_box_class))
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_combo_box_class)
+                (argument_list
+                  (identifier)))))
+          (javaswing_combo_box_local_declaration
+            (javaswing_combo_box_reference_type
+              (javaswing_combo_box_array_type
+                (javaswing_combo_box_class)
+                (dimensions)))
+            (variable_declarator
+              (identifier)
+              (array_creation_expression
+                (javaswing_combo_box_class)
+                (dimensions_expr
+                  (decimal_integer_literal))))))))))
+
+========================================
+Combo box selection and display methods
+========================================
+
+class Example {
+  void configure(JComboBox combo, Object value, ListCellRenderer renderer, ComboBoxEditor editor) {
+    combo.setSelectedItem(value);
+    Object selected = combo.getSelectedItem();
+    combo.setMaximumRowCount(15);
+    combo.setPrototypeDisplayValue("");
+    combo.setRenderer(renderer);
+    combo.getRenderer();
+    combo.setEditor(editor);
+    combo.getEditor();
+    combo.configureEditor(editor, value);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (javaswing_combo_box_class)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (javaswing_cell_renderer_editor_class)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list
+                  (identifier)))))
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (method_invocation
+                (javaswing_combo_box_interaction
+                  (identifier)
+                  (argument_list)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list
+                  (string_literal)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list
+                  (identifier)
+                  (identifier))))))))))
+
+========================================
+Combo box popup and key-selection methods
+========================================
+
+class Example {
+  void configure(JComboBox combo, KeySelectionManager manager) {
+    combo.showPopup();
+    combo.hidePopup();
+    boolean visible = combo.isPopupVisible();
+    combo.setKeySelectionManager(manager);
+    Object current = combo.getKeySelectionManager();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (javaswing_combo_box_class)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list))))
+          (local_variable_declaration
+            (boolean_type)
+            (variable_declarator
+              (identifier)
+              (method_invocation
+                (javaswing_combo_box_interaction
+                  (identifier)
+                  (argument_list)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                (identifier)
+                (argument_list
+                  (identifier)))))
+          (local_variable_declaration
+            (type_identifier)
+            (variable_declarator
+              (identifier)
+              (method_invocation
+                (javaswing_combo_box_interaction
+                  (identifier)
+                  (argument_list))))))))))
+
+========================================
+Ambiguous model and index methods remain outside combo rule
+========================================
+
+class Example {
+  void configure(JComboBox combo, JTabbedPane tabs, JList list, JTextField field, ComboBoxModel model) {
+    combo.setModel(model);
+    combo.getModel();
+    combo.setSelectedIndex(0);
+    combo.setPopupVisible(true);
+    tabs.setSelectedIndex(1);
+    list.getSelectedIndex();
+    field.setEditable(false);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (javaswing_combo_box_class)
+            (identifier))
+          (formal_parameter
+            (javaswing_tabbed_pane_class)
+            (identifier))
+          (formal_parameter
+            (javaswing_list_class)
+            (identifier))
+          (formal_parameter
+            (javaswing_text_input_class)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list)))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (true))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (decimal_integer_literal)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list)))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                (identifier)
+                (argument_list
+                  (false))))))))))

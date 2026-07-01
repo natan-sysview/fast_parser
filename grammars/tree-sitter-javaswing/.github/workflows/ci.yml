@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+
+jobs:
+  tree-sitter:
+    name: ${{ matrix.os }} / Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        node:
+          - "20"
+          - "22"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate parser
+        run: npm run generate
+
+      - name: Check generated artifacts
+        run: git diff --exit-code -- grammar.js tree-sitter.json src/parser.c src/grammar.json src/node-types.json
+
+      - name: Check public metadata
+        run: npm run metadata:check:public
+
+      - name: Run corpus tests
+        run: npm test
+
+      - name: Run parse smoke test
+        run: npm run parse:check
+
+      - name: Check queries
+        run: npm run query:check
+
+      - name: Parse public example
+        run: npm run example:parse
+
+      - name: Check public package contents
+        run: npm run pack:check
+
+      - name: Audit npm dependencies
+        run: npm run audit:check

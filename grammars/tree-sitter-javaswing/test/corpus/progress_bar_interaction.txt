@@ -1,0 +1,192 @@
+========================================
+Progress bar declarations and creation
+========================================
+
+class Example {
+  private JProgressBar progressBar = new JProgressBar(0, 100);
+  public javax.swing.JProgressBar progressBarConsulta;
+
+  void init() {
+    JProgressBar local = new JProgressBar();
+    this.progressBarConsulta = new javax.swing.JProgressBar();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_progress_bar_field
+        (modifiers)
+        type: (javaswing_progress_bar_class)
+        declarator: (variable_declarator
+          name: (identifier)
+          value: (object_creation_expression
+            (javaswing_progress_bar_creation
+              type: (javaswing_progress_bar_class)
+              arguments: (argument_list
+                (decimal_integer_literal)
+                (decimal_integer_literal))))))
+      (javaswing_progress_bar_field
+        (modifiers)
+        type: (javaswing_progress_bar_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_progress_bar_local_declaration
+            type: (javaswing_progress_bar_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_progress_bar_creation
+                  type: (javaswing_progress_bar_class)
+                  arguments: (argument_list)))))
+          (expression_statement
+            (assignment_expression
+              left: (field_access
+                object: (this)
+                field: (identifier))
+              right: (object_creation_expression
+                (javaswing_progress_bar_creation
+                  type: (javaswing_progress_bar_class)
+                  arguments: (argument_list))))))))))
+
+========================================
+Progress bar behavior methods
+========================================
+
+class Example {
+  void init() {
+    progressBar.setIndeterminate(true);
+    this.progressBar.setStringPainted(true);
+    dialogo.progressBarConsulta.setIndeterminate(false);
+    progressBar.isIndeterminate();
+    progressBar.isStringPainted();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_progress_bar_interaction
+                selector: (javaswing_progress_bar_selector)
+                arguments: (argument_list
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_progress_bar_interaction
+                selector: (javaswing_progress_bar_selector)
+                arguments: (argument_list
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_progress_bar_interaction
+                selector: (javaswing_progress_bar_selector)
+                arguments: (argument_list
+                  (false)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_progress_bar_interaction
+                selector: (javaswing_progress_bar_selector)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_progress_bar_interaction
+                selector: (javaswing_progress_bar_selector)
+                arguments: (argument_list)))))))))
+
+========================================
+Progress bar return methods are not fields
+========================================
+
+class Example {
+  private JProgressBar progressBar;
+
+  public JProgressBar getProgressBar() {
+    return progressBar;
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (javaswing_progress_bar_field
+        (modifiers)
+        type: (javaswing_progress_bar_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        (modifiers)
+        type: (javaswing_progress_bar_class)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (return_statement
+            (identifier)))))))
+
+========================================
+Nearby value and string calls remain generic
+========================================
+
+class Example {
+  void init(JProgressBar progressBar, Object value) {
+    progressBar.setValue(value);
+    progressBar.getValue();
+    progressBar.setString("Procesando");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_progress_bar_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (string_literal
+                  (string_fragment))))))))))

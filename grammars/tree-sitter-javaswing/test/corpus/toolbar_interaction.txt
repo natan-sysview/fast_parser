@@ -1,0 +1,218 @@
+========================================
+Toolbar declarations and creation
+========================================
+
+class Example {
+  private JToolBar toolbar;
+
+  void init() {
+    JToolBar local = new JToolBar();
+    this.toolbar = new javax.swing.JToolBar("Operaciones");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (field_declaration
+        (modifiers)
+        type: (javaswing_toolbar_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_toolbar_local_declaration
+            type: (javaswing_toolbar_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_toolbar_creation
+                  type: (javaswing_toolbar_class)
+                  arguments: (argument_list)))))
+          (expression_statement
+            (assignment_expression
+              left: (field_access
+                object: (this)
+                field: (identifier))
+              right: (object_creation_expression
+                (javaswing_toolbar_creation
+                  type: (javaswing_toolbar_class)
+                  arguments: (argument_list
+                    (string_literal
+                      (string_fragment))))))))))))
+
+========================================
+Toolbar separator methods
+========================================
+
+class Example {
+  void init() {
+    this.getToolBarGeneric().addSeparator();
+    this.getToolBarGeneric().addSeparator(new Dimension(8, 0));
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (this)
+                name: (identifier)
+                arguments: (argument_list))
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (this)
+                name: (identifier)
+                arguments: (argument_list))
+              name: (identifier)
+              arguments: (argument_list
+                (object_creation_expression
+                  (javaswing_dimension_creation
+                    type: (javaswing_dimension_class)
+                    arguments: (argument_list
+                      (decimal_integer_literal)
+                      (decimal_integer_literal))))))))))))
+
+========================================
+Toolbar behavior methods
+========================================
+
+class Example {
+  void init() {
+    this.getToolBarGeneric().setFloatable(false);
+    this.getToolBarGeneric().isFloatable();
+    this.getToolBarGeneric().setRollover(true);
+    this.getToolBarGeneric().isRollover();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (this)
+                name: (identifier)
+                arguments: (argument_list))
+              name: (identifier)
+              arguments: (argument_list
+                (false))))
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (this)
+                name: (identifier)
+                arguments: (argument_list))
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (this)
+                name: (identifier)
+                arguments: (argument_list))
+              name: (identifier)
+              arguments: (argument_list
+                (true))))
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (this)
+                name: (identifier)
+                arguments: (argument_list))
+              name: (identifier)
+              arguments: (argument_list))))))))
+
+========================================
+Nearby separator and toolbar-like methods remain generic
+========================================
+
+class Example {
+  void init(Builder builder, Panel panel) {
+    builder.addSeparator("Participante Firmado", cc.xyw(1, 7, 4));
+    panel.add(new JSeparator());
+    splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+    toolbar.setRolloverEnabled(true);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (string_literal
+                  (string_fragment))
+                (method_invocation
+                  object: (identifier)
+                  name: (identifier)
+                  arguments: (argument_list
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)
+                    (decimal_integer_literal))))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (object_creation_expression
+                  (javaswing_separator_creation
+                    type: (javaswing_separator_class)
+                    arguments: (argument_list))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_split_pane_interaction
+                split_pane: (identifier)
+                arguments: (argument_list
+                  (javaswing_split_pane_constant
+                    class: (javaswing_split_pane_class))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_property_setter
+                component: (identifier)
+                arguments: (argument_list
+                  (true))))))))))

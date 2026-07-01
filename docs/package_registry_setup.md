@@ -19,6 +19,7 @@ GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables
 | `PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH` | `true` | Publish `fastparse-language-java-frameworks` wheels to PyPI. |
 | `NUGET_LANGUAGE_PYTHON_PUBLISH` | `true` | Publish `FastParser.Language.Python` to nuget.org. |
 | `NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH` | `true` | Publish `FastParser.Language.JavaFrameworks` to nuget.org. |
+| `NUGET_LANGUAGE_JAVASWING_PUBLISH` | `true` | Publish `FastParser.Language.JavaSwing` to nuget.org. |
 
 The core `FastParser` NuGet package is published on tags by the existing NuGet trusted publishing step.
 
@@ -116,6 +117,16 @@ Workflow file    : release.yml
 Environment      : any / blank
 ```
 
+JavaSwing language extension:
+
+```text
+Package ID       : FastParser.Language.JavaSwing
+Repository owner : natan-sysview
+Repository       : fast_parser
+Workflow file    : release.yml
+Environment      : any / blank
+```
+
 ## Release Flow
 
 After the registry setup is complete:
@@ -129,14 +140,15 @@ GitHub Actions will:
 
 1. Build native core archives for Linux, macOS arm64, macOS x64, and Windows.
 2. Build core NuGet and PyPI packages.
-3. Build Python and Java Frameworks language extension native archives.
+3. Build Python, Java Frameworks, and JavaSwing language extension native archives.
 4. Build `fastparse-language-python` wheels.
 5. Build `fastparse-language-java-frameworks` wheels.
 6. Build `FastParser.Language.Python`.
 7. Build `FastParser.Language.JavaFrameworks`.
-8. Publish enabled packages to their registries.
-9. Run post-publish smoke tests from the public registries.
-10. Attach release assets and `SHA256SUMS.txt` to GitHub Releases.
+8. Build `FastParser.Language.JavaSwing`.
+9. Publish enabled packages to their registries.
+10. Run post-publish smoke tests from the public registries.
+11. Attach release assets and `SHA256SUMS.txt` to GitHub Releases.
 
 ## Developer Install Commands
 
@@ -153,6 +165,7 @@ C#:
 dotnet add package FastParser
 dotnet add package FastParser.Language.Python
 dotnet add package FastParser.Language.JavaFrameworks
+dotnet add package FastParser.Language.JavaSwing
 ```
 
 Minimal Python smoke:
@@ -193,6 +206,19 @@ using FastParse;
 using var parser = new FastParseClient();
 parser.LoadBundledLanguage("python");
 var result = parser.ParseText("def hello(): pass", new ParseOptions { Language = "python" });
+Console.WriteLine(result.NodeCount);
+```
+
+Minimal C# JavaSwing smoke:
+
+```csharp
+using FastParse;
+
+using var parser = new FastParseClient();
+parser.LoadBundledLanguage("javaswing");
+var result = parser.ParseText(
+    "import javax.swing.*; class Demo extends JFrame { JButton b = new JButton(\"OK\"); }",
+    new ParseOptions { Language = "javaswing" });
 Console.WriteLine(result.NodeCount);
 ```
 

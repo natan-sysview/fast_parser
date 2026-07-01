@@ -11,6 +11,7 @@ option(TSMP_BUILD_SHARED "Build TSMP as a shared library" ON)
 option(TSMP_USE_VENDORED_TREE_SITTER "Compile the vendored Tree-sitter runtime" ON)
 set(FASTPARSE_COBOL_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-cobol grammar directory for the experimental COBOL language extension")
 set(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-java-frameworks grammar directory for the experimental Java Frameworks language extension")
+set(FASTPARSE_JAVASWING_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-javaswing grammar directory for the Java Swing language extension")
 set(FASTPARSE_PYTHON_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-python grammar directory for the experimental Python language extension")
 set(FASTPARSE_RUST_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-rust grammar directory for the experimental Rust language extension")
 
@@ -26,6 +27,13 @@ if(NOT FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR AND EXISTS "${TSMP_GRAMMARS_DIR}/tr
     set(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR
         "${TSMP_GRAMMARS_DIR}/tree-sitter-java-frameworks"
         CACHE PATH "Optional tree-sitter-java-frameworks grammar directory for the experimental Java Frameworks language extension"
+        FORCE)
+endif()
+
+if(NOT FASTPARSE_JAVASWING_GRAMMAR_DIR AND EXISTS "${TSMP_GRAMMARS_DIR}/tree-sitter-javaswing/src/parser.c")
+    set(FASTPARSE_JAVASWING_GRAMMAR_DIR
+        "${TSMP_GRAMMARS_DIR}/tree-sitter-javaswing"
+        CACHE PATH "Optional tree-sitter-javaswing grammar directory for the Java Swing language extension"
         FORCE)
 endif()
 
@@ -160,6 +168,24 @@ if(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR)
         PRIVATE
             "${FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR}/src")
     fastparse_configure_language_extension(fastparse_language_java_frameworks "fastparse_language_java_frameworks")
+endif()
+
+if(FASTPARSE_JAVASWING_GRAMMAR_DIR)
+    if(NOT EXISTS "${FASTPARSE_JAVASWING_GRAMMAR_DIR}/src/parser.c")
+        message(FATAL_ERROR "FASTPARSE_JAVASWING_GRAMMAR_DIR must point to a tree-sitter-javaswing checkout with src/parser.c")
+    endif()
+    set(FASTPARSE_JAVASWING_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/extensions/javaswing/fastparse_language_javaswing.c"
+        "${FASTPARSE_JAVASWING_GRAMMAR_DIR}/src/parser.c")
+    if(EXISTS "${FASTPARSE_JAVASWING_GRAMMAR_DIR}/src/scanner.c")
+        list(APPEND FASTPARSE_JAVASWING_SOURCES "${FASTPARSE_JAVASWING_GRAMMAR_DIR}/src/scanner.c")
+    endif()
+    add_library(fastparse_language_javaswing SHARED
+        ${FASTPARSE_JAVASWING_SOURCES})
+    target_include_directories(fastparse_language_javaswing
+        PRIVATE
+            "${FASTPARSE_JAVASWING_GRAMMAR_DIR}/src")
+    fastparse_configure_language_extension(fastparse_language_javaswing "fastparse_language_javaswing")
 endif()
 
 if(FASTPARSE_PYTHON_GRAMMAR_DIR)

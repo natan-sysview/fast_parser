@@ -1,0 +1,347 @@
+========================================
+Action keyboard focus and mouse listeners
+========================================
+
+class Example {
+  void init(JButton button, JTextField field, JTable table) {
+    button.addActionListener(aceptar());
+    field.addKeyListener(new KeyAdapter() {});
+    field.addFocusListener(this.textMontoIndividualListener(i));
+    table.addMouseListener(new MouseAdapter() {});
+    table.addMouseMotionListener(mouseMotionAdapter);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_text_input_class)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (method_invocation
+                    name: (identifier)
+                    arguments: (argument_list))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    type: (type_identifier)
+                    arguments: (argument_list)
+                    (class_body))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (method_invocation
+                    object: (this)
+                    name: (identifier)
+                    arguments: (argument_list
+                      (identifier)))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    type: (type_identifier)
+                    arguments: (argument_list)
+                    (class_body))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier))))))))))
+
+========================================
+Window component and state listeners
+========================================
+
+class Example extends JDialog {
+  void init(JComboBox combo) {
+    this.addWindowListener(this);
+    addComponentListener(new ComponentAdapter() {});
+    combo.addItemListener(cmboHabilitaCampos());
+    combo.addPopupMenuListener(new PopupMenuListener() {});
+    combo.addPropertyChangeListener("selectedItem", listener);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    superclass: (superclass
+      (javaswing_dialog_type))
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_combo_box_class)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (this)
+                arguments: (argument_list
+                  (this)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                arguments: (argument_list
+                  (object_creation_expression
+                    type: (type_identifier)
+                    arguments: (argument_list)
+                    (class_body))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (method_invocation
+                    name: (identifier)
+                    arguments: (argument_list))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (object_creation_expression
+                    type: (type_identifier)
+                    arguments: (argument_list)
+                    (class_body))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (string_literal
+                    (string_fragment))
+                  (identifier))))))))))
+
+========================================
+Document table list and tree listeners
+========================================
+
+class Example {
+  void init(Document document, TableModel model, ListSelectionModel selection, JTree tree) {
+    document.addDocumentListener(documentListener);
+    document.addUndoableEditListener(undoListener);
+    model.addTableModelListener(tableModelListener);
+    selection.addListSelectionListener(selectionListener);
+    tree.addTreeSelectionListener(treeSelectionListener);
+    tree.addTreeExpansionListener(treeExpansionListener);
+    tree.addTreeWillExpandListener(treeWillExpandListener);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier))))))))))
+
+========================================
+Menu internal frame and ancestor listeners
+========================================
+
+class Example {
+  void init(JMenu menu, JMenuItem item, JInternalFrame frame, JComponent component) {
+    menu.addMenuListener(menuListener);
+    item.addMenuKeyListener(menuKeyListener);
+    item.addMenuDragMouseListener(menuDragMouseListener);
+    frame.addInternalFrameListener(internalFrameListener);
+    component.addAncestorListener(ancestorListener);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_event_listener
+                component: (identifier)
+                arguments: (argument_list
+                  (identifier))))))))))
+
+========================================
+Custom and backend listener-like calls remain generic
+========================================
+
+class Example {
+  void init(Object combo, Object service, Object bus) {
+    combo.addCareListener(caretListener);
+    service.addBusinessListener(listener);
+    bus.addAuditListener(listener);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier)))))))))

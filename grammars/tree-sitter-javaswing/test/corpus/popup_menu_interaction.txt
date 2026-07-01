@@ -1,0 +1,144 @@
+========================================
+Popup menu display calls
+========================================
+
+class Example {
+  void init(JPopupMenu menuOrdenes, Component objetoPadre) {
+    menuOrdenes.show(objetoPadre, x, y);
+    vista.popupMenuDotacion.show(e.getComponent(), e.getX(), e.getY());
+    getPopupOpciones().show(btn, e.getX(), e.getY());
+    popup.show(component, x, y);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_popup_menu_interaction
+                popup_menu: (identifier)
+                arguments: (javaswing_popup_menu_show_arguments
+                  invoker: (identifier)
+                  x: (identifier)
+                  y: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_popup_menu_interaction
+                popup_menu: (field_access
+                  object: (identifier)
+                  field: (identifier))
+                arguments: (javaswing_popup_menu_show_arguments
+                  invoker: (method_invocation
+                    object: (identifier)
+                    name: (identifier)
+                    arguments: (argument_list))
+                  x: (method_invocation
+                    object: (identifier)
+                    name: (identifier)
+                    arguments: (argument_list))
+                  y: (method_invocation
+                    object: (identifier)
+                    name: (identifier)
+                    arguments: (argument_list))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_popup_menu_interaction
+                popup_menu: (method_invocation
+                  name: (identifier)
+                  arguments: (argument_list))
+                arguments: (javaswing_popup_menu_show_arguments
+                  invoker: (identifier)
+                  x: (method_invocation
+                    object: (identifier)
+                    name: (identifier)
+                    arguments: (argument_list))
+                  y: (method_invocation
+                    object: (identifier)
+                    name: (identifier)
+                    arguments: (argument_list))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_popup_menu_interaction
+                popup_menu: (identifier)
+                arguments: (javaswing_popup_menu_show_arguments
+                  invoker: (identifier)
+                  x: (identifier)
+                  y: (identifier))))))))))
+
+========================================
+Nearby show calls remain generic
+========================================
+
+class Example {
+  void init(Dialog dialog, JPopupMenu menuOrdenes, JMenuItem opc1) {
+    menuOrdenes.add(opc1);
+    vista.popupMenuDotacion.add(elementoMenu);
+    dialog.show();
+    dialog.show(true);
+    cardLayout.show(cards, "main");
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (field_access
+                object: (identifier)
+                field: (identifier))
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (true))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier)
+                (string_literal
+                  (string_fragment))))))))))

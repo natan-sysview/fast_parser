@@ -1,0 +1,146 @@
+========================================
+Menu bar and popup menu wiring
+========================================
+
+class Example extends JFrame {
+  void init(JFrame frame, JTable table, JPopupMenu menu) {
+    setJMenuBar(buildMenuBar());
+    frame.setJMenuBar(new JMenuBar());
+    table.setComponentPopupMenu(menu);
+    setComponentPopupMenu(new JPopupMenu());
+  }
+}
+
+---
+
+(program
+  (javaswing_screen
+    name: (identifier)
+    superclass: (javaswing_screen_superclass
+      type: (javaswing_screen_type))
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_menu_structure
+                arguments: (javaswing_menu_bar_arguments
+                  menu_bar: (method_invocation
+                    name: (identifier)
+                    arguments: (argument_list))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_menu_structure
+                window: (identifier)
+                arguments: (javaswing_menu_bar_arguments
+                  menu_bar: (object_creation_expression
+                    (javaswing_component_creation
+                      type: (javaswing_component_creation_type
+                        (javaswing_component_type))
+                      arguments: (argument_list)))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_menu_structure
+                component: (identifier)
+                arguments: (javaswing_component_popup_menu_arguments
+                  popup_menu: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_menu_structure
+                arguments: (javaswing_component_popup_menu_arguments
+                  popup_menu: (object_creation_expression
+                    (javaswing_component_creation
+                      type: (javaswing_component_creation_type
+                        (javaswing_component_type))
+                      arguments: (argument_list))))))))))))
+
+========================================
+Generic menu add separators remain generic
+========================================
+
+class Example {
+  void init(JPopupMenu menuOrdenes, JMenuItem opc1, Builder builder) {
+    menuOrdenes.add(opc1);
+    vista.popupMenuDotacion.add(elementoMenu);
+    builder.addSeparator("Participante Firmado", cc.xyw(1, 7, 4));
+    this.getToolBarGeneric().addSeparator();
+    dialog.show();
+    dialog.show(true);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (field_access
+                object: (identifier)
+                field: (identifier))
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (string_literal
+                  (string_fragment))
+                (method_invocation
+                  object: (identifier)
+                  name: (identifier)
+                  arguments: (argument_list
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)
+                    (decimal_integer_literal))))))
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (this)
+                name: (identifier)
+                arguments: (argument_list))
+              name: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list)))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              arguments: (argument_list
+                (true)))))))))

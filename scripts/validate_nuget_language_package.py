@@ -126,6 +126,83 @@ Console.WriteLine(parser.Version);
 Console.WriteLine(parser.LibraryPath);
 '''
 
+JAVASWING_PROGRAM = r'''using FastParse;
+
+using var parser = new FastParseClient();
+
+var load = parser.LoadBundledLanguage("javaswing");
+if (load.Language != "javaswing" || !parser.LanguageAvailable("javaswing"))
+{
+    throw new InvalidOperationException("FastParser.Language.JavaSwing load smoke failed");
+}
+
+var source = """
+import javax.swing.*;
+class Demo extends JFrame {
+    JButton button = new JButton("OK");
+    void build() {
+        JPanel panel = new JPanel();
+        panel.add(button);
+    }
+}
+""";
+
+var json = parser.ParseText(
+    source,
+    new ParseOptions
+    {
+        Language = "javaswing",
+        Format = FastParseFormat.Json,
+        IncludeRules = "javaswing_screen|javaswing_component_creation|javaswing_component_field|javaswing_container_add",
+        Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+    });
+
+if (json.NodeCount == 0 || !json.Text.Contains("javaswing_", StringComparison.Ordinal))
+{
+    throw new InvalidOperationException("FastParser.Language.JavaSwing JSON smoke failed");
+}
+
+var queryPath = Path.Combine(AppContext.BaseDirectory, "fastparse", "languages", "javaswing", "queries", "swing.scm");
+if (!File.Exists(queryPath))
+{
+    throw new InvalidOperationException($"Swing query was not copied to output: {queryPath}");
+}
+
+var query = File.ReadAllText(queryPath);
+var captures = parser.QueryTextSummary(
+    source,
+    query,
+    new QueryOptions
+    {
+        Language = "javaswing",
+        Format = FastParseFormat.Stats,
+        Fields = FastParseField.CaptureName
+    });
+
+if (captures.NodeCount == 0)
+{
+    throw new InvalidOperationException("FastParser.Language.JavaSwing query smoke failed");
+}
+
+var diagnostics = parser.ParseText(
+    "class Broken {",
+    new ParseOptions
+    {
+        Language = "javaswing",
+        Format = FastParseFormat.Diagnostics
+    });
+
+using var diagnosticsDocument = diagnostics.JsonDocument();
+if (!diagnosticsDocument.RootElement.GetProperty("hasErrors").GetBoolean())
+{
+    throw new InvalidOperationException("FastParser.Language.JavaSwing diagnostics smoke failed");
+}
+
+Console.WriteLine("FastParser language NuGet smoke OK");
+Console.WriteLine(parser.Version);
+Console.WriteLine(parser.LibraryPath);
+'''
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a FastParser.Language.* package from local nupkgs.")
@@ -151,6 +228,8 @@ def run_command(command: list[str], *, env: dict[str, str]) -> subprocess.Comple
 
 
 def package_language_name(language: str) -> str:
+    if native_language_name(language) == "javaswing":
+        return "JavaSwing"
     return "".join(part.capitalize() for part in language.replace("-", "_").split("_"))
 
 
@@ -195,6 +274,8 @@ def validate_package_layout(language_package: Path, language: str, require_all_r
         required.add(f"runtimes/{rid}/native/{native_file(language, rid)}")
     if language == "java-frameworks":
         required.add(f"contentFiles/any/any/fastparse/languages/{language}/queries/frameworks.scm")
+    if language == "javaswing":
+        required.add(f"contentFiles/any/any/fastparse/languages/{language}/queries/swing.scm")
     with zipfile.ZipFile(language_package) as zf:
         names = set(zf.namelist())
     missing = sorted(required - names)
@@ -255,7 +336,12 @@ def main() -> int:
             ],
             env=env,
         )
-        program = JAVA_FRAMEWORKS_PROGRAM if args.language == "java-frameworks" else PYTHON_PROGRAM
+        if args.language == "java-frameworks":
+            program = JAVA_FRAMEWORKS_PROGRAM
+        elif args.language == "javaswing":
+            program = JAVASWING_PROGRAM
+        else:
+            program = PYTHON_PROGRAM
         (project_dir / "Program.cs").write_text(program, encoding="utf-8")
         completed = run_command(["dotnet", "run", "--project", project], env=env)
         if "FastParser language NuGet smoke OK" not in completed.stdout:

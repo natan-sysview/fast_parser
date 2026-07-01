@@ -1,0 +1,195 @@
+========================================
+Viewport view assignment
+========================================
+
+class Example {
+  void init(JScrollPane scrollPane, JTable table, JPanel panel) {
+    scrollPane.setViewportView(table);
+    this.getScrollPane().setViewportView(panel);
+    setViewportView(createView());
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                scroll_pane: (identifier)
+                arguments: (javaswing_viewport_view_arguments
+                  view: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                scroll_pane: (method_invocation
+                  object: (this)
+                  name: (identifier)
+                  arguments: (argument_list))
+                arguments: (javaswing_viewport_view_arguments
+                  view: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                arguments: (javaswing_viewport_view_arguments
+                  view: (method_invocation
+                    name: (identifier)
+                    arguments: (argument_list)))))))))))
+
+========================================
+Scrollbar policy constants
+========================================
+
+class Example {
+  void init(JScrollPane scrollPane) {
+    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                scroll_pane: (identifier)
+                arguments: (javaswing_scroll_bar_policy_arguments
+                  policy: (javaswing_scroll_bar_policy_constant)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                scroll_pane: (identifier)
+                arguments: (javaswing_scroll_bar_policy_arguments
+                  policy: (javaswing_scroll_bar_policy_constant)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                arguments: (javaswing_scroll_bar_policy_arguments
+                  policy: (javaswing_scroll_bar_policy_constant)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                arguments: (javaswing_scroll_bar_policy_arguments
+                  policy: (javaswing_scroll_bar_policy_constant))))))))))
+
+========================================
+Policy expression fallback
+========================================
+
+class Example {
+  void init(JScrollPane scrollPane, int policy) {
+    scrollPane.setHorizontalScrollBarPolicy(policy);
+    scrollPane.setVerticalScrollBarPolicy(resolvePolicy());
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (integral_type)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                scroll_pane: (identifier)
+                arguments: (javaswing_scroll_bar_policy_arguments
+                  policy: (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_scroll_viewport
+                scroll_pane: (identifier)
+                arguments: (javaswing_scroll_bar_policy_arguments
+                  policy: (method_invocation
+                    name: (identifier)
+                    arguments: (argument_list)))))))))))
+
+========================================
+Nearby custom helpers remain generic
+========================================
+
+class Example {
+  void init(CustomScroll scroll) {
+    scroll.setScrollMode(mode);
+    scroll.setViewportTitle("Orders");
+    scroll.getViewport().add(component);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (string_literal
+                  (string_fragment)))))
+          (expression_statement
+            (method_invocation
+              object: (method_invocation
+                object: (identifier)
+                name: (identifier)
+                arguments: (argument_list))
+              arguments: (argument_list
+                (identifier)))))))))

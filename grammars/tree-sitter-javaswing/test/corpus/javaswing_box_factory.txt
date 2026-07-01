@@ -1,0 +1,118 @@
+========================================
+Java Swing Box factory methods
+========================================
+
+class BoxFactoryExample {
+  void init(JPanel panel, Dimension size) {
+    Box row = Box.createHorizontalBox();
+    Box column = javax.swing.Box.createVerticalBox();
+    panel.add(Box.createRigidArea(size));
+    panel.add(Box.createHorizontalGlue());
+    panel.add(Box.createVerticalStrut(8));
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (javaswing_dimension_class)
+            (identifier)))
+        (block
+          (local_variable_declaration
+            (javaswing_box_class)
+            (variable_declarator
+              (identifier)
+              (method_invocation
+                (javaswing_box_factory
+                  (javaswing_box_class)
+                  (argument_list)))))
+          (local_variable_declaration
+            (javaswing_box_class)
+            (variable_declarator
+              (identifier)
+              (method_invocation
+                (javaswing_box_factory
+                  (javaswing_box_class)
+                  (argument_list)))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list
+                (method_invocation
+                  (javaswing_box_factory
+                    (javaswing_box_class)
+                    (argument_list
+                      (identifier)))))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list
+                (method_invocation
+                  (javaswing_box_factory
+                    (javaswing_box_class)
+                    (argument_list))))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list
+                (method_invocation
+                  (javaswing_box_factory
+                    (javaswing_box_class)
+                    (argument_list
+                      (decimal_integer_literal))))))))))))
+
+========================================
+Java Swing Box factory negatives
+========================================
+
+class BoxFactoryExample {
+  void init(CustomBox box, JPanel panel) {
+    box.createHorizontalBox();
+    factory.createRigidArea(size);
+    panel.add(createVerticalGlue());
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list)))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list
+                (identifier))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (argument_list
+                (method_invocation
+                  (argument_list))))))))))

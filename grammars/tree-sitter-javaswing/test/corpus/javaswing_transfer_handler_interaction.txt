@@ -1,0 +1,108 @@
+========================================
+Java Swing transfer handler interaction
+========================================
+
+class TransferHandlerInteractionExample {
+  void init(JTable table) {
+    TransferHandler handler = new TransferHandler("text");
+    table.setTransferHandler(handler);
+    table.getTransferHandler();
+    table.setDragEnabled(true);
+    table.setTransferHandler(new javax.swing.TransferHandler("value"));
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (local_variable_declaration
+            (javaswing_transfer_handler_class)
+            (variable_declarator
+              (identifier)
+              (object_creation_expression
+                (javaswing_transfer_handler_creation
+                  (javaswing_transfer_handler_class)
+                  (argument_list
+                    (string_literal
+                      (string_fragment)))))))
+          (expression_statement
+            (method_invocation
+              (javaswing_transfer_handler_interaction
+                (identifier)
+                (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_transfer_handler_interaction
+                (identifier)
+                (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_transfer_handler_interaction
+                (identifier)
+                (argument_list
+                  (true)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_transfer_handler_interaction
+                (identifier)
+                (argument_list
+                  (object_creation_expression
+                    (javaswing_transfer_handler_creation
+                      (javaswing_transfer_handler_class)
+                      (argument_list
+                        (string_literal
+                          (string_fragment))))))))))))))
+
+========================================
+Java Swing transfer handler interaction negatives
+========================================
+
+class TransferHandlerInteractionExample {
+  void init(Service service) {
+    service.setTransferState(true);
+    service.getTransferStatus();
+    new TransferJob();
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list
+                (true))))
+          (expression_statement
+            (method_invocation
+              (identifier)
+              (identifier)
+              (argument_list)))
+          (expression_statement
+            (object_creation_expression
+              (type_identifier)
+              (argument_list))))))))

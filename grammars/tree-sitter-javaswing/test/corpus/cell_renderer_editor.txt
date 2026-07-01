@@ -1,0 +1,274 @@
+========================================
+Cell renderer editor declarations and creation
+========================================
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+
+class Example {
+  private TableCellRenderer renderer;
+
+  void init() {
+    DefaultTableCellRenderer tableRenderer = new DefaultTableCellRenderer();
+    DefaultCellEditor editor = new DefaultCellEditor(checkBox);
+  }
+}
+
+---
+
+(program
+  (import_declaration
+    (scoped_identifier
+      scope: (scoped_identifier
+        scope: (identifier)
+        name: (identifier))
+      name: (identifier)))
+  (import_declaration
+    (scoped_identifier
+      scope: (scoped_identifier
+        scope: (scoped_identifier
+          scope: (identifier)
+          name: (identifier))
+        name: (identifier))
+      name: (identifier)))
+  (import_declaration
+    (scoped_identifier
+      scope: (scoped_identifier
+        scope: (scoped_identifier
+          scope: (identifier)
+          name: (identifier))
+        name: (identifier))
+      name: (identifier)))
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (field_declaration
+        (modifiers)
+        type: (javaswing_cell_renderer_editor_class)
+        declarator: (variable_declarator
+          name: (identifier)))
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters)
+        body: (block
+          (javaswing_cell_renderer_editor_local_declaration
+            type: (javaswing_cell_renderer_editor_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_cell_renderer_editor_creation
+                  type: (javaswing_cell_renderer_editor_class)
+                  arguments: (argument_list)))))
+          (javaswing_cell_renderer_editor_local_declaration
+            type: (javaswing_cell_renderer_editor_class)
+            declarator: (variable_declarator
+              name: (identifier)
+              value: (object_creation_expression
+                (javaswing_cell_renderer_editor_creation
+                  type: (javaswing_cell_renderer_editor_class)
+                  arguments: (argument_list
+                    (identifier)))))))))))
+
+========================================
+Cell renderer editor wiring methods
+========================================
+
+class Example {
+  void init(JTable table, JTableHeader header, TableColumn column) {
+    table.setDefaultRenderer(Object.class, renderer);
+    table.setDefaultEditor(Boolean.class, editor);
+    header.setDefaultRenderer(renderer);
+    column.setCellRenderer(renderer);
+    column.setCellEditor(editor);
+    column.setHeaderRenderer(renderer);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier))
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (class_literal
+                    (type_identifier))
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (class_literal
+                    (type_identifier))
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier))))))))))
+
+========================================
+Cell renderer editor callback methods
+========================================
+
+class Example implements TableCellRenderer {
+  void init(TableCellRenderer renderer, ListCellRenderer listRenderer, TableCellEditor editor) {
+    renderer.getTableCellRendererComponent(table, value, selected, focus, row, column);
+    listRenderer.getListCellRendererComponent(list, value, index, selected, focus);
+    editor.getTableCellEditorComponent(table, value, selected, row, column);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    interfaces: (super_interfaces
+      (type_list
+        (javaswing_cell_renderer_editor_class)))
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (javaswing_cell_renderer_editor_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_cell_renderer_editor_class)
+            name: (identifier))
+          (formal_parameter
+            type: (javaswing_cell_renderer_editor_class)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier)
+                  (identifier)
+                  (identifier)
+                  (identifier)
+                  (identifier)
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier)
+                  (identifier)
+                  (identifier)
+                  (identifier)
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_cell_renderer_editor_interaction
+                renderer_editor: (identifier)
+                arguments: (argument_list
+                  (identifier)
+                  (identifier)
+                  (identifier)
+                  (identifier)
+                  (identifier))))))))))
+
+========================================
+Generic renderer editor methods remain outside rule
+========================================
+
+class Example {
+  void init(CustomWidget widget) {
+    widget.setRenderer(renderer);
+    widget.getRenderer();
+    widget.setEditor(editor);
+    widget.getEditor();
+    table.prepareRenderer(renderer, row, column);
+  }
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (method_declaration
+        type: (void_type)
+        name: (identifier)
+        parameters: (formal_parameters
+          (formal_parameter
+            type: (type_identifier)
+            name: (identifier)))
+        body: (block
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                combo_box: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                combo_box: (identifier)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                combo_box: (identifier)
+                arguments: (argument_list
+                  (identifier)))))
+          (expression_statement
+            (method_invocation
+              (javaswing_combo_box_interaction
+                combo_box: (identifier)
+                arguments: (argument_list))))
+          (expression_statement
+            (method_invocation
+              object: (identifier)
+              name: (identifier)
+              arguments: (argument_list
+                (identifier)
+                (identifier)
+                (identifier)))))))))
