@@ -139,6 +139,7 @@ jobs:
       - javaswing-language-wheel
     runs-on: ubuntu-latest
     if: needs.resolve-version.outputs.publish == 'true'
+    environment: pypi
     permissions:
       contents: read
       id-token: write
