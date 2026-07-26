@@ -63,6 +63,10 @@ Each node is a MessagePack map. The keys present depend on `TsmpOptions.fields`.
 | `TSMP_FIELD_BYTE_RANGE` | `startByte` | unsigned integer |
 | `TSMP_FIELD_BYTE_RANGE` | `endByte` | unsigned integer |
 | `TSMP_FIELD_CHILD_COUNT` | `childCount` | unsigned integer |
+| `TSMP_FIELD_FIELD_NAME` | `fieldName` | string or nil |
+| `TSMP_FIELD_CHILD_INDEX` | `childIndex` | unsigned integer |
+| `TSMP_FIELD_NAMED` | `isNamed` | bool |
+| `TSMP_FIELD_DEPTH` | `depth` | unsigned integer |
 | `TSMP_FIELD_DIAGNOSTICS` | `isError` | bool |
 | `TSMP_FIELD_DIAGNOSTICS` | `isMissing` | bool |
 | `TSMP_FIELD_DIAGNOSTICS` | `hasError` | bool |

@@ -12,6 +12,9 @@ TSMP_1.0 {
         fastparse_result_free;
         fastparse_load_language_extension;
         fastparse_language_available;
+        fastparse_language_count;
+        fastparse_language_name;
+        fastparse_language_display_name;
         fastparse_language_load_result_free;
     local:
         *;

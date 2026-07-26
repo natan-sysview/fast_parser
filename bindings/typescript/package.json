@@ -1,0 +1,45 @@
+{
+  "name": "@natan-sysview/fastparse",
+  "version": "0.1.0",
+  "description": "TypeScript/Node/Electron binding for the FastParse native parser.",
+  "license": "Apache-2.0",
+  "author": "Natan Barron",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "runtimes",
+    "docs",
+    "examples",
+    "AI_AGENT_GUIDE.md",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@msgpack/msgpack": "^3.0.0",
+    "koffi": "^2.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "fastparse",
+    "tree-sitter",
+    "parser",
+    "ast",
+    "electron",
+    "typescript",
+    "native"
+  ]
+}

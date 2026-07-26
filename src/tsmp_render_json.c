@@ -69,7 +69,14 @@ int tsmp_json_children(TsmpBuffer *buffer, const TsmpRenderCtx *ctx, TSNode node
     return tsmp_buffer_append(buffer, "]");
 }
 
-int tsmp_json_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t parent_id)
+int tsmp_json_node(
+    TsmpRenderCtx *ctx,
+    TSNode node,
+    size_t node_id,
+    size_t parent_id,
+    const char *field_name,
+    uint32_t child_index,
+    uint32_t depth)
 {
     TsmpBuffer *buffer = &ctx->buffer;
     TSPoint start_point = ts_node_start_point(node);
@@ -90,6 +97,26 @@ int tsmp_json_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t paren
         } else if (!tsmp_buffer_append_size(buffer, parent_id)) {
             return 0;
         }
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_FIELD_NAME)) {
+        if (!append_json_key(buffer, "fieldName", &first)) return 0;
+        if (field_name) {
+            if (!tsmp_buffer_append_json_string(buffer, field_name)) return 0;
+        } else if (!tsmp_buffer_append(buffer, "null")) {
+            return 0;
+        }
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_CHILD_INDEX)) {
+        if (!append_json_key(buffer, "childIndex", &first)) return 0;
+        if (!tsmp_buffer_append_u32(buffer, child_index)) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_NAMED)) {
+        if (!append_json_key(buffer, "isNamed", &first)) return 0;
+        if (!append_json_bool(buffer, ts_node_is_named(node))) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_DEPTH)) {
+        if (!append_json_key(buffer, "depth", &first)) return 0;
+        if (!tsmp_buffer_append_u32(buffer, depth)) return 0;
     }
     if (tsmp_has_field(ctx, TSMP_FIELD_RULE)) {
         if (!append_json_key(buffer, "rule", &first)) return 0;

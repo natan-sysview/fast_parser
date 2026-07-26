@@ -91,6 +91,9 @@ Native functions:
 ```text
 fastparse_load_language_extension
 fastparse_language_available
+fastparse_language_count
+fastparse_language_name
+fastparse_language_display_name
 fastparse_language_load_result_free
 ```
 
@@ -185,6 +188,12 @@ TSMP_FIELD_BYTE_RANGE
 TSMP_FIELD_CHILD_COUNT
 TSMP_FIELD_CHILDREN
 TSMP_FIELD_DIAGNOSTICS
+TSMP_FIELD_CAPTURE_NAME
+TSMP_FIELD_PATTERN_INDEX
+TSMP_FIELD_FIELD_NAME
+TSMP_FIELD_CHILD_INDEX
+TSMP_FIELD_NAMED
+TSMP_FIELD_DEPTH
 TSMP_FIELD_ALL
 ```
 
@@ -203,6 +212,10 @@ startByte
 endByte
 childCount
 children
+fieldName
+childIndex
+isNamed
+depth
 hasErrors
 errorNodeCount
 missingNodeCount

@@ -122,12 +122,14 @@ dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExampl
 - [ ] Confirm `FastParser.Language.Python` trusted publishing policy exists on NuGet.
 - [ ] Confirm `FastParser.Language.JavaFrameworks` trusted publishing policy exists on NuGet when publishing Java Frameworks.
 - [ ] Confirm `FastParser.Language.JavaSwing` trusted publishing policy exists on NuGet when publishing JavaSwing.
+- [ ] Confirm npm scope `@natan-sysview` exists and trusted publishing is configured for `@natan-sysview/fastparse`.
 - [ ] Enable `PYPI_LANGUAGE_PYTHON_PUBLISH=true` when publishing the Python language extension.
 - [ ] Enable `PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH=true` when publishing the Java Frameworks language extension.
 - [ ] Enable `PYPI_LANGUAGE_JAVASWING_PUBLISH=true` when publishing the JavaSwing language extension.
 - [ ] Enable `NUGET_LANGUAGE_PYTHON_PUBLISH=true` when publishing the NuGet language extension.
 - [ ] Enable `NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH=true` when publishing the Java Frameworks NuGet language extension.
 - [ ] Enable `NUGET_LANGUAGE_JAVASWING_PUBLISH=true` when publishing the JavaSwing NuGet language extension.
+- [ ] Enable `NPM_PUBLISH=true` only when publishing the TypeScript npm package.
 - [ ] Confirm published language extension smoke tests pass on Linux, Windows, macOS arm64, and macOS x64.
 - [ ] Include supported platforms in release notes.
 - [ ] Include known limitations.

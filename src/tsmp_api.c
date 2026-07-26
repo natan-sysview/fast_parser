@@ -448,6 +448,21 @@ int fastparse_language_available(const char *language)
     return tsmp_language_available(language);
 }
 
+size_t fastparse_language_count(void)
+{
+    return tsmp_language_count();
+}
+
+const char *fastparse_language_name(size_t index)
+{
+    return tsmp_language_name(index);
+}
+
+const char *fastparse_language_display_name(size_t index)
+{
+    return tsmp_language_display_name(index);
+}
+
 void fastparse_language_load_result_free(FastParseLanguageLoadResult *result)
 {
     if (!result) return;

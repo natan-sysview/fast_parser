@@ -1,0 +1,11 @@
+{
+  "name": "fastparse-typescript-parse-java-example",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@natan-sysview/fastparse": "file:../../../bindings/typescript"
+  }
+}

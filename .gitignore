@@ -16,6 +16,8 @@ exports/*.sqlite-wal
 *.pyc
 __pycache__/
 *.egg-info/
+node_modules/
+npm-debug.log*
 bindings/csharp/**/bin/
 bindings/csharp/**/obj/
 examples/csharp/**/bin/

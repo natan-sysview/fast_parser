@@ -107,6 +107,47 @@ int tsmp_language_available(const char *name)
     return tsmp_find_language(name) != NULL;
 }
 
+size_t tsmp_language_count(void)
+{
+    size_t builtin_count = 0;
+    while (TSMP_LANGUAGES[builtin_count].name != NULL) {
+        builtin_count++;
+    }
+    return builtin_count + TSMP_EXTENSION_LANGUAGE_COUNT;
+}
+
+const char *tsmp_language_name(size_t index)
+{
+    size_t builtin_count = 0;
+    while (TSMP_LANGUAGES[builtin_count].name != NULL) {
+        if (builtin_count == index) {
+            return TSMP_LANGUAGES[builtin_count].name;
+        }
+        builtin_count++;
+    }
+    index -= builtin_count;
+    if (index >= TSMP_EXTENSION_LANGUAGE_COUNT) {
+        return NULL;
+    }
+    return TSMP_EXTENSION_LANGUAGES[index].name;
+}
+
+const char *tsmp_language_display_name(size_t index)
+{
+    size_t builtin_count = 0;
+    while (TSMP_LANGUAGES[builtin_count].name != NULL) {
+        if (builtin_count == index) {
+            return TSMP_LANGUAGES[builtin_count].name;
+        }
+        builtin_count++;
+    }
+    index -= builtin_count;
+    if (index >= TSMP_EXTENSION_LANGUAGE_COUNT) {
+        return NULL;
+    }
+    return TSMP_EXTENSION_LANGUAGES[index].display_name;
+}
+
 int tsmp_register_language_extension(
     const FastParseLanguageDescriptor *descriptor,
     void *library_handle,

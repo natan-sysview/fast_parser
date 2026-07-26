@@ -7,6 +7,9 @@
 
 const TSLanguage *tsmp_find_language(const char *name);
 int tsmp_language_available(const char *name);
+size_t tsmp_language_count(void);
+const char *tsmp_language_name(size_t index);
+const char *tsmp_language_display_name(size_t index);
 int tsmp_register_language_extension(
     const FastParseLanguageDescriptor *descriptor,
     void *library_handle,

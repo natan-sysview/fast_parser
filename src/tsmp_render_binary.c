@@ -145,6 +145,10 @@ static uint32_t node_property_count(const TsmpRenderCtx *ctx)
     uint32_t count = 0;
     if (tsmp_has_field(ctx, TSMP_FIELD_ID)) count++;
     if (tsmp_has_field(ctx, TSMP_FIELD_PARENT_ID)) count++;
+    if (tsmp_has_field(ctx, TSMP_FIELD_FIELD_NAME)) count++;
+    if (tsmp_has_field(ctx, TSMP_FIELD_CHILD_INDEX)) count++;
+    if (tsmp_has_field(ctx, TSMP_FIELD_NAMED)) count++;
+    if (tsmp_has_field(ctx, TSMP_FIELD_DEPTH)) count++;
     if (tsmp_has_field(ctx, TSMP_FIELD_RULE)) count++;
     if (tsmp_has_field(ctx, TSMP_FIELD_TEXT)) count++;
     if (tsmp_has_field(ctx, TSMP_FIELD_RANGE)) count += 4;
@@ -224,7 +228,14 @@ int tsmp_binary_end(TsmpRenderCtx *ctx, size_t total_nodes)
     return mp_uint(buffer, (uint64_t)ctx->node_count);
 }
 
-int tsmp_binary_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t parent_id)
+int tsmp_binary_node(
+    TsmpRenderCtx *ctx,
+    TSNode node,
+    size_t node_id,
+    size_t parent_id,
+    const char *field_name,
+    uint32_t child_index,
+    uint32_t depth)
 {
     TsmpBuffer *buffer = &ctx->buffer;
     TSPoint start_point = ts_node_start_point(node);
@@ -242,6 +253,23 @@ int tsmp_binary_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t par
         } else if (!mp_uint(buffer, (uint64_t)parent_id)) {
             return 0;
         }
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_FIELD_NAME)) {
+        if (!mp_key(buffer, "fieldName")) return 0;
+        if (field_name) {
+            if (!mp_str(buffer, field_name)) return 0;
+        } else if (!mp_nil(buffer)) {
+            return 0;
+        }
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_CHILD_INDEX)) {
+        if (!mp_key(buffer, "childIndex") || !mp_uint(buffer, child_index)) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_NAMED)) {
+        if (!mp_key(buffer, "isNamed") || !mp_bool(buffer, ts_node_is_named(node))) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_DEPTH)) {
+        if (!mp_key(buffer, "depth") || !mp_uint(buffer, depth)) return 0;
     }
     if (tsmp_has_field(ctx, TSMP_FIELD_RULE)) {
         if (!mp_key(buffer, "rule") || !mp_str(buffer, ts_node_type(node))) return 0;

@@ -27,6 +27,13 @@ static int fail_result(const char *label, const TsmpResult *result)
 
 int main(void)
 {
+    if (fastparse_language_count() == 0 ||
+        !fastparse_language_name(0) ||
+        !fastparse_language_display_name(0)) {
+        fprintf(stderr, "FastParse language discovery contract failed\n");
+        return 1;
+    }
+
     const unsigned char source[] = "class Demo { // caf\xe9\n  void m() {}\n}\n";
     TsmpResult result;
 
@@ -122,7 +129,37 @@ int main(void)
         fprintf(stderr, "json did not escape non-UTF8 byte\n");
         return 1;
     }
+    if (contains_bytes(result.data, result.length, "\"fieldName\"")) {
+        tsmp_result_free(&result);
+        fprintf(stderr, "legacy requested fields unexpectedly included new structural fields\n");
+        return 1;
+    }
     tsmp_result_free(&result);
+
+    TsmpOptions structural_options = {
+        "java",
+        TSMP_FORMAT_JSON,
+        NULL,
+        TSMP_FIELD_RULE |
+            TSMP_FIELD_FIELD_NAME |
+            TSMP_FIELD_CHILD_INDEX |
+            TSMP_FIELD_NAMED |
+            TSMP_FIELD_DEPTH,
+        0,
+        0
+    };
+
+    status = fastparse_parse(source, sizeof(source) - 1, &structural_options, &result);
+    if (status != TSMP_OK || result.status != TSMP_OK) return fail_result("structural parse", &result);
+    if (!contains_bytes(result.data, result.length, "\"fieldName\":\"name\"") ||
+        !contains_bytes(result.data, result.length, "\"childIndex\":") ||
+        !contains_bytes(result.data, result.length, "\"isNamed\":true") ||
+        !contains_bytes(result.data, result.length, "\"depth\":")) {
+        fastparse_result_free(&result);
+        fprintf(stderr, "structural fields payload did not match expected shape\n");
+        return 1;
+    }
+    fastparse_result_free(&result);
 
     TsmpOptions binary_options = {
         "java",

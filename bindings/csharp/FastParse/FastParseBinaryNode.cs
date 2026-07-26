@@ -11,6 +11,18 @@ public sealed class FastParseBinaryNode
     /// <summary>Parent node id when requested.</summary>
     public ulong? ParentId { get; init; }
 
+    /// <summary>Tree-sitter field name connecting this node to its direct parent when requested.</summary>
+    public string? FieldName { get; init; }
+
+    /// <summary>Zero-based Tree-sitter child index within the direct parent when requested.</summary>
+    public ulong? ChildIndex { get; init; }
+
+    /// <summary>Whether this node is named by the Tree-sitter grammar when requested.</summary>
+    public bool? IsNamed { get; init; }
+
+    /// <summary>Zero-based node depth, where the root is depth zero, when requested.</summary>
+    public ulong? Depth { get; init; }
+
     /// <summary>Tree-sitter grammar rule name when requested.</summary>
     public string? Rule { get; init; }
 

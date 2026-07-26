@@ -44,15 +44,36 @@ int tsmp_render_tree(
     TsmpResult *out_result);
 
 int tsmp_json_begin(TsmpRenderCtx *ctx);
-int tsmp_json_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t parent_id);
+int tsmp_json_node(
+    TsmpRenderCtx *ctx,
+    TSNode node,
+    size_t node_id,
+    size_t parent_id,
+    const char *field_name,
+    uint32_t child_index,
+    uint32_t depth);
 int tsmp_json_end(TsmpRenderCtx *ctx);
 int tsmp_json_children(TsmpBuffer *buffer, const TsmpRenderCtx *ctx, TSNode node);
 
 int tsmp_csv_begin(TsmpRenderCtx *ctx);
-int tsmp_csv_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t parent_id);
+int tsmp_csv_node(
+    TsmpRenderCtx *ctx,
+    TSNode node,
+    size_t node_id,
+    size_t parent_id,
+    const char *field_name,
+    uint32_t child_index,
+    uint32_t depth);
 
 int tsmp_binary_begin(TsmpRenderCtx *ctx, size_t total_nodes);
-int tsmp_binary_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t parent_id);
+int tsmp_binary_node(
+    TsmpRenderCtx *ctx,
+    TSNode node,
+    size_t node_id,
+    size_t parent_id,
+    const char *field_name,
+    uint32_t child_index,
+    uint32_t depth);
 int tsmp_binary_end(TsmpRenderCtx *ctx, size_t total_nodes);
 
 #endif /* TSMP_RENDER_H */

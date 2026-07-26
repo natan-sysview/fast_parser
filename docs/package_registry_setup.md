@@ -21,8 +21,37 @@ GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables
 | `NUGET_LANGUAGE_PYTHON_PUBLISH` | `true` | Publish `FastParser.Language.Python` to nuget.org. |
 | `NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH` | `true` | Publish `FastParser.Language.JavaFrameworks` to nuget.org. |
 | `NUGET_LANGUAGE_JAVASWING_PUBLISH` | `true` | Publish `FastParser.Language.JavaSwing` to nuget.org. |
+| `NPM_PUBLISH` | `true` | Publish `@natan-sysview/fastparse` to npm. |
 
 The core `FastParser` NuGet package is published on tags by the existing NuGet trusted publishing step.
+
+## npm Trusted Publishing
+
+The unscoped `fastparse` npm package name is already used by another project, so the TypeScript/Node/Electron binding should publish under a scope:
+
+```text
+@natan-sysview/fastparse
+```
+
+Required setup on npm:
+
+1. Create or verify access to the npm scope `@natan-sysview`.
+2. Configure trusted publishing for the GitHub repository:
+
+```text
+Owner:      natan-sysview
+Repository: fast_parser
+Workflow:   release.yml
+Package:    @natan-sysview/fastparse
+```
+
+3. In GitHub repository variables, set this only when releases should publish to npm:
+
+```text
+NPM_PUBLISH=true
+```
+
+The release workflow always builds and validates the `.tgz` artifact. It only publishes on tag releases when `NPM_PUBLISH` is `true`.
 
 ## PyPI Trusted Publishers
 
@@ -156,15 +185,16 @@ GitHub Actions will:
 
 1. Build native core archives for Linux, macOS arm64, macOS x64, and Windows.
 2. Build core NuGet and PyPI packages.
-3. Build Python, Java Frameworks, and JavaSwing language extension native archives.
-4. Build `fastparse-language-python` wheels.
-5. Build `fastparse-language-java-frameworks` wheels.
-6. Build `FastParser.Language.Python`.
-7. Build `FastParser.Language.JavaFrameworks`.
-8. Build `FastParser.Language.JavaSwing`.
-9. Publish enabled packages to their registries.
-10. Run post-publish smoke tests from the public registries.
-11. Attach release assets and `SHA256SUMS.txt` to GitHub Releases.
+3. Build and validate the TypeScript npm package with native runtime assets.
+4. Build Python, Java Frameworks, and JavaSwing language extension native archives.
+5. Build `fastparse-language-python` wheels.
+6. Build `fastparse-language-java-frameworks` wheels.
+7. Build `FastParser.Language.Python`.
+8. Build `FastParser.Language.JavaFrameworks`.
+9. Build `FastParser.Language.JavaSwing`.
+10. Publish enabled packages to their registries.
+11. Run post-publish smoke tests from the public registries.
+12. Attach release assets and `SHA256SUMS.txt` to GitHub Releases.
 
 ## Developer Install Commands
 
@@ -183,6 +213,12 @@ dotnet add package FastParser
 dotnet add package FastParser.Language.Python
 dotnet add package FastParser.Language.JavaFrameworks
 dotnet add package FastParser.Language.JavaSwing
+```
+
+TypeScript / Node / Electron:
+
+```bash
+npm install @natan-sysview/fastparse
 ```
 
 Minimal Python smoke:

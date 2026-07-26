@@ -10,4 +10,7 @@ _fastparse_query
 _fastparse_result_free
 _fastparse_load_language_extension
 _fastparse_language_available
+_fastparse_language_count
+_fastparse_language_name
+_fastparse_language_display_name
 _fastparse_language_load_result_free

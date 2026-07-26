@@ -141,7 +141,13 @@ static size_t count_walk(const TsmpOptions *options, TSNode node)
     return count;
 }
 
-static int render_walk(TsmpRenderCtx *ctx, TSNode node, size_t parent_id)
+static int render_walk(
+    TsmpRenderCtx *ctx,
+    TSNode node,
+    size_t parent_id,
+    const char *field_name,
+    uint32_t child_index,
+    uint32_t depth)
 {
     if (!ts_node_is_named(node)) return 1;
 
@@ -152,11 +158,32 @@ static int render_walk(TsmpRenderCtx *ctx, TSNode node, size_t parent_id)
     if (included) {
         current_id = ctx->next_id++;
         if (ctx->options->format == TSMP_FORMAT_JSON) {
-            if (!tsmp_json_node(ctx, node, current_id, parent_id)) return 0;
+            if (!tsmp_json_node(
+                    ctx,
+                    node,
+                    current_id,
+                    parent_id,
+                    field_name,
+                    child_index,
+                    depth)) return 0;
         } else if (ctx->options->format == TSMP_FORMAT_CSV) {
-            if (!tsmp_csv_node(ctx, node, current_id, parent_id)) return 0;
+            if (!tsmp_csv_node(
+                    ctx,
+                    node,
+                    current_id,
+                    parent_id,
+                    field_name,
+                    child_index,
+                    depth)) return 0;
         } else if (ctx->options->format == TSMP_FORMAT_BINARY) {
-            if (!tsmp_binary_node(ctx, node, current_id, parent_id)) return 0;
+            if (!tsmp_binary_node(
+                    ctx,
+                    node,
+                    current_id,
+                    parent_id,
+                    field_name,
+                    child_index,
+                    depth)) return 0;
         } else {
             return 0;
         }
@@ -165,7 +192,13 @@ static int render_walk(TsmpRenderCtx *ctx, TSNode node, size_t parent_id)
 
     uint32_t child_count = ts_node_child_count(node);
     for (uint32_t i = 0; i < child_count; i++) {
-        if (!render_walk(ctx, ts_node_child(node, i), current_id)) return 0;
+        if (!render_walk(
+                ctx,
+                ts_node_child(node, i),
+                current_id,
+                ts_node_field_name_for_child(node, i),
+                i,
+                depth + 1)) return 0;
     }
 
     return 1;
@@ -228,7 +261,7 @@ int tsmp_render_tree(
         return TSMP_ERROR_UNSUPPORTED_FORMAT;
     }
 
-    if (!render_walk(&ctx, ts_tree_root_node(tree), 0)) goto oom;
+    if (!render_walk(&ctx, ts_tree_root_node(tree), 0, NULL, 0, 0)) goto oom;
 
     if (options->format == TSMP_FORMAT_JSON && !tsmp_json_end(&ctx)) goto oom;
     if (options->format == TSMP_FORMAT_BINARY && !tsmp_binary_end(&ctx, total_nodes)) goto oom;

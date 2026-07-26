@@ -7,6 +7,7 @@ Target bindings:
 ```text
 Python
 C#
+TypeScript / Node / Electron
 Rust
 Java
 ```
@@ -83,6 +84,7 @@ Binding cleanup patterns:
 |---|---|
 | Python | `try/finally` around `ctypes` call. |
 | C# | `try/finally` or `SafeHandle`/`IDisposable`. |
+| TypeScript | copy native output into a Node `Buffer` and free in `finally`. |
 | Rust | `Drop` implementation around an owned result wrapper. |
 
 Bindings should copy native `result.data` into a managed/runtime-owned buffer before freeing the native result.
@@ -127,6 +129,10 @@ range
 byte_range
 child_count
 children
+field_name
+child_index
+named
+depth
 all
 ```
 
@@ -219,6 +225,7 @@ Recommended decoders:
 |---|---|
 | Python | `msgpack` |
 | C# | MessagePack-CSharp |
+| TypeScript | `@msgpack/msgpack` |
 | Rust | `rmp` / `rmp-serde` |
 | Java | msgpack-java |
 
@@ -324,6 +331,49 @@ Console.WriteLine(document.Nodes[0].Text); // byte[]
 ```
 
 This decoder understands the FastParse schema v1 and avoids external dependencies.
+
+## TypeScript / Node / Electron Binding
+
+The project includes a TypeScript binding:
+
+```text
+bindings/typescript
+```
+
+It uses `koffi` to call the FastParse C ABI from Node.js and Electron without creating a custom native addon in this repository.
+
+Required API:
+
+```ts
+new FastParseClient()
+new FastParseClient({ libraryPath })
+parser.parseBytes(source, options)
+parser.parseText(source, options)
+parser.parseBytesSummary(source, options)
+parser.queryBytes(source, query, options)
+parser.queryText(source, query, options)
+parser.loadLanguageExtension(path)
+parser.loadBundledLanguage(language)
+result.data
+result.text()
+result.json()
+result.binaryDocument()
+```
+
+Electron guidance:
+
+- Prefer Electron main process or a preload script.
+- Do not let untrusted renderer input choose native library paths.
+- Parent application owns file IO, IPC, queues, and persistence.
+- Use one `FastParseClient` per worker thread unless sharing has been tested for the application.
+
+Local validation:
+
+```bash
+cd bindings/typescript
+npm install
+FASTPARSE_LIBRARY_PATH=/path/to/libfastparse.dylib npm test
+```
 
 ## Rust Notes
 

@@ -20,6 +20,9 @@ examples/
     01_parse_string/
     04_query/
     03_inventory_to_sqlite/
+
+  typescript/
+    01_parse_java/
 ```
 
 ## Python
@@ -91,4 +94,14 @@ Build an exploration SQLite database from the Java inventory:
 dotnet run --project examples/csharp/03_inventory_to_sqlite/FastParse.InventoryToSqliteExample.csproj -- \
   --workers 12 \
   --out-db data/fastparse_java_ast_nodes_csharp.sqlite
+```
+
+## TypeScript / Node / Electron
+
+Parse Java, run a Tree-sitter query, and decode binary MessagePack from a clean Node consumer:
+
+```bash
+cd examples/typescript/01_parse_java
+npm install
+FASTPARSE_LIBRARY_PATH=/Users/natanbarronlugo/Desktop/Proyectos/fast_parser/bin/libfastparse.dylib npm start
 ```

@@ -72,6 +72,10 @@ typedef enum {
     TSMP_FIELD_DIAGNOSTICS = 1u << 8,
     TSMP_FIELD_CAPTURE_NAME = 1u << 9,
     TSMP_FIELD_PATTERN_INDEX = 1u << 10,
+    TSMP_FIELD_FIELD_NAME   = 1u << 11,
+    TSMP_FIELD_CHILD_INDEX = 1u << 12,
+    TSMP_FIELD_NAMED       = 1u << 13,
+    TSMP_FIELD_DEPTH       = 1u << 14,
     TSMP_FIELD_ALL         = 0xFFFFFFFFu
 } TsmpFieldMask;
 
@@ -168,6 +172,12 @@ TSMP_API int fastparse_load_language_extension(
 
 TSMP_API int fastparse_language_available(
     const char *language);
+
+TSMP_API size_t fastparse_language_count(void);
+
+TSMP_API const char *fastparse_language_name(size_t index);
+
+TSMP_API const char *fastparse_language_display_name(size_t index);
 
 TSMP_API void fastparse_language_load_result_free(
     FastParseLanguageLoadResult *result);

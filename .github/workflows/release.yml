@@ -197,6 +197,67 @@ jobs:
             dist/nuget/*.nupkg
             dist/nuget/*.snupkg
 
+  npm-package:
+    name: npm Package
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download native archives
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          pattern: fastparse-${{ steps.version.outputs.value }}-*
+          merge-multiple: true
+
+      - name: Build npm package
+        shell: bash
+        run: |
+          archives=()
+          while IFS= read -r -d '' archive; do
+            archives+=(--archive "$archive")
+          done < <(find release-artifacts -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' \) -print0)
+          python scripts/package_npm.py --version "${{ steps.version.outputs.value }}" "${archives[@]}"
+
+      - name: Validate npm package
+        shell: bash
+        run: |
+          package="$(find dist/npm -maxdepth 1 -name '*.tgz' | head -n 1)"
+          python scripts/validate_npm_package.py "$package" --require-all-platforms
+
+      - name: Publish npm package
+        shell: bash
+        run: npm publish "$(find dist/npm -maxdepth 1 -name '*.tgz' | head -n 1)" --access public --provenance
+        if: startsWith(github.ref, 'refs/tags/') && vars.NPM_PUBLISH == 'true'
+
+      - name: Upload npm artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-${{ steps.version.outputs.value }}-npm
+          path: dist/npm/*.tgz
+
   python-wheel:
     name: Python Wheel ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}

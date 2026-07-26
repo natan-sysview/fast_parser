@@ -4,6 +4,24 @@ All notable changes to FastParse will be documented here.
 
 This project follows semantic versioning once the first stable release is published.
 
+## Unreleased
+
+### Added
+
+- Additive C ABI functions `fastparse_language_count`,
+  `fastparse_language_name`, and `fastparse_language_display_name` for
+  deterministic grammar discovery by hosts such as Malib.
+- Structural node fields `fieldName`, `childIndex`, `isNamed`, and `depth`
+  across JSON, CSV, and MessagePack outputs.
+- Matching field flags in the C, C#, Python, and TypeScript bindings.
+
+### Compatibility
+
+- Existing ABI functions, enum values, result ownership, and cleanup functions
+  remain unchanged.
+- New field masks use previously unused bits and are opt-in unless callers
+  request the default/all field set.
+
 ## 0.1.0
 
 ### Added

@@ -120,6 +120,10 @@ public static class FastParseMessagePack
             var count = ReadMapLength();
             ulong? id = null;
             ulong? parentId = null;
+            string? fieldName = null;
+            ulong? childIndex = null;
+            bool? isNamed = null;
+            ulong? depth = null;
             string? rule = null;
             byte[]? text = null;
             ulong? startLine = null;
@@ -144,6 +148,18 @@ public static class FastParseMessagePack
                         break;
                     case "parentId":
                         parentId = TryReadNil() ? null : ReadUIntAfterPeek();
+                        break;
+                    case "fieldName":
+                        fieldName = TryReadNil() ? null : ReadString();
+                        break;
+                    case "childIndex":
+                        childIndex = ReadUInt();
+                        break;
+                    case "isNamed":
+                        isNamed = ReadBool();
+                        break;
+                    case "depth":
+                        depth = ReadUInt();
                         break;
                     case "rule":
                         rule = ReadString();
@@ -194,6 +210,10 @@ public static class FastParseMessagePack
             {
                 Id = id,
                 ParentId = parentId,
+                FieldName = fieldName,
+                ChildIndex = childIndex,
+                IsNamed = isNamed,
+                Depth = depth,
                 Rule = rule,
                 Text = text,
                 StartLine = startLine,

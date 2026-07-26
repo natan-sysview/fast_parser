@@ -83,6 +83,36 @@ public sealed class FastParseClientTests
     }
 
     [Fact]
+    public void StructuralFieldsExposeGrammarRelationshipsWithoutChangingLegacySelections()
+    {
+        using var parser = NewParser();
+
+        var result = parser.ParseText(Source, new ParseOptions
+        {
+            Format = FastParseFormat.Binary,
+            Fields = FastParseField.Id |
+                     FastParseField.ParentId |
+                     FastParseField.Rule |
+                     FastParseField.FieldName |
+                     FastParseField.ChildIndex |
+                     FastParseField.Named |
+                     FastParseField.Depth
+        });
+        var document = FastParseMessagePack.Decode(result.Data);
+
+        var method = document.Nodes.Single(node => node.Rule == "method_declaration");
+        var methodName = document.Nodes.Single(node =>
+            node.Rule == "identifier" &&
+            node.FieldName == "name" &&
+            node.ParentId == method.Id);
+
+        Assert.NotNull(methodName.Id);
+        Assert.NotNull(methodName.ParentId);
+        Assert.NotNull(methodName.ChildIndex);
+        Assert.True(methodName.IsNamed);
+    }
+
+    [Fact]
     public void JsonDiagnosticsReportsTreeSitterErrors()
     {
         using var parser = NewParser();

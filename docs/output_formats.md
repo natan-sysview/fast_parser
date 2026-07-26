@@ -44,6 +44,10 @@ Node fields depend on the requested field mask.
 
 Diagnostic top-level fields appear when `TSMP_FIELD_DIAGNOSTICS` is requested, or when the default/all field set is used. Per-node diagnostics are `isError`, `isMissing`, and `hasError`.
 
+Structural consumers can request `fieldName`, `childIndex`, `isNamed`, and
+`depth`. These fields let a host navigate Tree-sitter parent/child
+relationships without reconstructing grammar metadata from source text.
+
 ## CSV
 
 Native constant:
@@ -63,7 +67,7 @@ CSV columns depend on the requested field mask.
 When diagnostics are requested, CSV adds flat columns:
 
 ```text
-is_error,is_missing,has_error
+field_name,child_index,is_named,depth,is_error,is_missing,has_error
 ```
 
 ## Binary MessagePack

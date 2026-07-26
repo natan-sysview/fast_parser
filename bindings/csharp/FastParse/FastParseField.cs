@@ -42,6 +42,18 @@ public enum FastParseField : uint
     /// <summary>Include the matched Tree-sitter query pattern index.</summary>
     PatternIndex = 1u << 10,
 
+    /// <summary>Include the Tree-sitter field name connecting the node to its direct parent.</summary>
+    FieldName = 1u << 11,
+
+    /// <summary>Include the zero-based Tree-sitter child index within the direct parent.</summary>
+    ChildIndex = 1u << 12,
+
+    /// <summary>Include whether the node is named by the Tree-sitter grammar.</summary>
+    Named = 1u << 13,
+
+    /// <summary>Include the zero-based node depth, where the root is depth zero.</summary>
+    Depth = 1u << 14,
+
     /// <summary>Request all supported fields.</summary>
     All = 0xFFFFFFFFu
 }

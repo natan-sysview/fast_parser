@@ -18,6 +18,10 @@ class BinaryChild:
 class BinaryNode:
     id: int | None = None
     parent_id: int | None = None
+    field_name: str | None = None
+    child_index: int | None = None
+    is_named: bool | None = None
+    depth: int | None = None
     rule: str | None = None
     text: bytes | None = None
     start_line: int | None = None
@@ -191,6 +195,10 @@ def _decode_node(raw: Any) -> BinaryNode:
     return BinaryNode(
         id=raw.get("id"),
         parent_id=raw.get("parentId"),
+        field_name=raw.get("fieldName"),
+        child_index=raw.get("childIndex"),
+        is_named=raw.get("isNamed"),
+        depth=raw.get("depth"),
         rule=raw.get("rule"),
         text=raw.get("text"),
         start_line=raw.get("startLine"),

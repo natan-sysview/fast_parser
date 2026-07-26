@@ -11,8 +11,11 @@ The first public version ships with Java support. Parent applications own file I
 - Lets callers choose which node fields are returned.
 - Returns JSON, CSV, MessagePack binary, or stats.
 - Returns diagnostics-only quality reports for large grammar scans.
-- Exposes a small C ABI designed for Python, C#, Rust, Java, and other bindings.
+- Exposes a small C ABI designed for Python, C#, TypeScript/Node/Electron, Rust, Java, and other bindings.
 - Can load optional language extensions by native library path.
+- Enumerates built-in and dynamically loaded grammars through an additive C API.
+- Exposes structural node metadata such as grammar field name, child index,
+  named-node status, and depth.
 - Can apply safe memory-only normalization for legacy sources such as COBOL trailers.
 - Is thread-safe per parse call.
 
@@ -191,6 +194,13 @@ Current bindings:
 ```text
 bindings/python
 bindings/csharp/FastParse
+bindings/typescript
+```
+
+The TypeScript binding is intended for Node.js and Electron. Its npm package name is scoped because the unscoped `fastparse` name is already taken:
+
+```text
+@natan-sysview/fastparse
 ```
 
 Bindings are reusable code intended for application developers. Runnable demos and lab applications live under `examples/`.
@@ -204,6 +214,7 @@ Bindings are reusable code intended for application developers. Runnable demos a
 - [Binding Contracts](docs/bindings.md)
 - [Python Binding](docs/python_binding.md)
 - [C# Binding](docs/csharp_binding.md)
+- [TypeScript Binding](docs/typescript_binding.md)
 - [AI Agent Integration Guide](docs/ai_agent_integration.md)
 - [Encoding And Bytes Contract](docs/encoding.md)
 - [Threading, Platforms, And Packaging](docs/packaging.md)

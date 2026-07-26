@@ -65,6 +65,17 @@ int fastparse_language_available(const char *language);
 Returns non-zero when a language is registered.
 
 ```c
+size_t fastparse_language_count(void);
+const char *fastparse_language_name(size_t index);
+const char *fastparse_language_display_name(size_t index);
+```
+
+Enumerates registered languages in deterministic registry order. Returned
+strings are borrowed from FastParse and must not be freed. An out-of-range
+index returns `NULL`. Load language extensions before starting concurrent
+parsing or enumeration.
+
+```c
 void fastparse_language_load_result_free(
     FastParseLanguageLoadResult *result);
 ```

@@ -21,6 +21,10 @@ int tsmp_csv_begin(TsmpRenderCtx *ctx)
     int first = 1;
     if (!append_header_field(ctx, &first, TSMP_FIELD_ID, "id")) return 0;
     if (!append_header_field(ctx, &first, TSMP_FIELD_PARENT_ID, "parent_id")) return 0;
+    if (!append_header_field(ctx, &first, TSMP_FIELD_FIELD_NAME, "field_name")) return 0;
+    if (!append_header_field(ctx, &first, TSMP_FIELD_CHILD_INDEX, "child_index")) return 0;
+    if (!append_header_field(ctx, &first, TSMP_FIELD_NAMED, "is_named")) return 0;
+    if (!append_header_field(ctx, &first, TSMP_FIELD_DEPTH, "depth")) return 0;
     if (!append_header_field(ctx, &first, TSMP_FIELD_RULE, "rule")) return 0;
     if (!append_header_field(ctx, &first, TSMP_FIELD_TEXT, "text")) return 0;
 
@@ -57,7 +61,14 @@ static int append_children_csv_field(TsmpBuffer *buffer, const TsmpRenderCtx *ct
     return ok;
 }
 
-int tsmp_csv_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t parent_id)
+int tsmp_csv_node(
+    TsmpRenderCtx *ctx,
+    TSNode node,
+    size_t node_id,
+    size_t parent_id,
+    const char *field_name,
+    uint32_t child_index,
+    uint32_t depth)
 {
     TsmpBuffer *buffer = &ctx->buffer;
     TSPoint start_point = ts_node_start_point(node);
@@ -71,6 +82,26 @@ int tsmp_csv_node(TsmpRenderCtx *ctx, TSNode node, size_t node_id, size_t parent
     if (tsmp_has_field(ctx, TSMP_FIELD_PARENT_ID)) {
         if (!append_separator(buffer, &first)) return 0;
         if (parent_id != 0 && !tsmp_buffer_append_size(buffer, parent_id)) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_FIELD_NAME)) {
+        if (!append_separator(buffer, &first)) return 0;
+        if (field_name &&
+            !tsmp_buffer_append_csv_bytes(
+                buffer,
+                (const unsigned char *)field_name,
+                strlen(field_name))) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_CHILD_INDEX)) {
+        if (!append_separator(buffer, &first)) return 0;
+        if (!tsmp_buffer_append_u32(buffer, child_index)) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_NAMED)) {
+        if (!append_separator(buffer, &first)) return 0;
+        if (!tsmp_buffer_append(buffer, ts_node_is_named(node) ? "1" : "0")) return 0;
+    }
+    if (tsmp_has_field(ctx, TSMP_FIELD_DEPTH)) {
+        if (!append_separator(buffer, &first)) return 0;
+        if (!tsmp_buffer_append_u32(buffer, depth)) return 0;
     }
     if (tsmp_has_field(ctx, TSMP_FIELD_RULE)) {
         const char *rule = ts_node_type(node);
