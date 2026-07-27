@@ -12,6 +12,7 @@ option(TSMP_USE_VENDORED_TREE_SITTER "Compile the vendored Tree-sitter runtime" 
 set(FASTPARSE_COBOL_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-cobol grammar directory for the experimental COBOL language extension")
 set(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-java-frameworks grammar directory for the experimental Java Frameworks language extension")
 set(FASTPARSE_JAVASWING_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-javaswing grammar directory for the Java Swing language extension")
+set(FASTPARSE_PLSQL_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-plsql grammar directory for the PL/SQL language extension")
 set(FASTPARSE_PYTHON_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-python grammar directory for the experimental Python language extension")
 set(FASTPARSE_RUST_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-rust grammar directory for the experimental Rust language extension")
 
@@ -34,6 +35,13 @@ if(NOT FASTPARSE_JAVASWING_GRAMMAR_DIR AND EXISTS "${TSMP_GRAMMARS_DIR}/tree-sit
     set(FASTPARSE_JAVASWING_GRAMMAR_DIR
         "${TSMP_GRAMMARS_DIR}/tree-sitter-javaswing"
         CACHE PATH "Optional tree-sitter-javaswing grammar directory for the Java Swing language extension"
+        FORCE)
+endif()
+
+if(NOT FASTPARSE_PLSQL_GRAMMAR_DIR AND EXISTS "${TSMP_GRAMMARS_DIR}/tree-sitter-plsql/src/parser.c")
+    set(FASTPARSE_PLSQL_GRAMMAR_DIR
+        "${TSMP_GRAMMARS_DIR}/tree-sitter-plsql"
+        CACHE PATH "Optional tree-sitter-plsql grammar directory for the PL/SQL language extension"
         FORCE)
 endif()
 
@@ -186,6 +194,24 @@ if(FASTPARSE_JAVASWING_GRAMMAR_DIR)
         PRIVATE
             "${FASTPARSE_JAVASWING_GRAMMAR_DIR}/src")
     fastparse_configure_language_extension(fastparse_language_javaswing "fastparse_language_javaswing")
+endif()
+
+if(FASTPARSE_PLSQL_GRAMMAR_DIR)
+    if(NOT EXISTS "${FASTPARSE_PLSQL_GRAMMAR_DIR}/src/parser.c")
+        message(FATAL_ERROR "FASTPARSE_PLSQL_GRAMMAR_DIR must point to a tree-sitter-plsql checkout with src/parser.c")
+    endif()
+    set(FASTPARSE_PLSQL_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/extensions/plsql/fastparse_language_plsql.c"
+        "${FASTPARSE_PLSQL_GRAMMAR_DIR}/src/parser.c")
+    if(EXISTS "${FASTPARSE_PLSQL_GRAMMAR_DIR}/src/scanner.c")
+        list(APPEND FASTPARSE_PLSQL_SOURCES "${FASTPARSE_PLSQL_GRAMMAR_DIR}/src/scanner.c")
+    endif()
+    add_library(fastparse_language_plsql SHARED
+        ${FASTPARSE_PLSQL_SOURCES})
+    target_include_directories(fastparse_language_plsql
+        PRIVATE
+            "${FASTPARSE_PLSQL_GRAMMAR_DIR}/src")
+    fastparse_configure_language_extension(fastparse_language_plsql "fastparse_language_plsql")
 endif()
 
 if(FASTPARSE_PYTHON_GRAMMAR_DIR)
