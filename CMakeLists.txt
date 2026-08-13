@@ -158,6 +158,9 @@ if(FASTPARSE_COBOL_GRAMMAR_DIR)
     endif()
     add_library(fastparse_language_cobol SHARED
         ${FASTPARSE_COBOL_SOURCES})
+    if(MSVC)
+        target_compile_options(fastparse_language_cobol PRIVATE /bigobj)
+    endif()
     target_include_directories(fastparse_language_cobol
         PRIVATE
             "${FASTPARSE_COBOL_GRAMMAR_DIR}/src")
