@@ -208,6 +208,22 @@ Console.WriteLine(parser.LibraryPath);
 '''
 
 
+COBOL_PROGRAM = r'''using FastParse;
+
+using var parser = new FastParseClient();
+
+var load = parser.LoadBundledLanguage("cobol");
+if (load.Language != "cobol" || !parser.LanguageAvailable("cobol"))
+{
+    throw new InvalidOperationException("FastParser.Language.Cobol load smoke failed");
+}
+
+Console.WriteLine("FastParser published language NuGet smoke OK");
+Console.WriteLine(parser.Version);
+Console.WriteLine(parser.LibraryPath);
+'''
+
+
 def run_command(command: list[str], *, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
     completed = subprocess.run(
         command,
@@ -219,6 +235,23 @@ def run_command(command: list[str], *, env: dict[str, str]) -> subprocess.Comple
     if completed.returncode != 0:
         raise RuntimeError(f"command failed ({completed.returncode}): {' '.join(command)}\n{completed.stdout}")
     return completed
+
+
+def smoke_framework(env: dict[str, str]) -> str:
+    completed = run_command(["dotnet", "--list-sdks"], env=env)
+    majors = []
+    for line in completed.stdout.splitlines():
+        version = line.split()[0] if line.split() else ""
+        major = version.split(".", 1)[0]
+        if major.isdigit():
+            majors.append(int(major))
+    if 9 in majors:
+        return "net9.0"
+    if 10 in majors:
+        return "net10.0"
+    if 8 in majors:
+        return "net8.0"
+    return "net9.0"
 
 
 def parse_args() -> argparse.Namespace:
@@ -249,6 +282,8 @@ def smoke_program(language: str) -> str:
         return JAVA_FRAMEWORKS_PROGRAM
     if language == "javaswing":
         return JAVASWING_PROGRAM
+    if language == "cobol":
+        return COBOL_PROGRAM
     return PYTHON_PROGRAM
 
 
@@ -297,7 +332,7 @@ def main() -> int:
         env.pop(f"FASTPARSE_LANGUAGE_{args.language.replace('-', '_').upper()}_PATH", None)
 
         run_command(
-            ["dotnet", "new", "console", "--framework", "net9.0", "--output", str(project_dir)],
+            ["dotnet", "new", "console", "--framework", smoke_framework(env), "--output", str(project_dir)],
             env=env,
         )
         project = str(project_dir / "consumer.csproj")

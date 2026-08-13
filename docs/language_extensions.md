@@ -381,7 +381,7 @@ parser.load_language_extension("bin/libfastparse_language_cobol.dylib")
 result = parser.parse_bytes(source, language="cobol", fields=["rule", "diagnostics"])
 ```
 
-This is not packaged as `FastParser.Language.Cobol` yet. The first goal is to evaluate grammar quality against real COBOL corpora using diagnostics.
+COBOL is packaged as `FastParser.Language.Cobol` when the release workflow builds all required native RIDs. Because this grammar is experimental and can be slow on some inputs, package smoke tests validate bundled loading and layout; corpus-level parse quality remains a separate diagnostics benchmark.
 
 ## Experimental Python Extension
 

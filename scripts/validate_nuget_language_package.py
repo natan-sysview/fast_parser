@@ -204,6 +204,22 @@ Console.WriteLine(parser.LibraryPath);
 '''
 
 
+COBOL_PROGRAM = r'''using FastParse;
+
+using var parser = new FastParseClient();
+
+var load = parser.LoadBundledLanguage("cobol");
+if (load.Language != "cobol" || !parser.LanguageAvailable("cobol"))
+{
+    throw new InvalidOperationException("FastParser.Language.Cobol load smoke failed");
+}
+
+Console.WriteLine("FastParser language NuGet smoke OK");
+Console.WriteLine(parser.Version);
+Console.WriteLine(parser.LibraryPath);
+'''
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a FastParser.Language.* package from local nupkgs.")
     parser.add_argument("--core-package", type=Path, required=True)
@@ -262,6 +278,23 @@ def current_rid() -> str:
     return f"linux-{arch}"
 
 
+def smoke_framework(env: dict[str, str]) -> str:
+    completed = run_command(["dotnet", "--list-sdks"], env=env)
+    majors = []
+    for line in completed.stdout.splitlines():
+        version = line.split()[0] if line.split() else ""
+        major = version.split(".", 1)[0]
+        if major.isdigit():
+            majors.append(int(major))
+    if 9 in majors:
+        return "net9.0"
+    if 10 in majors:
+        return "net10.0"
+    if 8 in majors:
+        return "net8.0"
+    return "net9.0"
+
+
 def validate_package_layout(language_package: Path, language: str, require_all_rids: bool) -> None:
     package_name = package_language_name(language)
     required = {
@@ -314,7 +347,7 @@ def main() -> int:
         env.pop(f"FASTPARSE_LANGUAGE_{native_language_name(args.language).upper()}_PATH", None)
 
         run_command(
-            ["dotnet", "new", "console", "--framework", "net9.0", "--output", str(project_dir)],
+            ["dotnet", "new", "console", "--framework", smoke_framework(env), "--output", str(project_dir)],
             env=env,
         )
         project = str(project_dir / "consumer.csproj")
@@ -340,6 +373,8 @@ def main() -> int:
             program = JAVA_FRAMEWORKS_PROGRAM
         elif args.language == "javaswing":
             program = JAVASWING_PROGRAM
+        elif args.language == "cobol":
+            program = COBOL_PROGRAM
         else:
             program = PYTHON_PROGRAM
         (project_dir / "Program.cs").write_text(program, encoding="utf-8")

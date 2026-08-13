@@ -24,6 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--arch", default=default_arch())
     parser.add_argument("--build-dir", type=Path, default=ROOT / "build-language-extension")
     parser.add_argument("--dist-dir", type=Path, default=ROOT / "dist" / "languages")
+    parser.add_argument("--grammar-dir", type=Path, help="Tree-sitter grammar checkout to build/package. Defaults to grammars/tree-sitter-<language>.")
     parser.add_argument("--skip-build", action="store_true")
     return parser.parse_args()
 
@@ -74,12 +75,13 @@ def cmake_language_key(language: str) -> str:
     return native_language_name(language).upper()
 
 
-def grammar_dir(language: str) -> Path:
+def grammar_dir(language: str, override: Path | None = None) -> Path:
+    if override is not None:
+        return override.resolve()
     return ROOT / "grammars" / f"tree-sitter-{language}"
 
 
-def build_extension(language: str, build_dir: Path) -> None:
-    grammar = grammar_dir(language)
+def build_extension(language: str, build_dir: Path, grammar: Path) -> None:
     if not (grammar / "src" / "parser.c").is_file():
         raise FileNotFoundError(f"grammar is not vendored: {grammar}")
     cmake_var = f"FASTPARSE_{cmake_language_key(language)}_GRAMMAR_DIR={grammar}"
@@ -104,6 +106,7 @@ def package_extension(args: argparse.Namespace) -> Path:
     language = args.language
     platform_name = args.platform.lower()
     arch = args.arch.lower()
+    grammar = grammar_dir(language, args.grammar_dir)
     rid = rid_for(platform_name, arch)
     native_name = library_name(language, platform_name)
     built_library = ROOT / "bin" / native_name
@@ -125,7 +128,6 @@ def package_extension(args: argparse.Namespace) -> Path:
     shutil.copy2(extension_dir / "README.md", package_dir / "README.md")
     copy_tree_if_exists(extension_dir / "queries", package_dir / "queries")
 
-    grammar = grammar_dir(language)
     grammar_meta = package_dir / "grammar"
     grammar_meta.mkdir()
     for name in ["LICENSE", "README.md", "tree-sitter.json", "package.json"]:
@@ -156,8 +158,9 @@ def package_extension(args: argparse.Namespace) -> Path:
 
 def main() -> int:
     args = parse_args()
+    grammar = grammar_dir(args.language, args.grammar_dir)
     if not args.skip_build:
-        build_extension(args.language, args.build_dir.resolve())
+        build_extension(args.language, args.build_dir.resolve(), grammar)
     archive = package_extension(args)
     print(f"Language extension archive: {archive}")
     return 0

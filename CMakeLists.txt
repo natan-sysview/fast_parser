@@ -150,10 +150,14 @@ if(FASTPARSE_COBOL_GRAMMAR_DIR)
     if(NOT EXISTS "${FASTPARSE_COBOL_GRAMMAR_DIR}/src/parser.c")
         message(FATAL_ERROR "FASTPARSE_COBOL_GRAMMAR_DIR must point to a tree-sitter-cobol checkout with src/parser.c")
     endif()
-    add_library(fastparse_language_cobol SHARED
+    set(FASTPARSE_COBOL_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/extensions/cobol/fastparse_language_cobol.c"
-        "${FASTPARSE_COBOL_GRAMMAR_DIR}/src/parser.c"
-        "${FASTPARSE_COBOL_GRAMMAR_DIR}/src/scanner.c")
+        "${FASTPARSE_COBOL_GRAMMAR_DIR}/src/parser.c")
+    if(EXISTS "${FASTPARSE_COBOL_GRAMMAR_DIR}/src/scanner.c")
+        list(APPEND FASTPARSE_COBOL_SOURCES "${FASTPARSE_COBOL_GRAMMAR_DIR}/src/scanner.c")
+    endif()
+    add_library(fastparse_language_cobol SHARED
+        ${FASTPARSE_COBOL_SOURCES})
     target_include_directories(fastparse_language_cobol
         PRIVATE
             "${FASTPARSE_COBOL_GRAMMAR_DIR}/src")
