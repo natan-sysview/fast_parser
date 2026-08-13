@@ -303,7 +303,7 @@ none
 cobol_fixed_legacy
 ```
 
-`auto_safe` is the default. For COBOL it removes known legacy trailer bytes in RAM before parsing, such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record. For modern languages it currently leaves the source untouched.
+`auto_safe` is the default. For COBOL it applies memory-only legacy normalization before parsing: detected CP037/EBCDIC byte streams are decoded to UTF-8, tabs are expanded to fixed-width spaces, and known trailer bytes such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record are removed. For modern languages it currently leaves the source untouched.
 
 Use `normalization="none"` when a caller needs byte-for-byte parsing with no cleanup.
 

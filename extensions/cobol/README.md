@@ -44,3 +44,5 @@ result = parser.parse_text(cobol_source, language="cobol")
 ```
 
 The grammar accepts full COBOL programs, copybook fragments, and COBOL sources with embedded `EXEC SQL ... END-EXEC` blocks. Fixed-column and legacy layout normalization is handled before parsing by FastParse or the lab validation tools.
+
+For NuGet publication, publish the core `FastParser` package and `FastParser.Language.Cobol` as a matched pair. Raw enterprise COBOL can include CP037/EBCDIC files and tab-indented copybooks; those cases require a core version whose `auto_safe` / `cobol_fixed_legacy` normalization decodes detected CP037/EBCDIC input, expands tabs, and removes legacy trailer records in memory.

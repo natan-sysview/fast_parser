@@ -1,0 +1,156 @@
+====================================
+copy replacing identifier pair
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+           COPY BGTCMOVA REPLACING BGTCMOV BY BGTCMOVA-ENT1.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (copy_statement
+          (WORD)
+          (replacing_clause
+            (copy_replacing_item
+              (copy_replacing_operand
+                (qualified_word
+                  (WORD)))
+              (copy_replacing_operand
+                (qualified_word
+                  (WORD))))))))
+    (procedure_division)))
+
+====================================
+copy suppress replacing string pair
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           COPY DEBUGAID SUPPRESS REPLACING 'TRACE-ID' BY '000ENTRY'.
+           EXEC CICS
+             RETURN
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (copy_statement
+        book: (WORD)
+        supress: (SUPPRESS)
+        (replacing_clause
+          (copy_replacing_item
+            x: (copy_replacing_operand
+              (string))
+            by: (copy_replacing_operand
+              (string)))))
+      (period)
+      (exec_cics_statement
+        body: (cics_body
+          command: (cics_command)))
+      (period))))
+
+====================================
+copy replacing multiple pairs
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+           COPY MGYICMOV REPLACING MOV-MGYICMOV BY E1
+                                  TRAILING OLD-NAME BY NEW-NAME.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (copy_statement
+          (WORD)
+          (replacing_clause
+            (copy_replacing_item
+              (copy_replacing_operand
+                (qualified_word
+                  (WORD)))
+              (copy_replacing_operand
+                (qualified_word
+                  (WORD))))
+            (copy_replacing_item
+              (TRAILING)
+              (copy_replacing_operand
+                (qualified_word
+                  (WORD)))
+              (copy_replacing_operand
+                (qualified_word
+                  (WORD))))))))
+    (procedure_division)))
+
+====================================
+copy replacing pseudo text
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+           COPY TRDX00WS REPLACING ==:PGMID:== BY =='SAMA3EDB'==
+                                  ==:KEY:== BY ==TEMP-KEY==.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (copy_statement
+          (WORD)
+          (replacing_clause
+            (copy_replacing_item
+              (copy_replacing_operand
+                (copy_pseudo_text))
+              (copy_replacing_operand
+                (copy_pseudo_text)))
+            (copy_replacing_item
+              (copy_replacing_operand
+                (copy_pseudo_text))
+              (copy_replacing_operand
+                (copy_pseudo_text)))))))
+    (procedure_division)))
+
+====================================
+inspect replacing stays statement
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           INSPECT REG-WORK REPLACING ALL X'00' BY SPACES.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (inspect_statement
+        send: (qualified_word
+          (WORD))
+        (inspect_replacing
+          (replacing_item
+            region: (ALL)
+            region: (replacing_region
+              x: (x_string)
+              by: (SPACE)))))
+      (period))))

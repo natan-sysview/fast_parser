@@ -1,0 +1,41 @@
+====================================
+copy between identification and environment divisions
+====================================
+       identification division.
+       program-id. a.
+       copy TRDX00CR.
+       environment division.
+       data division.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (copy_statement
+      book: (WORD))
+    (environment_division)
+    (data_division)
+    (procedure_division)))
+
+====================================
+copy between environment and data divisions
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       copy ENVCPY.
+       data division.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division)
+    (copy_statement
+      book: (WORD))
+    (data_division)
+    (procedure_division)))

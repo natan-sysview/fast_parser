@@ -124,40 +124,210 @@ static int language_is(const char *language, const char *expected)
     return language && strcmp(language, expected) == 0;
 }
 
+static const uint16_t CP037_TO_UNICODE[256] = {
+    0x0000, 0x0001, 0x0002, 0x0003, 0x009C, 0x0009, 0x0086, 0x007F, 0x0097, 0x008D, 0x008E, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
+    0x0010, 0x0011, 0x0012, 0x0013, 0x009D, 0x0085, 0x0008, 0x0087, 0x0018, 0x0019, 0x0092, 0x008F, 0x001C, 0x001D, 0x001E, 0x001F,
+    0x0080, 0x0081, 0x0082, 0x0083, 0x0084, 0x000A, 0x0017, 0x001B, 0x0088, 0x0089, 0x008A, 0x008B, 0x008C, 0x0005, 0x0006, 0x0007,
+    0x0090, 0x0091, 0x0016, 0x0093, 0x0094, 0x0095, 0x0096, 0x0004, 0x0098, 0x0099, 0x009A, 0x009B, 0x0014, 0x0015, 0x009E, 0x001A,
+    0x0020, 0x00A0, 0x00E2, 0x00E4, 0x00E0, 0x00E1, 0x00E3, 0x00E5, 0x00E7, 0x00F1, 0x00A2, 0x002E, 0x003C, 0x0028, 0x002B, 0x007C,
+    0x0026, 0x00E9, 0x00EA, 0x00EB, 0x00E8, 0x00ED, 0x00EE, 0x00EF, 0x00EC, 0x00DF, 0x0021, 0x0024, 0x002A, 0x0029, 0x003B, 0x00AC,
+    0x002D, 0x002F, 0x00C2, 0x00C4, 0x00C0, 0x00C1, 0x00C3, 0x00C5, 0x00C7, 0x00D1, 0x00A6, 0x002C, 0x0025, 0x005F, 0x003E, 0x003F,
+    0x00F8, 0x00C9, 0x00CA, 0x00CB, 0x00C8, 0x00CD, 0x00CE, 0x00CF, 0x00CC, 0x0060, 0x003A, 0x0023, 0x0040, 0x0027, 0x003D, 0x0022,
+    0x00D8, 0x0061, 0x0062, 0x0063, 0x0064, 0x0065, 0x0066, 0x0067, 0x0068, 0x0069, 0x00AB, 0x00BB, 0x00F0, 0x00FD, 0x00FE, 0x00B1,
+    0x00B0, 0x006A, 0x006B, 0x006C, 0x006D, 0x006E, 0x006F, 0x0070, 0x0071, 0x0072, 0x00AA, 0x00BA, 0x00E6, 0x00B8, 0x00C6, 0x00A4,
+    0x00B5, 0x007E, 0x0073, 0x0074, 0x0075, 0x0076, 0x0077, 0x0078, 0x0079, 0x007A, 0x00A1, 0x00BF, 0x00D0, 0x00DD, 0x00DE, 0x00AE,
+    0x005E, 0x00A3, 0x00A5, 0x00B7, 0x00A9, 0x00A7, 0x00B6, 0x00BC, 0x00BD, 0x00BE, 0x005B, 0x005D, 0x00AF, 0x00A8, 0x00B4, 0x00D7,
+    0x007B, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047, 0x0048, 0x0049, 0x00AD, 0x00F4, 0x00F6, 0x00F2, 0x00F3, 0x00F5,
+    0x007D, 0x004A, 0x004B, 0x004C, 0x004D, 0x004E, 0x004F, 0x0050, 0x0051, 0x0052, 0x00B9, 0x00FB, 0x00FC, 0x00F9, 0x00FA, 0x00FF,
+    0x005C, 0x00F7, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057, 0x0058, 0x0059, 0x005A, 0x00B2, 0x00D4, 0x00D6, 0x00D2, 0x00D3, 0x00D5,
+    0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039, 0x00B3, 0x00DB, 0x00DC, 0x00D9, 0x00DA, 0x009F
+};
+
+static int looks_ebcdic_cobol(const unsigned char *source, size_t source_len)
+{
+    size_t sample_len = source_len < 8192 ? source_len : 8192;
+    size_t ascii_text = 0;
+    size_t ebcdic_text = 0;
+    size_t ascii_spaces = 0;
+    size_t ebcdic_spaces = 0;
+
+    if (sample_len == 0) return 0;
+
+    for (size_t i = 1; i < sample_len; i++) {
+        if (source[i - 1] == 0x0D && source[i] == 0x25) {
+            return 1;
+        }
+    }
+
+    for (size_t i = 0; i < sample_len; i++) {
+        unsigned char byte = source[i];
+        if (byte == 0x20) ascii_spaces++;
+        if (byte == 0x40) ebcdic_spaces++;
+        if (byte == 9 || byte == 10 || byte == 13 || byte == 32 ||
+            (byte >= 48 && byte <= 57) ||
+            (byte >= 65 && byte <= 90) ||
+            (byte >= 97 && byte <= 122)) {
+            ascii_text++;
+        }
+        if (byte == 0x05 || byte == 0x15 || byte == 0x25 || byte == 0x40 ||
+            (byte >= 0x81 && byte <= 0x89) ||
+            (byte >= 0x91 && byte <= 0x99) ||
+            (byte >= 0xA2 && byte <= 0xA9) ||
+            (byte >= 0xC1 && byte <= 0xC9) ||
+            (byte >= 0xD1 && byte <= 0xD9) ||
+            (byte >= 0xE2 && byte <= 0xE9) ||
+            (byte >= 0xF0 && byte <= 0xF9)) {
+            ebcdic_text++;
+        }
+    }
+
+    size_t min_ebcdic_spaces = ascii_spaces * 2;
+    if (min_ebcdic_spaces < 4) min_ebcdic_spaces = 4;
+    return ebcdic_text > ascii_text * 2 && ebcdic_spaces >= min_ebcdic_spaces;
+}
+
+static size_t utf8_codepoint_length(uint32_t codepoint)
+{
+    if (codepoint <= 0x7F) return 1;
+    if (codepoint <= 0x7FF) return 2;
+    if (codepoint <= 0xFFFF) return 3;
+    return 4;
+}
+
+static void append_utf8_codepoint(unsigned char *output, size_t *offset, uint32_t codepoint)
+{
+    if (codepoint <= 0x7F) {
+        output[(*offset)++] = (unsigned char)codepoint;
+    } else if (codepoint <= 0x7FF) {
+        output[(*offset)++] = (unsigned char)(0xC0 | (codepoint >> 6));
+        output[(*offset)++] = (unsigned char)(0x80 | (codepoint & 0x3F));
+    } else if (codepoint <= 0xFFFF) {
+        output[(*offset)++] = (unsigned char)(0xE0 | (codepoint >> 12));
+        output[(*offset)++] = (unsigned char)(0x80 | ((codepoint >> 6) & 0x3F));
+        output[(*offset)++] = (unsigned char)(0x80 | (codepoint & 0x3F));
+    } else {
+        output[(*offset)++] = (unsigned char)(0xF0 | (codepoint >> 18));
+        output[(*offset)++] = (unsigned char)(0x80 | ((codepoint >> 12) & 0x3F));
+        output[(*offset)++] = (unsigned char)(0x80 | ((codepoint >> 6) & 0x3F));
+        output[(*offset)++] = (unsigned char)(0x80 | (codepoint & 0x3F));
+    }
+}
+
+static int decode_cp037_to_utf8(const unsigned char *source, size_t source_len, unsigned char **out_data, size_t *out_len)
+{
+    size_t capacity = 1;
+    for (size_t i = 0; i < source_len; i++) {
+        capacity += utf8_codepoint_length(CP037_TO_UNICODE[source[i]]);
+    }
+
+    unsigned char *output = malloc(capacity);
+    if (!output) return TSMP_ERROR_OUT_OF_MEMORY;
+
+    size_t offset = 0;
+    for (size_t i = 0; i < source_len; i++) {
+        append_utf8_codepoint(output, &offset, CP037_TO_UNICODE[source[i]]);
+    }
+    output[offset] = '\0';
+
+    *out_data = output;
+    *out_len = offset;
+    return TSMP_OK;
+}
+
+static int slice_has_tab(const unsigned char *source, size_t start, size_t end)
+{
+    for (size_t i = start; i < end; i++) {
+        if (source[i] == '\t') return 1;
+    }
+    return 0;
+}
+
+static int copy_cobol_parser_input(
+    const unsigned char *source,
+    size_t start,
+    size_t end,
+    unsigned char **out_data,
+    size_t *out_len)
+{
+    size_t input_len = end > start ? end - start : 0;
+    size_t capacity = input_len * 8 + 1;
+    unsigned char *output = malloc(capacity);
+    if (!output) return TSMP_ERROR_OUT_OF_MEMORY;
+
+    size_t offset = 0;
+    size_t column = 0;
+    for (size_t i = start; i < end; i++) {
+        unsigned char byte = source[i];
+        if (byte == '\t') {
+            size_t spaces = 8 - (column % 8);
+            for (size_t s = 0; s < spaces; s++) {
+                output[offset++] = ' ';
+            }
+            column += spaces;
+            continue;
+        }
+
+        output[offset++] = byte;
+        if (byte == '\r' || byte == '\n') {
+            column = 0;
+        } else {
+            column++;
+        }
+    }
+    output[offset] = '\0';
+
+    *out_data = output;
+    *out_len = offset;
+    return TSMP_OK;
+}
+
 static int normalize_cobol_fixed_legacy(
     const unsigned char *source,
     size_t source_len,
     NormalizedSource *out_source)
 {
+    const unsigned char *working = source;
+    size_t working_len = source_len;
+    unsigned char *decoded = NULL;
+    int status = TSMP_OK;
     size_t start = 0;
     size_t end = source_len;
     int changed = 0;
 
-    if (source_len >= 3 &&
-        source[0] == 0xEF &&
-        source[1] == 0xBB &&
-        source[2] == 0xBF) {
+    if (looks_ebcdic_cobol(source, source_len)) {
+        status = decode_cp037_to_utf8(source, source_len, &decoded, &working_len);
+        if (status != TSMP_OK) return status;
+        working = decoded;
+        changed = 1;
+    }
+
+    end = working_len;
+
+    if (working_len >= 3 &&
+        working[0] == 0xEF &&
+        working[1] == 0xBB &&
+        working[2] == 0xBF) {
         start = 3;
         changed = 1;
     }
 
     while (end > start) {
-        size_t candidate_end = trim_trailing_ascii_space(source, start, end);
+        size_t candidate_end = trim_trailing_ascii_space(working, start, end);
         if (candidate_end > start &&
-            (source[candidate_end - 1] == 0x1A ||
-             source[candidate_end - 1] == 0x7F ||
-             source[candidate_end - 1] == 0x00)) {
+            (working[candidate_end - 1] == 0x1A ||
+             working[candidate_end - 1] == 0x7F ||
+             working[candidate_end - 1] == 0x00)) {
             end = candidate_end - 1;
             changed = 1;
             continue;
         }
 
         size_t line_start = candidate_end;
-        while (line_start > start && source[line_start - 1] != '\n') {
+        while (line_start > start && working[line_start - 1] != '\n') {
             line_start--;
         }
         if (line_start < candidate_end &&
-            is_cobol_legacy_trailer_line(source, line_start, candidate_end)) {
+            is_cobol_legacy_trailer_line(working, line_start, candidate_end)) {
             end = line_start;
             changed = 1;
             continue;
@@ -166,17 +336,16 @@ static int normalize_cobol_fixed_legacy(
         break;
     }
 
-    if (!changed) {
+    if (!changed && !slice_has_tab(working, start, end)) {
+        free(decoded);
         return TSMP_OK;
     }
 
-    size_t normalized_len = end - start;
+    size_t normalized_len = 0;
     unsigned char *copy = NULL;
-    if (normalized_len > 0) {
-        copy = malloc(normalized_len);
-        if (!copy) return TSMP_ERROR_OUT_OF_MEMORY;
-        memcpy(copy, source + start, normalized_len);
-    }
+    status = copy_cobol_parser_input(working, start, end, &copy, &normalized_len);
+    free(decoded);
+    if (status != TSMP_OK) return status;
 
     out_source->data = copy ? copy : (const unsigned char *)"";
     out_source->length = normalized_len;

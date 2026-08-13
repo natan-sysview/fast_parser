@@ -1,8 +1,6 @@
 #include <tree_sitter/parser.h>
 #include <wctype.h>
 
-#define MAX_START_WITH_WORDS 64
-
 enum TokenType {
     WHITE_SPACES,
     LINE_PREFIX_COMMENT,
@@ -340,13 +338,8 @@ static bool start_with_word( TSLexer *lexer, char *words[], int number_of_words)
         lexer->advance(lexer, true);
     }
 
-    if(number_of_words > MAX_START_WITH_WORDS) {
-        return false;
-    }
-
-    char *keyword_pointer[MAX_START_WITH_WORDS];
-    bool continue_check[MAX_START_WITH_WORDS];
-
+    char *keyword_pointer[number_of_words];
+    bool continue_check[number_of_words];
     for(int i=0; i<number_of_words; ++i) {
         keyword_pointer[i] = words[i];
         continue_check[i] = true;

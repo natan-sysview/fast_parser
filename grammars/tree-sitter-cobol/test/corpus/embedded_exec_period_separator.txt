@@ -1,0 +1,63 @@
+====================================
+exec cics period before next paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       100-first.
+           EXEC CICS RECEIVE
+                MAP('MAPA')
+                RESP(WS-RESP)
+           END-EXEC.
+       200-next.
+           MOVE 'X' TO WS-FLAG.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (exec_cics_statement
+        body: (cics_body
+          command: (cics_command)
+          (string)))
+      (period)
+      (paragraph_header)
+      (move_statement
+        src: (string)
+        dst: (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+exec sql period before next paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       100-first.
+           EXEC SQL
+             INSERT INTO TABLA
+             VALUES (:WS-CAMPO)
+           END-EXEC.
+       200-next.
+           GOBACK.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))))
+      (period)
+      (paragraph_header)
+      (goback_statement)
+      (period))))

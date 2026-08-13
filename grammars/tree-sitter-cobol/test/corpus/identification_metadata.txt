@@ -1,0 +1,148 @@
+====================================
+empty date compiled before environment
+====================================
+       identification division.
+       program-id. a.
+       date-compiled.
+       environment division.
+       input-output section.
+       file-control.
+       select f assign to printer.
+       procedure division.
+       stop run.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name)
+      (date_compiled_section))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (PRINTER)))))
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+empty security before data
+====================================
+       identification division.
+       program-id. a.
+       security.
+       data division.
+       working-storage section.
+       01 a-field pic x.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name)
+      (security_section))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (procedure_division)))
+
+====================================
+program id without final period before environment
+====================================
+       identification division.
+       program-id. a
+       environment division.
+       configuration section.
+       procedure division.
+       stop run.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (configuration_section))
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+program id without final period before data
+====================================
+       identification division.
+       program-id. a
+       data division.
+       working-storage section.
+       01 a-field pic x.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+            (picture_clause
+              (picture_x)))))
+    (procedure_division)))
+
+====================================
+program id without final period before author
+====================================
+       identification division.
+       program-id. a
+       author.
+       environment division.
+       configuration section.
+       procedure division.
+       stop run.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name)
+      (author_section))
+    (environment_division
+      (configuration_section))
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+program id without final period before date compiled
+====================================
+       identification division.
+       program-id. a
+       date-compiled.
+       data division.
+       working-storage section.
+       01 a-field pic x.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name)
+      (date_compiled_section))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (procedure_division)))

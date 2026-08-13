@@ -268,7 +268,7 @@ FastParseNormalization.None
 FastParseNormalization.CobolFixedLegacy
 ```
 
-`AutoSafe` is the default. For COBOL it removes known fixed-format legacy trailer bytes such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record. Modern languages are left unchanged.
+`AutoSafe` is the default. For COBOL it applies memory-only fixed-format legacy normalization: detected CP037/EBCDIC byte streams are decoded to UTF-8, tabs are expanded to fixed-width spaces, and known trailer bytes such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record are removed. Modern languages are left unchanged.
 
 Use `None` when the caller needs byte-for-byte parsing with no cleanup.
 

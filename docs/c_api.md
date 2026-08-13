@@ -138,7 +138,7 @@ TSMP_NORMALIZATION_NONE
 TSMP_NORMALIZATION_COBOL_FIXED_LEGACY
 ```
 
-`AUTO_SAFE` currently applies COBOL fixed-format legacy cleanup when `language = "cobol"` and leaves modern languages unchanged. The cleanup is memory-only and removes known non-source trailer bytes such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record.
+`AUTO_SAFE` currently applies COBOL fixed-format legacy cleanup when `language = "cobol"` and leaves modern languages unchanged. The cleanup is memory-only: it decodes detected CP037/EBCDIC input to UTF-8, expands tab characters to fixed-width spaces, and removes known non-source trailer bytes such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record.
 
 Call `fastparse_parse_v2` / `tsmp_parse_v2` to use normalization:
 

@@ -1,0 +1,75 @@
+====================================
+condition parenthesized value list
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF WS-FIELD = (SPACES OR LOW-VALUES)
+              CONTINUE
+           END-IF.
+           IF RECORRIDO EQUAL (0001 OR 0002 OR 0003)
+              CONTINUE
+           END-IF.
+           IF (WVGE0-I-NUMCLIEN = (SPACES OR LOW-VALUES) AND
+               WVGE0-I-NUM-DOC = (SPACES OR LOW-VALUES))
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (eq)
+          (parenthesized_condition_value_list
+            (SPACE)
+            (OR)
+            (LOW_VALUE))))
+      (continue_statement)
+      (END_IF)
+      (period)
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (eq)
+          (parenthesized_condition_value_list
+            (number
+              (integer))
+            (OR)
+            (number
+              (integer))
+            (OR)
+            (number
+              (integer)))))
+      (continue_statement)
+      (END_IF)
+      (period)
+      (if_header
+        condition: (expr
+          (expr
+            (expr
+              (qualified_word
+                (WORD))
+              (eq)
+              (parenthesized_condition_value_list
+                (SPACE)
+                (OR)
+                (LOW_VALUE)))
+            (AND)
+            (expr
+              (qualified_word
+                (WORD))
+              (eq)
+              (parenthesized_condition_value_list
+                (SPACE)
+                (OR)
+                (LOW_VALUE))))))
+      (continue_statement)
+      (END_IF)
+      (period))))

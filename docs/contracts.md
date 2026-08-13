@@ -563,9 +563,10 @@ Current `auto_safe` behavior:
 Current COBOL fixed legacy cleanup:
 
 - Removes UTF-8 BOM at the start.
+- Decodes detected CP037/EBCDIC byte streams to UTF-8 before parsing.
+- Expands tab characters to fixed-width spaces so fixed-column COBOL layout remains parseable.
 - Removes final legacy EOF/control markers: `0x1A`, `0x7F`, and NUL.
 - Removes final invalid trailer records `FHA` and a lone `*` in column 1.
-- Does not shift COBOL columns.
 - Does not remove valid fixed-format code records.
 - Does not write normalized source to disk.
 

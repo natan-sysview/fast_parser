@@ -1,0 +1,280 @@
+====================================
+string value period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+008400     05  LT-INI-WS PIC X(41) VALUE '** INICIO WORKING STORAGE **'.00840000
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (string))))))
+    (procedure_division)))
+
+====================================
+ordinary signed decimal value remains decimal
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WS-SIGNED-RATE PIC S9(03)V9(02) VALUE +0.25.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (value_clause
+            (value_item
+              (number
+                (decimal)))))))
+    (procedure_division)))
+
+====================================
+usage period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+008800     05  WS-IMPORTE-TOT              PIC S9(13)V9(2) USAGE COMP-3.00880068
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (usage_clause
+            (COMP_3)))))
+    (procedure_division)))
+
+====================================
+numeric zero value period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+013700   05 WC-LEIDOS                         PIC S9(07) COMP-3 VALUE 0.00013700
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (usage_clause
+            (COMP_3))
+          (value_clause
+            (value_item
+              (integer))))))
+    (procedure_division)))
+
+====================================
+signed numeric value period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+054300     05  CON-C-SELECT                PIC S9(3)  COMP-3 VALUE +440.05430000
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (usage_clause
+            (COMP_3))
+          (value_clause
+            (value_item
+              (integer))))))
+    (procedure_division)))
+
+====================================
+negative numeric value period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+054302     05  CON-C-NEGATIVE              PIC S9(3)  COMP-3 VALUE  -12.05430200
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (usage_clause
+            (COMP_3))
+          (value_clause
+            (value_item
+              (integer))))))
+    (procedure_division)))
+
+====================================
+ordinary decimal value remains decimal
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WS-RATE PIC 9(03)V9(02) VALUE 0.25.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (value_clause
+            (value_item
+              (number
+                (decimal)))))))
+    (procedure_division)))
+
+====================================
+unsigned numeric value period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+015400       05 WS-CONTA-LINEAS             PIC S9(03) COMP-3 VALUE 999.01540000
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (usage_clause
+            (COMP_3))
+          (value_clause
+            (value_item
+              (integer))))))
+    (procedure_division)))
+
+====================================
+ordinary unsigned decimal value remains decimal
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WS-RATE PIC 9(03)V9(02) VALUE 999.12.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (value_clause
+            (value_item
+              (number
+                (decimal)))))))
+    (procedure_division)))
+
+====================================
+right side unsigned decimal value remains decimal
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+000101       05 WS-RATE                 PIC 9(03)V9(02) VALUE 999.12.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (value_clause
+            (value_item
+              (number
+                (decimal)))))))
+    (procedure_division)))

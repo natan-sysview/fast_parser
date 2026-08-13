@@ -151,7 +151,7 @@ Official grammar extensions must follow [FastParse Grammar Standard](docs/gramma
 
 ## Source Normalization
 
-New bindings use `auto_safe` normalization by default. Modern languages are left unchanged. For COBOL, FastParse removes known legacy trailer bytes in RAM before parsing, such as final `0x1A`, `0x7F`, NUL, `FHA`, or a lone final `*` record.
+New bindings use `auto_safe` normalization by default. Modern languages are left unchanged. For COBOL, FastParse applies memory-only legacy normalization before parsing: it removes known trailer bytes, expands tab characters to fixed-width spaces, and decodes CP037/EBCDIC sources when the byte stream is detected as EBCDIC. This is part of the core `FastParser` package, so COBOL language extensions must be published against a core version that includes the same normalization contract.
 
 Use `none` when the caller needs byte-for-byte parsing with no cleanup. Normalization does not write to disk and does not change the output field contract.
 

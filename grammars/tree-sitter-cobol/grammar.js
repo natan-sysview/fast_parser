@@ -65,6 +65,7 @@ module.exports = grammar({
 
     _copybook_data_entry: $ => prec.right(choice(
       seq($.copy_statement, repeat1($._data_period)),
+      prec(2, seq(alias($._condition_name_entry, $.data_description), repeat1($._data_period))),
       seq($.data_description, repeat1($.copy_statement), repeat1($._data_period)),
       seq($.data_description, repeat1($._data_period)),
       seq(alias($._exec_sql_include_statement, $.exec_sql_statement), optional(seq($._data_period, optional($._data_period)))),
@@ -102,12 +103,19 @@ module.exports = grammar({
 
     program_definition: $ => prec.right(4, seq(
       $.identification_division,
+      repeat($._inter_division_copy_statement),
       optional($.environment_division),
+      repeat($._inter_division_copy_statement),
       optional($.data_division),
       optional($.procedure_division), //todo
       repeat($.end_program), //todo
       //optional($.LINE_PREFIX_COMMENT),
     )),
+
+    _inter_division_copy_statement: $ => seq(
+      $.copy_statement,
+      $._data_period
+    ),
 
     identification_division: $ => seq(
       $._IDENTIFICATION, $._DIVISION, '.',
@@ -816,25 +824,33 @@ module.exports = grammar({
       optional($.screen_section),
     )),
 
-    file_section: $ => prec.right(choice(
-      seq(
-        $._FILE,
-        $._SECTION,
-        '.',
-        repeat($.file_description)
-      ),
-      seq(
-        $.file_type,
-        seq(
+	    file_section: $ => prec.right(choice(
+	      seq(
+	        $._FILE,
+	        $._SECTION,
+	        '.',
+	        repeat(choice(
+	          $.file_description,
+	          $._file_section_copy_statement
+	        ))
+	      ),
+	      seq(
+	        $.file_type,
+	        seq(
           $.file_description_entry,
           optional($.record_description_list),
           repeat1($.file_description)
         )
-      )
-    )),
+	      )
+	    )),
 
-    file_description: $ => prec.right(seq(
-      $.file_type,
+    _file_section_copy_statement: $ => seq(
+      $.copy_statement,
+      $._data_period
+    ),
+
+	    file_description: $ => prec.right(seq(
+	      $.file_type,
       $.file_description_entry,
       optional($.record_description_list)
     )),
@@ -996,6 +1012,7 @@ module.exports = grammar({
 
     _data_division_entry: $ => prec.right(choice(
       seq($.copy_statement, repeat1($._data_period)),
+      prec(2, seq(alias($._condition_name_entry, $.data_description), repeat1($._data_period))),
       seq($.data_description, repeat1($.copy_statement), repeat1($._data_period)),
       seq($.data_description, repeat1($._data_period)),
       $.data_description_without_period,
@@ -1008,6 +1025,67 @@ module.exports = grammar({
     _data_period: $ => choice(
       '.',
       $._fixed_format_period
+    ),
+
+    _condition_name_entry: $ => prec.right(4, seq(
+      alias($.level_number_88, $.level_number),
+      $.entry_name,
+      alias($._condition_name_value_clause, $.value_clause)
+    )),
+
+    _condition_name_value_clause: $ => prec.right(4, seq(
+      choice($._VALUE, $._VALUES),
+      optional(choice($._IS, $._ARE)),
+      repeat1(alias($._condition_name_value_item, $.value_item)),
+      optional($._WHEN),
+      optional($._SET),
+      optional($._TO),
+      optional(seq(
+        $._FALSE,
+        optional($._IS),
+        field('when_set_to_false', $._literal)))
+    )),
+
+    _condition_name_value_item: $ => prec.right(4, seq(
+      $._condition_name_value_literal,
+      optional(seq(
+        $.THRU,
+        $._condition_name_value_literal
+      )),
+      optional(',')
+    )),
+
+    _condition_name_value_literal: $ => choice(
+      alias($._condition_name_number, $.number),
+      $._condition_name_basic_literal,
+      seq($.ALL, $._condition_name_basic_value)
+    ),
+
+    _condition_name_number: $ => choice(
+      alias($._condition_name_integer, $.integer),
+      alias($._condition_name_decimal, $.decimal),
+      alias($._fixed_format_integer_value, $.integer)
+    ),
+
+    _condition_name_integer: $ => token(prec(2, /[+-]?[0-9]+/)),
+    _condition_name_decimal: $ => token(prec(2, /[+-]?[0-9]*\.[0-9]+/)),
+
+    _condition_name_basic_literal: $ => prec(1, sepBy(
+      $._condition_name_basic_value,
+      '&'
+    )),
+
+    _condition_name_basic_value: $ => choice(
+      $.dfhvalue_expression,
+      $.at_hex_literal,
+      $._string,
+      $.SPACE,
+      $.ZERO,
+      $.ZEROS,
+      $.QUOTE,
+      $.HIGH_VALUE,
+      $.LOW_VALUE,
+      $.TOK_NULL
     ),
 
     data_description: $ => choice(
@@ -1026,7 +1104,7 @@ module.exports = grammar({
     ),
 
     level_number: $ => /[0-9][0-9]?/,
-    level_number_88: $ => /88/,
+    level_number_88: $ => token(prec(1, /88/)),
 
     entry_name: $ => choice(
       $._FILLER,
@@ -1231,9 +1309,37 @@ module.exports = grammar({
       /([aAxX9bBvVzZpPwW\(\)0-9$/,\.*+<>-]|[cC][rR]|[dD][bB])*([aAxX9bBvVzZpPwW\(\)0-9$/,*+<>-]|[cC][rR]|[dD][bB])/
     ),
 
-    usage_clause: $ => seq(
-      optional(seq($._USAGE, optional($._IS))),
-      $._usage
+    sql_type_clause: $ => seq(
+      $._SQL,
+      optional(seq($._TYPE, optional($._IS))),
+      field('type', $.sql_type_name),
+      optional(field('size', $.sql_type_size))
+    ),
+
+    sql_type_name: $ => choice(
+      alias($._BLOB, $.blob_type),
+      alias($._CLOB, $.clob_type),
+      alias($._DBCLOB, $.dbclob_type)
+    ),
+
+    sql_type_size: $ => seq(
+      '(',
+      field('length', alias($._sql_type_length, $.integer)),
+      ')'
+    ),
+
+    _sql_type_length: $ => token(prec(2, /[0-9]+[kKmMgG]?/)),
+
+    usage_clause: $ => choice(
+      seq(
+        optional(seq($._USAGE, optional($._IS))),
+        $._usage
+      ),
+      seq(
+        $._USAGE,
+        optional($._IS),
+        $.sql_type_clause
+      )
     ),
 
     _usage: $ => choice(
@@ -3212,6 +3318,7 @@ module.exports = grammar({
     _BLANK_LINE: $ => /[bB][lL][aA][nN][kK]-[lL][iI][nN][eE]/,
     _BLANK_SCREEN: $ => /[bB][lL][aA][nN][kK]-[sS][cC][rR][eE][eE][nN]/,
     _BLINK: $ => /[bB][lL][iI][nN][kK]/,
+    _BLOB: $ => token(prec(2, /[bB][lL][oO][bB]/)),
     _BLOCK: $ => /[bB][lL][oO][cC][kK]/,
     _BOTTOM: $ => /[bB][oO][tT][tT][oO][mM]/,
     _BURROUGHS: $ => /[bB][uU][rR][rR][oO][uU][gG][hH][sS]/,
@@ -3226,6 +3333,7 @@ module.exports = grammar({
     _CICS: $ => token(prec(2, /[cC][iI][cC][sS]/)),
     _CLASS: $ => /[cC][lL][aA][sS][sS]/,
     _CLASS_NAME: $ => /[cC][lL][aA][sS][sS]-[nN][aA][mM][eE]/,
+    _CLOB: $ => token(prec(2, /[cC][lL][oO][bB]/)),
     _COPY: $ => /[cC][oO][pP][yY]/,
     _CLOSE: $ => /[cC][lL][oO][sS][eE]/,
     _CLOSE_NOFEED: $ => /[cC][lL][oO][sS][eE]-[nN][oO][fF][eE][eE][dD]/,
@@ -3274,6 +3382,7 @@ module.exports = grammar({
     _DATA_BASE: $ => /[dD][aA][tT][aA]-[bB][aA][sS][eE]/,
     _DATE: $ => /[dD][aA][tT][eE]/,
     _DB: $ => /[dD][bB]/,
+    _DBCLOB: $ => token(prec(2, /[dD][bB][cC][lL][oO][bB]/)),
     _DAY: $ => /[dD][aA][yY]/,
     _DAY_OF_WEEK: $ => /[dD][aA][yY]-[oO][fF]-[wW][eE][eE][kK]/,
     _DE: $ => /[dD][eE]/,

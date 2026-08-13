@@ -1,0 +1,91 @@
+====================================
+symbol compiler directives before program
+====================================
+000100$$SET LIST STACK MAP LINEINFO ERRORLIMIT = 500 OPTIMIZE
+000200$$SET LEVEL = 0
+000300 IDENTIFICATION DIVISION.
+000400 PROGRAM-ID. A.
+000500 PROCEDURE DIVISION.
+000600 STOP RUN.
+
+---
+
+(start
+  (compiler_directive)
+  (compiler_directive)
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+skip listing directives before program
+====================================
+000100 SKIP1
+000200 SKIP2                                                        00020000
+000300 SKIP3
+000400 IDENTIFICATION DIVISION.
+000500 PROGRAM-ID. A.
+000600 PROCEDURE DIVISION.
+000700 STOP RUN.
+
+---
+
+(start
+  (compiler_directive)
+  (compiler_directive)
+  (compiler_directive)
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+symbol compiler directives with comp and set
+====================================
+000052]COMP AS $S264/OBJECT/P140/07MTP003
+000100$SET LIST STACK MAP LINEINFO ERRORLIMIT = 500 OPTIMIZE
+000110$$SET LEVEL = 0
+000200 IDENTIFICATION DIVISION.
+000300 PROGRAM-ID. P140.
+000400 PROCEDURE DIVISION.
+000500 STOP RUN.
+
+---
+
+(start
+  (compiler_directive)
+  (compiler_directive)
+  (compiler_directive)
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+process compiler directives before program
+====================================
+000100 PROCESS RENT TRUNC(OPT) ZWB NOSSR
+000200 PROCESS NOCMPR2 DATA(31) NUMPROC(PFD) OPT APOST
+000300 IDENTIFICATION DIVISION.
+000400 PROGRAM-ID. A.
+000500 PROCEDURE DIVISION.
+000600 STOP RUN.
+
+---
+
+(start
+  (compiler_directive)
+  (compiler_directive)
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (stop_statement)
+      (period))))

@@ -1,0 +1,595 @@
+====================================
+file-section
+====================================
+       identification division.
+       program-id. a.
+003300 ENVIRONMENT DIVISION.                                            NC1014.2
+003900 INPUT-OUTPUT SECTION.                                            NC1014.2
+004000 FILE-CONTROL.                                                    NC1014.2
+004100     SELECT PRINT-FILE ASSIGN TO                                  NC1014.2
+004200     "report.log".                                                NC1014.2
+004300 DATA DIVISION.                                                   NC1014.2
+004400 FILE SECTION.                                                    NC1014.2
+004500 FD  PRINT-FILE.                                                  NC1014.2
+004600 01  PRINT-REC PICTURE X(120).                                    NC1014.2
+004700 01  DUMMY-RECORD PICTURE X(120).                                 NC1014.2
+004800 WORKING-STORAGE SECTION.                                         NC1014.2
+004900 77  WRK-DS-18V00                PICTURE S9(18).                  NC1014.2
+       PROCEDURE DIVISION.
+       DISPLAY 1.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (string)))))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name)
+              (picture_clause
+                (picture_x)))
+            (data_description
+              (level_number)
+              (entry_name)
+              (picture_clause
+                (picture_x))))))
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)))))
+    (procedure_division
+      (display_statement
+        (number
+          (integer)))
+      (period))))
+
+====================================
+value clause
+====================================
+       identification division.
+       program-id. a.
+       DATA DIVISION.                                                   
+       WORKING-STORAGE SECTION.                                         
+       77  A06THREES-DS-03V03          PICTURE S999V999 VALUE 333.333.  
+       PROCEDURE DIVISION.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (value_clause
+            (value_item
+              (number
+                (decimal)))))))
+    (procedure_division)))
+
+====================================
+picture decimal
+====================================
+       identification division.
+       program-id. a.
+       DATA DIVISION.                                                   
+       WORKING-STORAGE SECTION.                                         
+       77  A06THREES-DS-03V03     PICTURE SV9(5) VALUE .11111.
+       PROCEDURE DIVISION.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (value_clause
+            (value_item
+              (number
+                (decimal)))))))
+    (procedure_division)))
+
+====================================
+computational
+====================================
+       identification division.
+       program-id. a.
+       DATA DIVISION.                                                   
+       WORKING-STORAGE SECTION.                                         
+       77  A06THREES-DS-03V03     PICTURE SV9(5) COMPUTATIONAL.
+       PROCEDURE DIVISION.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (usage_clause
+            (COMPUTATIONAL)))))
+    (procedure_division)))
+
+====================================
+level 88 comma value list
+====================================
+       identification division.
+       program-id. a.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 SW-SWITCHES.
+          05 SW-VALIDAR PIC X(01).
+             88 SW-VALIDAR-OK VALUE 'A','B','C','D',
+                                   'E','F'.
+       PROCEDURE DIVISION.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))
+        (data_description
+          (level_number)
+          (entry_name)
+          (value_clause
+            (value_item
+              (string))
+            (value_item
+              (string))
+            (value_item
+              (string))
+            (value_item
+              (string))
+            (value_item
+              (string))
+            (value_item
+              (string))))))
+    (procedure_division)))
+
+====================================
+fd copy record description
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       FD  FD-INPUT
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           DATA RECORD IS INPUT-REC.
+       COPY FDINPUTC.
+       working-storage section.
+       01 WS-A PIC X.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD)
+            (file_description_clause
+              (label_records_clause
+                (STANDARD)))
+            (file_description_clause
+              (block_contains_clause
+                num: (integer)))
+            (file_description_clause
+              (data_records_clause
+                (qualified_word
+                  (WORD)))))
+          (record_description_list
+            (copy_statement
+              book: (WORD)))))
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (procedure_division)))
+
+====================================
+fd record description followed by copy
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       FD  DCOMIS01
+           LABEL RECORD IS STANDARD.
+       01  R-DCOMIS01
+           COPY DDS-ALL-FORMATS OF DCOMIS01.
+       FD  DCOMIS02
+           LABEL RECORD IS STANDARD.
+       01  R-DCOMIS02.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD)
+            (file_description_clause
+              (label_records_clause
+                (STANDARD))))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name))
+            (copy_statement
+              book: (WORD)
+              lib_name: (WORD))))
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD)
+            (file_description_clause
+              (label_records_clause
+                (STANDARD))))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name))))))
+    (procedure_division)))
+
+====================================
+binary literal value clause
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       77 SETON PIC 1 VALUE B"1".
+       77 SETOFF PIC 1 VALUE B'0'.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit))
+          (value_clause
+            (value_item
+              (b_string))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit))
+          (value_clause
+            (value_item
+              (b_string))))))
+    (procedure_division)))
+
+====================================
+data description without period before next entry
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 GROUP-A.
+          03 FIELD-A PIC X VALUE SPACE
+          03 FIELD-B PIC X VALUE SPACES.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description_without_period
+          (data_description
+            (level_number)
+            (entry_name)
+            (picture_clause
+              (picture_x))
+            (value_clause
+              (value_item
+                (SPACE)))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (SPACE))))))
+    (procedure_division)))
+
+====================================
+linkage section copy-only body
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 WS-A PIC X.
+       linkage section.
+       COPY AXWCPS13.
+       procedure division using PS13-REG.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))))
+      (linkage_section
+        (copy_statement
+          book: (WORD))))
+    (procedure_division
+      (procedure_using_chaining
+        (USING)
+        (procedure_param)))))
+
+====================================
+label record variants
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       FD  FD-A
+           LABEL RECORD ARE STANDARD.
+       FD  FD-B
+           LABEL RECORDS IS STANDARD.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD)
+            (file_description_clause
+              (label_records_clause
+                (STANDARD)))))
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD)
+            (file_description_clause
+              (label_records_clause
+                (STANDARD)))))))
+    (procedure_division)))
+
+====================================
+single quote continuation value
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01  TITLE-LINE.
+           05 FILLER PIC X(80) VALUE 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNO
+      -    'PQRSTUVWXYZ'.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (string))))))
+    (procedure_division)))
+
+====================================
+burroughs lower bounds clause
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 A WITH LOWER-BOUNDS.
+          05 B PIC 9.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (burroughs_lower_bounds_clause))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)))))
+    (procedure_division)))
+
+====================================
+burroughs real data description
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       77 A REAL.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (real_usage_clause))))
+    (procedure_division)))
+
+====================================
+at-hex value literal
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 ctt-eofi pic 9(02) comp value @0D@.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (usage_clause
+            (COMP))
+          (value_clause
+            (value_item
+              (at_hex_literal))))))))
+
+====================================
+sql type lob data description
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 BLOB-IMGN-ANVRSO USAGE IS SQL TYPE IS BLOB(30K).
+       05 DOC-TEXT USAGE IS SQL TYPE IS CLOB(3900).
+       05 DOC-DBCS USAGE SQL TYPE DBCLOB(12M).
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (usage_clause
+            (sql_type_clause
+              type: (sql_type_name
+                (blob_type))
+              size: (sql_type_size
+                length: (integer)))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (usage_clause
+            (sql_type_clause
+              type: (sql_type_name
+                (clob_type))
+              size: (sql_type_size
+                length: (integer)))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (usage_clause
+            (sql_type_clause
+              type: (sql_type_name
+                (dbclob_type))
+              size: (sql_type_size
+                length: (integer)))))))
+    (procedure_division)))

@@ -1,0 +1,86 @@
+====================================
+eject directives between divisions
+====================================
+000100 IDENTIFICATION DIVISION.
+000200 PROGRAM-ID. A.
+000300 EJECT
+000400 ENVIRONMENT DIVISION.
+000500 CONFIGURATION SECTION.
+000600 SOURCE-COMPUTER. IBM-370.
+000700 EJECT                                                        00070000
+000800 DATA DIVISION.
+000900 WORKING-STORAGE SECTION.
+001000 01 WS-A PIC X.
+001100 EJECT                                                        00110000
+001200 PROCEDURE DIVISION.
+001300     DISPLAY WS-A.
+001400     STOP RUN.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (compiler_directive)
+    (environment_division
+      (configuration_section
+        (source_computer_paragraph
+          (WORD))))
+    (compiler_directive)
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (compiler_directive)
+    (procedure_division
+      (display_statement
+        (qualified_word
+          (WORD)))
+      (period)
+      (stop_statement)
+      (period))))
+
+====================================
+eject-like identifier remains operand
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 EJECT PIC X.
+       01 WS-A PIC X.
+       procedure division.
+           MOVE EJECT TO WS-A.
+           DISPLAY WS-A.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (procedure_division
+      (move_statement
+        (qualified_word
+          (WORD))
+        (qualified_word
+          (WORD)))
+      (period)
+      (display_statement
+        (qualified_word
+          (WORD)))
+      (period))))

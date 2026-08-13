@@ -1,0 +1,99 @@
+====================================
+lowercase prefixed value literals
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 WS-XHEX PIC X VALUE x'74'.
+       01 WS-HHEX PIC X VALUE h'F1'.
+       01 WS-NCHAR PIC N VALUE n'Z'.
+       procedure division.
+           display WS-XHEX.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (x_string))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (h_string))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_n))
+          (value_clause
+            (value_item
+              (n_string))))))
+    (procedure_division
+      (display_statement
+        (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+mixed-case figurative constants
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 WS-SPACE PIC X VALUE SPACEs.
+       01 WS-ZERO PIC 9 VALUE ZEROes.
+       01 WS-QUOTE PIC X VALUE QUOTEs.
+       procedure division.
+           display WS-SPACE.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (SPACE))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (value_clause
+            (value_item
+              (ZEROS))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (QUOTE))))))
+    (procedure_division
+      (display_statement
+        (qualified_word
+          (WORD)))
+      (period))))

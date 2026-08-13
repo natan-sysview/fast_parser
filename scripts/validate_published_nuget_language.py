@@ -208,7 +208,8 @@ Console.WriteLine(parser.LibraryPath);
 '''
 
 
-COBOL_PROGRAM = r'''using FastParse;
+COBOL_PROGRAM = r'''using System.Text;
+using FastParse;
 
 using var parser = new FastParseClient();
 
@@ -216,6 +217,84 @@ var load = parser.LoadBundledLanguage("cobol");
 if (load.Language != "cobol" || !parser.LanguageAvailable("cobol"))
 {
     throw new InvalidOperationException("FastParser.Language.Cobol load smoke failed");
+}
+
+var source = """
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HELLO.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-NAME PIC X(10) VALUE 'CARLOS'.
+       PROCEDURE DIVISION.
+           DISPLAY WS-NAME.
+           EXEC SQL
+              COMMIT
+           END-EXEC.
+           GOBACK.
+       END PROGRAM HELLO.
+""";
+
+var json = parser.ParseText(
+    source,
+    new ParseOptions
+    {
+        Language = "cobol",
+        Format = FastParseFormat.Json,
+        IncludeRules = "program_definition|exec_sql_statement|display_statement",
+        Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+    });
+
+if (json.NodeCount == 0 ||
+    !json.Text.Contains("program_definition", StringComparison.Ordinal) ||
+    !json.Text.Contains("exec_sql_statement", StringComparison.Ordinal))
+{
+    throw new InvalidOperationException("published COBOL language NuGet JSON smoke failed");
+}
+
+var diagnostics = parser.ParseText(
+    source,
+    new ParseOptions
+    {
+        Language = "cobol",
+        Format = FastParseFormat.Diagnostics
+    });
+
+using var diagnosticsDocument = diagnostics.JsonDocument();
+if (diagnosticsDocument.RootElement.GetProperty("hasErrors").GetBoolean())
+{
+    throw new InvalidOperationException("published COBOL language NuGet diagnostics smoke found errors");
+}
+
+var ebcdicCopybook = Convert.FromHexString("40404040404040F0F140D9C5C760E3C5D3C1F0F14B0D254040404040404040404040F0F240E2C4E3D4D6E5D4E3D640D7C9C340E74DF1F05D4B0D25");
+var ebcdicDiagnostics = parser.ParseBytes(
+    ebcdicCopybook,
+    new ParseOptions
+    {
+        Language = "cobol",
+        Format = FastParseFormat.Diagnostics,
+        Normalization = FastParseNormalization.AutoSafe
+    });
+
+using var ebcdicDocument = ebcdicDiagnostics.JsonDocument();
+if (ebcdicDocument.RootElement.GetProperty("hasErrors").GetBoolean())
+{
+    throw new InvalidOperationException("published COBOL language NuGet EBCDIC diagnostics smoke found errors");
+}
+
+var tabbedCopybook = Encoding.UTF8.GetBytes("       01 RCX11.\n\t 02 FCX11-CDEMP               PIC 9(02).\n");
+var tabbedDiagnostics = parser.ParseBytes(
+    tabbedCopybook,
+    new ParseOptions
+    {
+        Language = "cobol",
+        Format = FastParseFormat.Diagnostics,
+        Normalization = FastParseNormalization.AutoSafe
+    });
+
+using var tabbedDocument = tabbedDiagnostics.JsonDocument();
+if (tabbedDocument.RootElement.GetProperty("hasErrors").GetBoolean())
+{
+    throw new InvalidOperationException("published COBOL language NuGet tab-expanded diagnostics smoke found errors");
 }
 
 Console.WriteLine("FastParser published language NuGet smoke OK");
@@ -257,6 +336,7 @@ def smoke_framework(env: dict[str, str]) -> str:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a FastParser.Language.* package from nuget.org.")
     parser.add_argument("--version", required=True)
+    parser.add_argument("--core-version", help="FastParser dependency version. Defaults to --version.")
     parser.add_argument("--language", default="python")
     parser.add_argument("--timeout-seconds", type=int, default=900)
     parser.add_argument("--interval-seconds", type=int, default=30)
@@ -313,9 +393,10 @@ def wait_for_version(package_id: str, index_url: str, version: str, timeout_seco
 
 def main() -> int:
     args = parse_args()
+    core_version = args.core_version or args.version
     language_package = package_id(args.language)
     language_index_url = package_index_url(args.language)
-    wait_for_version(CORE_PACKAGE, CORE_INDEX_URL, args.version, args.timeout_seconds, args.interval_seconds)
+    wait_for_version(CORE_PACKAGE, CORE_INDEX_URL, core_version, args.timeout_seconds, args.interval_seconds)
     wait_for_version(language_package, language_index_url, args.version, args.timeout_seconds, args.interval_seconds)
     print("Published language NuGet smoke environment", flush=True)
     print(f"  Python        : {platform.python_version()} {platform.platform()}", flush=True)
@@ -337,7 +418,7 @@ def main() -> int:
         )
         project = str(project_dir / "consumer.csproj")
         run_command(
-            ["dotnet", "add", project, "package", CORE_PACKAGE, "--version", args.version, "--source", SOURCE],
+            ["dotnet", "add", project, "package", CORE_PACKAGE, "--version", core_version, "--source", SOURCE],
             env=env,
         )
         run_command(

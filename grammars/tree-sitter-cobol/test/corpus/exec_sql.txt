@@ -1,0 +1,297 @@
+====================================
+exec sql include
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+           EXEC SQL
+             INCLUDE SQLCA
+           END-EXEC.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (exec_sql_statement
+          body: (exec_sql_include
+            name: (qualified_word
+              (WORD))))))
+    (procedure_division)))
+
+====================================
+exec sql include double data period
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+           EXEC SQL INCLUDE SQLCA END-EXEC..
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (exec_sql_statement
+          body: (exec_sql_include
+            name: (qualified_word
+              (WORD))))))
+    (procedure_division)))
+
+====================================
+exec sql insert host variables
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+             INSERT INTO BGDTOPT
+             VALUES (:OPT-CODAPLI,
+                     :OPT-FECIMP,
+                     :OPT-NUMEROFIC)
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))))
+      (period))))
+
+====================================
+exec sql host variable subscript
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+             SELECT CAMPO INTO :WS-CAMPO(WS-IDX)
+             FROM TABLA
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD))
+            subscript: (subref
+              (qualified_word
+                (WORD))))))
+      (period))))
+
+====================================
+exec cics stays cics
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC CICS
+             SEND MAP('X')
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_cics_statement
+        body: (cics_body
+          command: (cics_command)
+          (string)))
+      (period))))
+
+====================================
+exec sql db2 not equal operator
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+             SELECT ESTADO
+               INTO :WS-ESTADO
+               FROM TABLA E
+              WHERE E.ESTADO_ENC ^= :WS-ESTADO
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))))
+      (period))))
+
+====================================
+exec sql db2 single pipe operator
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+              SELECT A | B
+              INTO :C
+              FROM T
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))))
+      (period))))
+
+====================================
+exec sql db2 not less than operator
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+             SELECT FECHA
+               INTO :WS-FECHA
+               FROM TABLA
+              WHERE FE_FIN_VIGEN ^< :FECHA-FIN-ALTA
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))))
+      (period))))
+
+====================================
+exec sql db2 not greater than operator
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+             SELECT FECHA
+               INTO :WS-FECHA
+               FROM TABLA
+              WHERE FE_INIC_VIGEN ^> :FECHA-FIN-ALTA
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))))
+      (period))))
+
+====================================
+exec sql db2 not equal sign operator
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+             SELECT IMPVALOR
+               INTO :WS-IMPVALOR
+               FROM TABLA
+              WHERE IMPVALOR ¬= 0
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))
+          (number
+            (integer))))
+      (period))))
+
+====================================
+exec sql db2 concat operator
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+             SELECT CVE_CATALOGO
+               INTO :WS-CATALOGO
+               FROM TABLA
+              WHERE CVE_CATALOGO||CODIGO||SUBCODIGO >= :LLAVE-CATD
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))))
+      (period))))

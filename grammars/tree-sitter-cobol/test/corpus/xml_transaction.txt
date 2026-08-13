@@ -1,0 +1,99 @@
+====================================
+xml generate and parse
+====================================
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ZCOVSPEC.
+       PROCEDURE DIVISION.
+       X0004-XMLG.
+           XML GENERATE WS-XML FROM WS-DOC
+              ON EXCEPTION CONTINUE
+              NOT ON EXCEPTION CONTINUE
+           END-XML.
+       X0005-XMLP.
+           XML PARSE WS-XML PROCESSING PROCEDURE P7000-XML-EVENT
+              ON EXCEPTION CONTINUE
+              NOT ON EXCEPTION CONTINUE
+           END-XML.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (xml_generate_statement
+        (XML)
+        target: (qualified_word
+          (WORD))
+        source: (qualified_word
+          (WORD)))
+      (on_exception)
+      (continue_statement)
+      (not_on_exception)
+      (continue_statement)
+      (END_XML)
+      (period)
+      (paragraph_header)
+      (xml_parse_statement
+        (XML)
+        source: (qualified_word
+          (WORD))
+        procedure: (label
+          (qualified_word
+            (WORD))))
+      (on_exception)
+      (continue_statement)
+      (not_on_exception)
+      (continue_statement)
+      (END_XML)
+      (period))))
+
+====================================
+transaction organization and acquire
+====================================
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ZCOVTRAN.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT TRN-FILE ASSIGN TO WORKSTATION-ZCOVTRN
+              ORGANIZATION IS TRANSACTION
+              ACCESS MODE IS SEQUENTIAL
+              FILE STATUS IS WS-TRN-ST.
+       PROCEDURE DIVISION.
+       Q0001-ACQU.
+           ACQUIRE 'QPADEV000R' FOR TRN-FILE.
+           ACQUIRE WS-DEV FOR TRN-FILE.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (TRANSACTION))
+          (access_mode_clause
+            (SEQUENTIAL))
+          (file_status_clause
+            file_or_sort: (FILE)
+            reference: (qualified_word
+              (WORD))))))
+    (procedure_division
+      (paragraph_header)
+      (acquire_statement
+        terminal: (string)
+        file_name: (WORD))
+      (period)
+      (acquire_statement
+        terminal: (qualified_word
+          (WORD))
+        file_name: (WORD))
+      (period))))

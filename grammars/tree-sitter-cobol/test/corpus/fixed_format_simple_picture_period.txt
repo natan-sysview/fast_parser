@@ -1,0 +1,184 @@
+====================================
+simple numeric picture period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+012310     05 WS-TASACRENT2E-NUM REDEFINES WS-TASACRENT2E-TEXT PIC 9999.00012310
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (redefines_clause
+            (qualified_word
+              (WORD)))
+          (picture_clause
+            (picture_9)))))
+    (procedure_division)))
+
+====================================
+simple counted numeric picture period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+000276        10 WS-NRO-PERCAP-AUX.                                     00027600
+000279        10 WS-NRO-PERCAP-NUM REDEFINES WS-NRO-PERCAP-AUX PIC 9(3).00027900
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description
+          (level_number)
+          (entry_name)
+          (redefines_clause
+            (qualified_word
+              (WORD)))
+          (picture_clause
+            (picture_9)))))
+    (procedure_division)))
+
+====================================
+simple alphanumeric picture period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+060300   05 WS-CUOTA-VAL-PAGO REDEFINES WS-CUOTA-VAL-NUM-PAGO PIC X(06).00060300
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (redefines_clause
+            (qualified_word
+              (WORD)))
+          (picture_clause
+            (picture_x)))))
+    (procedure_division)))
+
+====================================
+simple numeric picture period in fixed column
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+014210                08  WKS-SNC-IMPORTE-AUTORIZACION     PIC 9(12)V99.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)))))
+    (procedure_division)))
+
+====================================
+ordinary edited numeric picture remains edited
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WS-AMOUNT PIC 9.99.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit)))))
+    (procedure_division)))
+
+====================================
+ordinary edited alphanumeric picture remains edited
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WS-MASK PIC X/X.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit)))))
+    (procedure_division)))
+
+====================================
+ordinary comma-edited numeric picture remains edited
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WS-LEIDOS-MASC PIC 999,999,999
+                           VALUE ZEROES.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit))
+          (value_clause
+            (value_item
+              (ZEROS))))))
+    (procedure_division)))

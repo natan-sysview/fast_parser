@@ -1,0 +1,146 @@
+====================================
+level 88 space separated numeric value list
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 W-FECHA.
+          05 W-MES PIC 99.
+             88 MES VALUE 01 02 03 04.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)))
+        (data_description
+          (level_number)
+          (entry_name)
+          (value_clause
+            (value_item
+              (number
+                (integer)))
+            (value_item
+              (number
+                (integer)))
+            (value_item
+              (number
+                (integer)))
+            (value_item
+              (number
+                (integer)))))))
+    (procedure_division)))
+
+====================================
+level 88 comma adjacent numeric range list
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 WS-TIME.
+          05 WS-HOUR PIC 9(06).
+             88 WS-HOUR-VALID VALUE 000000 THRU 005959,
+                010000 THRU 015959,020000 THRU 025959.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)))
+        (data_description
+          (level_number)
+          (entry_name)
+          (value_clause
+            (value_item
+              (number
+                (integer))
+              (THRU)
+              (number
+                (integer)))
+            (value_item
+              (number
+                (integer))
+              (THRU)
+              (number
+                (integer)))
+            (value_item
+              (number
+                (integer))
+              (THRU)
+              (number
+                (integer)))))))
+    (procedure_division)))
+
+====================================
+level 88 continued numeric value list
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 WS-SWITCHES.
+          05 WS-STATUS PIC 9(02) VALUE 0.
+             88 WS-STATUS-BAD VALUE
+                02 03 04 08.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (value_clause
+            (value_item
+              (number
+                (integer)))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (value_clause
+            (value_item
+              (number
+                (integer)))
+            (value_item
+              (number
+                (integer)))
+            (value_item
+              (number
+                (integer)))
+            (value_item
+              (number
+                (integer)))))))
+    (procedure_division)))

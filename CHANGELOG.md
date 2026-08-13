@@ -14,6 +14,8 @@ This project follows semantic versioning once the first stable release is publis
 - Structural node fields `fieldName`, `childIndex`, `isNamed`, and `depth`
   across JSON, CSV, and MessagePack outputs.
 - Matching field flags in the C, C#, Python, and TypeScript bindings.
+- COBOL language extension release workflow and NuGet validation smoke tests.
+- COBOL `auto_safe` / `cobol_fixed_legacy` normalization for detected CP037/EBCDIC sources, tab-expanded fixed layout, and legacy trailer cleanup.
 
 ### Compatibility
 

@@ -1,0 +1,97 @@
+====================================
+copybook data definition
+====================================
+       01  CMN-RUN-CONTEXT.
+           05 CMN-RUN-DATE PIC 9(8).
+           05 CMN-RUN-USER PIC X(10).
+---
+
+(start
+  (copybook_definition
+    (copybook_data_definition
+      (data_description
+        (level_number)
+        (entry_name))
+      (data_description
+        (level_number)
+        (entry_name)
+        (picture_clause
+          (picture_9)))
+      (data_description
+        (level_number)
+        (entry_name)
+        (picture_clause
+          (picture_x))))))
+
+====================================
+copybook procedure definition
+====================================
+           ACCEPT WS-DT-CAL FROM DATE YYYYMMDD.
+           MOVE WS-DT-CAL TO WS-DATA-2000.
+           GO INICIO-PROGRAMA.
+       LIMPA-TUDO.
+           EXIT.
+---
+
+(start
+  (copybook_definition
+    (copybook_procedure_definition
+      (accept_statement
+        (qualified_word
+          (WORD))
+        from: (DATE)
+        from: (YYYYMMDD))
+      (period)
+      (move_statement
+        src: (qualified_word
+          (WORD))
+        dst: (qualified_word
+          (WORD)))
+      (period)
+      (goto_statement
+        to: (label
+          (qualified_word
+            (WORD))))
+      (period)
+      (paragraph_header)
+      (exit_statement)
+      (period))))
+
+====================================
+copybook exec sql include
+====================================
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+           01  HOST-AREA PIC X(10).
+---
+
+(start
+  (copybook_definition
+    (copybook_data_definition
+      (exec_sql_statement
+        body: (exec_sql_include
+          name: (qualified_word
+            (WORD))))
+      (data_description
+        (level_number)
+        (entry_name)
+        (picture_clause
+          (picture_x))))))
+
+====================================
+copybook procedure accept auto-skip
+====================================
+           ACCEPT WS-PARE AT 2475 WITH AUTO-SKIP.
+---
+
+(start
+  (copybook_definition
+    (copybook_procedure_definition
+      (accept_statement
+        (qualified_word
+          (WORD))
+        (at_line_column
+          at: (number
+            (integer)))
+        (with_accp_attr
+          (AUTO_SKIP)))
+      (period))))

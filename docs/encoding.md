@@ -16,7 +16,7 @@ int tsmp_parse(
 
 `source` is an opaque byte buffer.
 
-TSMP does not:
+By default, TSMP does not:
 
 - Open files.
 - Detect encoding.
@@ -26,6 +26,8 @@ TSMP does not:
 - Validate that the input is UTF-8.
 
 The parent application decides how to read bytes from disk, network, database, editor memory, or any other source.
+
+The V2 API can apply explicit language-specific normalization before parsing. For `language = "cobol"` with `auto_safe` or `cobol_fixed_legacy`, FastParse may decode detected CP037/EBCDIC bytes to UTF-8, expand tab characters to fixed-width spaces, and remove known non-source trailer records in memory. Use `normalization = none` when byte-for-byte original offsets are required.
 
 ## Empty Input
 

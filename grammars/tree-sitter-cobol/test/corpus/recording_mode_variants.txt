@@ -1,0 +1,71 @@
+====================================
+recording mode are
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       fd fd-input
+          label record are standard
+          recording mode are f.
+       01 fd-rec pic x(80).
+       procedure division.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD)
+            (file_description_clause
+              (label_records_clause
+                (STANDARD)))
+            (file_description_clause
+              (recording_mode_clause
+                mode: (WORD))))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name)
+              (picture_clause
+                (picture_x)))))))
+    (procedure_division)))
+
+====================================
+recording mode is remains accepted
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       fd fd-output
+          recording mode is f.
+       01 fd-rec pic x.
+       procedure division.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD)
+            (file_description_clause
+              (recording_mode_clause
+                mode: (WORD))))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name)
+              (picture_clause
+                (picture_x)))))))
+    (procedure_division)))

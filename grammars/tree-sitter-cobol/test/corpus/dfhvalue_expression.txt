@@ -1,0 +1,78 @@
+====================================
+dfhvalue value clause
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 WS-STATUS PIC S9(8) COMP.
+          88 WS-STATUS-OPEN VALUE DFHVALUE(OPEN).
+       procedure division.
+           display WS-STATUS.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (usage_clause
+            (COMP)))
+        (data_description
+          (level_number)
+          (entry_name)
+          (value_clause
+            (value_item
+              (dfhvalue_expression
+                (WORD)))))))
+    (procedure_division
+      (display_statement
+        (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+dfhvalue condition expression
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 WS-STATUS PIC S9(8) COMP.
+       procedure division.
+           IF WS-STATUS = DFHVALUE(DISABLED)
+              DISPLAY 'N'
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (usage_clause
+            (COMP)))))
+    (procedure_division
+      (if_header
+        (expr
+          (qualified_word
+            (WORD))
+          (eq)
+          (dfhvalue_expression
+            (WORD))))
+      (display_statement
+        (string))
+      (END_IF)
+      (period))))

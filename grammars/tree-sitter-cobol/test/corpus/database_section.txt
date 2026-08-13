@@ -1,0 +1,109 @@
+====================================
+database section with db entries
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       data-base section.
+       DB S264BD03SERVHISDB.
+       01 S264B02HISMONNAC.
+       01 S264B03HISMONEXT.
+       working-storage section.
+       01 WS-A PIC X.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (database_section
+        (database_description
+          name: (qualified_word
+            (WORD)))
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description
+          (level_number)
+          (entry_name)))
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (procedure_division)))
+
+====================================
+database section with multiple db groups
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       data-base section.
+       DB S264BD03SERVHISDB.
+       01 S264B02HISMONNAC.
+       DB S264SERVTRANS.
+       01 MOVTOSXTRANS.
+       01 MOVTOSXCHQS.
+       working-storage section.
+       01 WS-A PIC X.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (database_section
+        (database_description
+          name: (qualified_word
+            (WORD)))
+        (data_description
+          (level_number)
+          (entry_name))
+        (database_description
+          name: (qualified_word
+            (WORD)))
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description
+          (level_number)
+          (entry_name)))
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (procedure_division)))
+
+====================================
+database heading in comment remains comment
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+      *                 DATABASE     SECTION
+       01 WS-A PIC X.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (comment)
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (procedure_division)))

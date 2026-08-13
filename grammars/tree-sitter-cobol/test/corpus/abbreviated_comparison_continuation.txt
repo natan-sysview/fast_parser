@@ -1,0 +1,60 @@
+====================================
+abbreviated not equal continuation
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF ESTADO-ORD NOT = '01'
+              AND NOT = '14'
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (ne)
+          (string)
+          (AND_NE)
+          (string)))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+abbreviated equality after line-broken or
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF COMMAREA-TRANSFER-PROG = 'SOMAS58P' OR
+                                    = 'SOMAS59P' OR
+                                    = 'SOMAS62P'
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (eq)
+          (string)
+          (OR_EQ)
+          (string)
+          (OR_EQ)
+          (string)))
+      (continue_statement)
+      (END_IF)
+      (period))))

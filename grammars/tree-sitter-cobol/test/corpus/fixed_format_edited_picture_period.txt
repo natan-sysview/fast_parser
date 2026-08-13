@@ -1,0 +1,47 @@
+====================================
+edited numeric picture period before suffix digits
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+021600    05 WA-CIFRA1                      PIC -ZZZ,ZZZ,ZZZ,ZZZ,ZZ9.99.02060069
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit)))))
+    (procedure_division)))
+
+====================================
+ordinary edited decimal picture remains edited
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WA-CIFRA1 PIC -ZZZ,ZZ9.99.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit)))))
+    (procedure_division)))

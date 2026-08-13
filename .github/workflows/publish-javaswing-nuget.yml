@@ -153,6 +153,7 @@ jobs:
             --core-package "$core_package" \
             --language-package "$language_package" \
             --version "${{ needs.resolve-version.outputs.version }}" \
+            --core-version "${{ needs.resolve-version.outputs.core_version }}" \
             --language javaswing \
             --require-all-rids
 
@@ -221,4 +222,8 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Validate published NuGet JavaSwing language package
-        run: python scripts/validate_published_nuget_language.py --version "${{ needs.resolve-version.outputs.version }}" --language javaswing
+        run: >
+          python scripts/validate_published_nuget_language.py
+          --version "${{ needs.resolve-version.outputs.version }}"
+          --core-version "${{ needs.resolve-version.outputs.core_version }}"
+          --language javaswing

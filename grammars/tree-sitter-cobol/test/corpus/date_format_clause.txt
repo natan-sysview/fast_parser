@@ -1,0 +1,129 @@
+====================================
+numeric data description date format clause
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WSV-FECHA PIC 9(08) DATE FORMAT YYYYXXXX.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)
+            (date_format_clause)))))
+    (procedure_division)))
+
+====================================
+lowercase date format clause
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 ws-fecha pic 9(08) date format yyyymmdd.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)
+            (date_format_clause)))))
+    (procedure_division)))
+
+====================================
+date format clause with fixed suffix
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+          05 WSV-FECFA-REF1            PIC 9(08) DATE FORMAT YYYYXXXX.  00050400
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)
+            (date_format_clause)))))
+    (procedure_division)))
+
+====================================
+date format text in literals remains a string
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WS-LABEL PIC X(20) VALUE 'DATE FORMAT YYYYXXXX'.
+       procedure division.
+       DISPLAY 'DATE FORMAT SWITCH'.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (string))))))
+    (procedure_division
+      (display_statement
+        (string))
+      (period))))
+
+====================================
+date format in an entry name remains generic
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WS-DATE-FORMAT PIC X(08).
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (procedure_division)))

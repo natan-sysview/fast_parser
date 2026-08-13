@@ -1,0 +1,70 @@
+====================================
+file section copy before file description
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       copy MKWCMASC.
+       fd output-file.
+       01 output-rec pic x.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (copy_statement
+          book: (WORD))
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name)
+              (picture_clause
+                (picture_x)))))))
+    (procedure_division)))
+
+====================================
+file section multiple copies before file description
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       copy HEADER-FILES.
+       copy EXTRA-FILES.
+       fd output-file.
+       01 output-rec pic x.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (copy_statement
+          book: (WORD))
+        (copy_statement
+          book: (WORD))
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name)
+              (picture_clause
+                (picture_x)))))))
+    (procedure_division)))
