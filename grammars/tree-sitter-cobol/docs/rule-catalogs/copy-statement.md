@@ -14,6 +14,7 @@ Data Division and Procedure Division rules.
 
 - `COPY member.`
 - `COPY member OF library.`
+- `COPY member library.`
 - `COPY member SUPPRESS REPLACING ...`
 - `COPY member REPLACING ...`
 - `COPY "member.cpy".`
@@ -36,7 +37,8 @@ context owns the terminator:
   `COPY layout OF library.` as one record-description list.
 
 The `book` field is required. `lib_name`, `supress`, and `replacing_clause` are
-optional.
+optional. `lib_name` can appear with `OF`/`IN` or as the next bare copy target;
+Cementera uses this for DDS forms such as `COPY DDS-ALL-FORMATS DCLINAT25.`.
 
 ## Corpus
 

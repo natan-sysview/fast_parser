@@ -1,4 +1,150 @@
 ====================================
+not equal symbol in if header
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF FS1 NOT = "00"
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (ne)
+          (string)))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+numeric abbreviated literal tail before range tail
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF CDPRODVAS = 0499 OR 0500 OR > 0299 AND < 0324
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (eq)
+          (number
+            (integer))
+          (abbreviated_literal_tail)
+          (OR_GT)
+          (number
+            (integer))
+          (AND_LT)
+          (number
+            (integer))))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+numeric abbreviated literal tail after line-broken or
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF CDPRO = 116 OR 134 OR
+                      234 OR > 125
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (eq)
+          (number
+            (integer))
+          (abbreviated_literal_tail)
+          (abbreviated_literal_tail)
+          (OR_GT)
+          (number
+            (integer))))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+legacy not literal condition
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF FS1 NOT "00"
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (legacy_not_literal_condition
+          left: (qualified_word
+            (WORD))
+          right: (string)))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+legacy fi typo in if header
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           FI FS1 NOT = "00"
+              GO FIM.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        (legacy_fi_if_keyword)
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (ne)
+          (string)))
+      (goto_statement
+        to: (label
+          (qualified_word
+            (WORD))))
+      (period))))
+
+====================================
 abbreviated not equal continuation
 ====================================
        identification division.
@@ -23,6 +169,40 @@ abbreviated not equal continuation
           (string)
           (AND_NE)
           (string)))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+line-broken and followed by source marker
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+>          IF FS EQUAL '10' AND
+>             CONT EQUAL ZERO
+>             CONTINUE
+>          END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (expr
+            (qualified_word
+              (WORD))
+            (eq)
+            (string))
+          (AND)
+          (expr
+            (qualified_word
+              (WORD))
+            (eq)
+            (ZERO))))
       (continue_statement)
       (END_IF)
       (period))))
@@ -55,6 +235,340 @@ abbreviated equality after line-broken or
           (string)
           (OR_EQ)
           (string)))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+abbreviated less greater without than
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF W-SIG-TRABAJO GREATER 20 OR LESS 19
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (gt)
+          (number
+            (integer))
+          (OR_LT)
+          (number
+            (integer))))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+compact not equal operator
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF CTA-CHQ NOT= CTA-CHQ-ANT
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (ne)
+          (qualified_word
+            (WORD))))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+abbreviated less or equal split to
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF RGEC030-DIAS GREATER THAN CTE-30 AND LESS OR EQUAL
+              TO CTE-90
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (gt)
+          (qualified_word
+            (WORD))
+          (AND_LE)
+          (qualified_word
+            (WORD))))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+abbreviated operator after line-broken or
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF WS-VALUE < WS-MIN OR
+                              > WS-MAX
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (lt)
+          (qualified_word
+            (WORD))
+          (OR_GT)
+          (qualified_word
+            (WORD))))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+abbreviated operator after line-broken and
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF WS-VALUE > WS-MIN AND
+                              < WS-MAX
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (gt)
+          (qualified_word
+            (WORD))
+          (AND_LT)
+          (qualified_word
+            (WORD))))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+abbreviated less or equal after line-broken and
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF TMOP-MCFCANCEL >= WSV-FECHA-INI AND
+                             <= WSV-FECHA-FIN
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (ge)
+          (qualified_word
+            (WORD))
+          (AND_LE)
+          (qualified_word
+            (WORD))))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+not equal split after not
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF FIELD-A NOT
+                      = ' '
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (ne)
+          (string)))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+abbreviated literal chain with mixed explicit equality
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF CSW-I-MAE-PROCRED = 'TM' OR 'IN' OR '99' OR
+                                  = 'PL' OR 'FI'
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (eq)
+          (string)
+          (abbreviated_literal_tail)
+          (abbreviated_literal_tail)
+          (OR_EQ)
+          (string)
+          (abbreviated_literal_tail)))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+abbreviated figurative constant chain
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF EVA-RESOLUCI NOT EQUAL SPACES
+              AND LOW-VALUES AND ZEROES
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (ne)
+          (SPACE)
+          (abbreviated_literal_tail)
+          (abbreviated_literal_tail)))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+numeric leading identifier after or remains boolean
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF 054-EVENTO EQUAL SPACES OR
+              054-EVENTO EQUAL LOW-VALUES
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (expr
+            (qualified_word
+              (WORD))
+            (eq)
+            (SPACE))
+          (OR)
+          (expr
+            (qualified_word
+              (WORD))
+            (eq)
+            (LOW_VALUE))))
+      (continue_statement)
+      (END_IF)
+      (period))))
+
+====================================
+condition name after and remains boolean
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF CAA-CODTRAN = 'U880' AND 88-WS-EXISTE-TIPEROGA
+              CONTINUE
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (expr
+            (qualified_word
+              (WORD))
+            (eq)
+            (string))
+          (AND)
+          (expr
+            (qualified_word
+              (WORD)))))
       (continue_statement)
       (END_IF)
       (period))))

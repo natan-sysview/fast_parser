@@ -1,0 +1,26 @@
+====================================
+read prior at end
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           READ TOTCAIXA PRIOR AT END
+               GO ERRO-2
+           END-READ.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (read_statement
+        file_name: (WORD)
+        flag_next: (PRIOR))
+      (at_end)
+      (goto_statement
+        to: (label
+          (qualified_word
+            (WORD))))
+      (END_READ)
+      (period))))

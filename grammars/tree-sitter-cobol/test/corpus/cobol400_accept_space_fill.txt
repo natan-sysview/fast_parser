@@ -1,0 +1,60 @@
+====================================
+accept with space fill attribute
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           ACCEPT W-NOMECLI AT 1648 WITH AUTO-SKIP SPACE-FILL.
+           ACCEPT WDESCBAIRRO WITH AUTO-SKIP UPDATE SPACE-FILL AT 1337.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (accept_statement
+        (qualified_word
+          (WORD))
+        (at_line_column
+          (number
+            (integer)))
+        (with_accp_attr
+          (AUTO_SKIP)
+          (SPACE_FILL)))
+      (period)
+      (accept_statement
+        (qualified_word
+          (WORD))
+        (with_accp_attr
+          (AUTO_SKIP)
+          (UPDATE)
+          (SPACE_FILL))
+        (at_line_column
+          (number
+            (integer))))
+      (period))))
+
+====================================
+accept with secure attribute
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           ACCEPT WSENHA01 AT 1937 WITH SECURE.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (accept_statement
+        (qualified_word
+          (WORD))
+        (at_line_column
+          (number
+            (integer)))
+        (with_accp_attr
+          (SECURE)))
+      (period))))

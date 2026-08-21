@@ -1,0 +1,98 @@
+====================================
+io control direct commitment control
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       i-o-control.
+           commitment control for XX20 XX14V1 LC50V
+                                  XX10 XX12 RESTART.
+       data division.
+       file section.
+       FD  XX05V.
+       01  REG-XX05.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (i_o_control
+          (i_o_control_clause
+            (commitment_control_clause
+              (commitment_control_resources
+                resources: (qualified_word
+                  (WORD))
+                resources: (qualified_word
+                  (WORD))
+                resources: (qualified_word
+                  (WORD))
+                resources: (qualified_word
+                  (WORD))
+                resources: (qualified_word
+                  (WORD))
+                resources: (qualified_word
+                  (WORD))))))))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name))))))
+    (procedure_division)))
+
+====================================
+io control multiple commitment control clauses with periods
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       i-o-control.
+           commitment control for DPREV019.
+           commitment control for DPREV019C.
+       data division.
+       file section.
+       FD  XX05V.
+       01  REG-XX05.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (i_o_control
+          (i_o_control_clause
+            (commitment_control_clause
+              (commitment_control_resources
+                resources: (qualified_word
+                  (WORD)))))
+          (i_o_control_clause
+            (commitment_control_clause
+              (commitment_control_resources
+                resources: (qualified_word
+                  (WORD))))))))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name))))))
+    (procedure_division)))

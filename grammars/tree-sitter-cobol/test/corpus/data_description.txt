@@ -142,6 +142,33 @@ computational
     (procedure_division)))
 
 ====================================
+pointer value nulls
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       05 WS-PTR POINTER VALUE NULLS.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (usage_clause
+            (POINTER))
+          (value_clause
+            (value_item
+              (TOK_NULL))))))
+    (procedure_division)))
+
+====================================
 level 88 comma value list
 ====================================
        identification division.
@@ -398,6 +425,44 @@ linkage section copy-only body
         (procedure_param)))))
 
 ====================================
+linkage before working storage section
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       linkage section.
+       01 PARAMETROS PIC X(5).
+       working-storage section.
+       01 WS-NOME PIC X(5).
+       procedure division using PARAMETROS.
+           goback.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (linkage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))))
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x)))))
+    (procedure_division
+      (procedure_using_chaining
+        (USING)
+        (procedure_param))
+      (goback_statement)
+      (period))))
+
+====================================
 label record variants
 ====================================
        identification division.
@@ -433,6 +498,122 @@ label record variants
             (file_description_clause
               (label_records_clause
                 (STANDARD)))))))
+    (procedure_division)))
+
+====================================
+legacy typo label record ommited
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       FD  IMPRESSORA LABEL RECORD IS OMMITED.
+       01  LINHA-DETALHE  PIC X(80).
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD)
+            (file_description_clause
+              (label_records_clause
+                (OMITTED))))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name)
+              (picture_clause
+                (picture_x)))))))
+    (procedure_division)))
+
+====================================
+data division direct single fd
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       FD  DPREV111
+           LABEL RECORD ARE STANDARD.
+       01  REG-DPREV111.
+           COPY DDS-ALL-FORMATS OF DPREV111.
+       working-storage section.
+       77  WS-PARADA PIC X(2) VALUE SPACES.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_type
+          (FD))
+        (file_description_entry
+          (WORD)
+          (file_description_clause
+            (label_records_clause
+              (STANDARD))))
+        (record_description_list
+          (data_description
+            (level_number)
+            (entry_name))
+          (copy_statement
+            (WORD)
+            (WORD))))
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (SPACE))))))
+    (procedure_division)))
+
+====================================
+legacy typo value spaces
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01  A PIC X VALUE SCACES.
+       01  B PIC X VALUE SPCACES.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (SPACE))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (SPACE))))))
     (procedure_division)))
 
 ====================================
@@ -592,4 +773,77 @@ sql type lob data description
                 (dbclob_type))
               size: (sql_type_size
                 length: (integer)))))))
+    (procedure_division)))
+
+====================================
+blank when zeros plural
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       03 NRNF1-L PIC 999.999BB BLANK WHEN ZEROS.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit))
+          (blank_clause))))
+    (procedure_division)))
+
+====================================
+level copy statement
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       FD I-RS02.
+       01 REG-RS02.
+          03 COPY DDS-ALL-FORMATS OF RS02LF5.
+       FD VIAGLANCAL.
+       01 COPY DDS-ALL-FORMATS OF VIAGLANCAL.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name))
+            (level_copy_statement
+              (level_number)
+              (copy_statement
+                book: (WORD)
+                lib_name: (WORD)))))
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD))
+          (record_description_list
+            (level_copy_statement
+              (level_number)
+              (copy_statement
+                book: (WORD)
+                lib_name: (WORD)))))))
     (procedure_division)))

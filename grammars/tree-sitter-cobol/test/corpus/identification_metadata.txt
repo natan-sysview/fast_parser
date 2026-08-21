@@ -146,3 +146,117 @@ program id without final period before date compiled
           (picture_clause
             (picture_x)))))
     (procedure_division)))
+
+====================================
+metadata without final period before aligned environment division
+====================================
+       identification division.
+       program-id. fc3cfc30.
+       author. fabrica de software
+       date-written. abril de 2008
+       environment                     division.
+       configuration                   section.
+       procedure division.
+       stop run.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name)
+      (author_section
+        comment: (comment_entry))
+      (date_written_section
+        comment: (comment_entry)))
+    (environment_division
+      (configuration_section))
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+program id bare initial attribute
+====================================
+       identification division.
+       program-id. trdcuini initial.
+       environment division.
+       configuration section.
+       procedure division.
+       stop run.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name)
+      (is_initial))
+    (environment_division
+      (configuration_section))
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+program id bare common attribute
+====================================
+       identification division.
+       program-id. trdcuini common.
+       environment division.
+       configuration section.
+       procedure division.
+       stop run.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name)
+      (is_common))
+    (environment_division
+      (configuration_section))
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+installation metadata without keyword period
+====================================
+       identification division.
+       program-id. bk4ck704.
+       author. j. luis sanchez.
+       installation   (banco bilbao vizcaya-mexico).
+       date-written. agosto de 1998.
+       environment division.
+       procedure division.
+       stop run.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name)
+      (author_section
+        comment: (comment_entry))
+      (installation_section
+        comment: (comment_entry))
+      (date_written_section
+        comment: (comment_entry)))
+    (environment_division)
+    (procedure_division
+      (stop_statement)
+      (period))))
+
+====================================
+program id with underscore
+====================================
+       identification division.
+       program-id. PCALEND_TP.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name
+        (cobol400_word)))
+    (procedure_division)))

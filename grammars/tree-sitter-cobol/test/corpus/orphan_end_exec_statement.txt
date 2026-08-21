@@ -1,0 +1,59 @@
+====================================
+orphan end exec as statement
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           MOVE A TO B.
+           END-EXEC
+           PERFORM 100-A.
+       100-A.
+           EXIT.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (move_statement
+        src: (qualified_word
+          (WORD))
+        dst: (qualified_word
+          (WORD)))
+      (period)
+      (orphan_end_exec_statement)
+      (perform_statement_call_proc
+        procedure: (perform_procedure
+          (label
+            (qualified_word
+              (WORD)))))
+      (period)
+      (paragraph_header)
+      (exit_statement)
+      (period))))
+
+====================================
+balanced exec sql remains exec sql statement
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+              SELECT 1 INTO :A FROM SYSIBM.SYSDUMMY1
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        (sql_body
+          (number
+            (integer))
+          (sql_host_variable
+            (qualified_word
+              (WORD)))))
+      (period))))

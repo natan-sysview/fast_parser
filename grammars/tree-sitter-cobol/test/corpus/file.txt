@@ -119,6 +119,92 @@ open extend
       (period))))
 
 ====================================
+cobol400 file names in io statements
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       file-control.
+       select FECA_SFP assign database-FECA_SFP.
+       procedure division.
+       open input FECA_SFP DCALEND_TP.
+       read FECA_SFP.
+       delete FECA_SFP.
+       close FECA_SFP.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (cobol400_word)
+          (assign_clause
+            to: (database_assignment_name)))))
+    (procedure_division
+      (open_statement
+        (open_arg
+          mode: (INPUT)
+          file_name_list: (cobol400_word)
+          file_name_list: (cobol400_word)))
+      (period)
+      (read_statement
+        file_name: (cobol400_word))
+      (period)
+      (delete_statement
+        file_name: (cobol400_word))
+      (period)
+      (close_statement
+        (close_arg
+          file_handler: (cobol400_word)))
+      (period))))
+
+====================================
+delete multiple file names
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       delete f1 f2.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (delete_statement
+        file_name: (WORD)
+        file_name: (WORD))
+      (period))))
+
+====================================
+start split not less than
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       start f key is not
+             less than externally-described-key.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (start_statement
+        file_name: (WORD)
+        (start_key
+          op: (ge)
+          keys: (qualified_word
+            (WORD))))
+      (period))))
+
+====================================
 close
 ====================================
        identification division.

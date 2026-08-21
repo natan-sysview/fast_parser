@@ -49,3 +49,39 @@ Redefines
           (picture_clause
             (picture_9)))))
     (procedure_division)))
+
+====================================
+legacy typo defines as redefines
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 WCONVDT PIC 9(08).
+       03 FILLER DEFINES WCONVDT.
+          05 WCA2 PIC 9(04).
+       procedure division.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)))
+        (data_description
+          (level_number)
+          (entry_name)
+          (redefines_clause
+            (qualified_word
+              (WORD))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9)))))
+    (procedure_division)))

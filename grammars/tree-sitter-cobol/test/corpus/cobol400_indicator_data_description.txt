@@ -1,0 +1,45 @@
+====================================
+data description indicator clause
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01  INDICADOR.
+           05 IN03                            PIC 1 INDIC 03.
+           05 IN-FIM-PGM                      PIC 1 INDIC 05.
+           05 INDIC-FMT10                     PIC 1 INDICATOR 1.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit))
+          (indicator_clause
+            indicator: (integer)))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit))
+          (indicator_clause
+            indicator: (integer)))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_edit))
+          (indicator_clause
+            indicator: (integer)))))
+    (procedure_division)))

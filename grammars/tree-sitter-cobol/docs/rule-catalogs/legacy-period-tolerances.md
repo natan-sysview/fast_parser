@@ -4,6 +4,7 @@
 
 - `data_description_without_period`
 - `_procedure_division_statements_before_header`
+- `paragraph_header`
 
 ## Purpose
 
@@ -33,6 +34,30 @@ The first `03` is exposed as `data_description_without_period`.
 
 This accepts a `rewrite_statement` immediately before the next paragraph header.
 
+### EXIT Before Paragraph Header
+
+```cobol
+       020-SAI.
+           EXIT
+       800-CABECALHO.
+           DISPLAY "CAB".
+```
+
+This accepts an `exit_statement` immediately before the next paragraph header.
+
+### Paragraph Header Without Period
+
+```cobol
+       CALCULA-DIA.
+           GO CALCULA-VENCIMENTO.
+       VENCIMENTO-SAI
+           EXIT.
+```
+
+This accepts a Procedure Division paragraph header when the label appears in
+header position but omits the terminating period. Cementera uses this form for
+labels such as `STARTA-DACCA001`, `ACCEPT-MESINI`, and `VENCIMENTO-SAI`.
+
 ## Excluded Forms
 
 - Broadly accepting every missing period in Procedure Division.
@@ -45,9 +70,14 @@ This accepts a `rewrite_statement` immediately before the next paragraph header.
 period-terminated entries continue to parse through the standard
 `data_description` path.
 
-The Procedure Division tolerance is intentionally scoped to `rewrite_statement`
-before a header because that is the concrete Carlos pattern. Broader missing
-period support should be added only after a separate audit finds more families.
+The Procedure Division tolerance is intentionally scoped to audited statement
+families before a header: `rewrite_statement` from the Carlos project and
+`exit_statement` from Cementera. Broader missing period support should be added
+only after a separate audit finds more families.
+
+`paragraph_header` accepts an optional period so dialectal header labels without
+`.` do not create synthetic `MISSING "."` nodes. This tolerance is local to the
+header rule; statements still require their own valid syntax.
 
 ## Corpus
 

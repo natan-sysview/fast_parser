@@ -1,0 +1,77 @@
+====================================
+display with compact screen position
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           DISPLAY "TITLE" AT 0724.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (display_statement
+        (string)
+        (at_line_column
+          at: (number
+            (integer))))
+      (period))))
+
+====================================
+write printer format with add line counter
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           WRITE REGIMP FORMAT IS "RDET01" ADD 1 TO KLIN.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (write_statement
+        record_name: (qualified_word
+          (WORD))
+        format: (write_format_clause
+          name: (string))
+        add: (write_add_clause
+          from: (number
+            (integer))
+          to: (arithmetic_x
+            (qualified_word
+              (WORD)))))
+      (period))))
+
+====================================
+display multiple positioned items
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           DISPLAY
+           "TOTAL A RECEBER IMPOSSIVEL !!!" AT 2315
+           "SUGERIDO==>>" AT 2347 WITH HIGHLIGHT.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (display_statement
+        (string)
+        (at_line_column
+          at: (number
+            (integer)))
+        (string)
+        (at_line_column
+          at: (number
+            (integer)))
+        (with_clause
+          (disp_attr
+            (HIGHLIGHT))))
+      (period))))

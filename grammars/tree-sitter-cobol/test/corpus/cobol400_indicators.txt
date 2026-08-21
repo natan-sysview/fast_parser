@@ -1,0 +1,68 @@
+====================================
+write format with indicators
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           WRITE REG-TELA006 FORMAT "RODAPE" INDICATORS ARE INDICADOR.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (write_statement
+        record_name: (qualified_word
+          (WORD))
+        format: (write_format_clause
+          name: (string))
+        indicators: (indicators_clause
+          name: (qualified_word
+            (WORD))))
+      (period))))
+
+====================================
+read with indicators
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           READ TELA006 INDICATORS ARE INDICADOR.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (read_statement
+        file_name: (WORD)
+        indicators: (indicators_clause
+          name: (qualified_word
+            (WORD))))
+      (period))))
+
+====================================
+read format with indicators
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           READ MFF900 FORMAT IS 'MFF900T0'
+                INDICATORS ARE MFF900T0-I-INDIC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (read_statement
+        file_name: (WORD)
+        format: (read_format_clause
+          name: (string))
+        indicators: (indicators_clause
+          name: (qualified_word
+            (WORD))))
+      (period))))

@@ -1,0 +1,119 @@
+====================================
+cobol400 read into format and subfile io
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           READ TELA INTO TMFP155NEW-I
+                FORMAT "TMFP155NEW"
+                INDICATORS ARE INDICADORES.
+           READ SUBFILE TELA INTO TMFP155SNE-I
+                FORMAT "TMFP155SNE"
+                INDICATORS ARE INDICADORES.
+           WRITE SUBFILE REG-TELA FROM TMFP155SNE-O
+                 FORMAT "TMFP155SNE"
+                 INDICATORS ARE INDICADORES.
+           REWRITE SUBFILE REG-TELA FROM TMFP155SNE-I
+                   FORMAT "TMFP155SNE"
+                   INDICATORS ARE INDICADORES.
+           READ SUBFILE TELA NEXT MODIFIED
+                            INTO TPESTSUBF-I
+                FORMAT "TPESTSUBF"
+                INDICATORS ARE INDICADORES.
+           WRITE REG-TELA
+                FROM CABEC-O
+                FORMAT "CABEC"
+                INDIC CABEC-O-INDIC.
+           READ TELA
+                INTO CABEC-I
+                FORMAT "CABEC"
+                INDIC CABEC-I-INDIC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (read_statement
+        (cobol400_read_statement
+          file_name: (WORD)
+          into: (qualified_word
+            (WORD))
+          (read_format_clause
+            name: (string))
+          (indicators_clause
+            name: (qualified_word
+              (WORD)))))
+      (period)
+      (read_statement
+        (cobol400_read_statement
+          file_name: (WORD)
+          into: (qualified_word
+            (WORD))
+          (read_format_clause
+            name: (string))
+          (indicators_clause
+            name: (qualified_word
+              (WORD)))))
+      (period)
+      (write_statement
+        (cobol400_write_statement
+          record_name: (qualified_word
+            (WORD))
+          from: (qualified_word
+            (WORD))
+          format: (write_format_clause
+            name: (string))
+          indicators: (indicators_clause
+            name: (qualified_word
+              (WORD)))))
+      (period)
+      (rewrite_statement
+        (cobol400_rewrite_statement
+          record: (qualified_word
+            (WORD))
+          from: (qualified_word
+            (WORD))
+          format: (write_format_clause
+            name: (string))
+          indicators: (indicators_clause
+            name: (qualified_word
+              (WORD)))))
+      (period)
+      (read_statement
+        (cobol400_read_statement
+          file_name: (WORD)
+          (read_next_modified_clause
+            (NEXT)
+            (MODIFIED))
+          into: (qualified_word
+            (WORD))
+          (read_format_clause
+            name: (string))
+          (indicators_clause
+            name: (qualified_word
+              (WORD)))))
+      (period)
+      (write_statement
+        record_name: (qualified_word
+          (WORD))
+        from: (qualified_word
+          (WORD))
+        format: (write_format_clause
+          name: (string))
+        indicators: (indicators_clause
+          name: (qualified_word
+            (WORD))))
+      (period)
+      (read_statement
+        (cobol400_read_statement
+          file_name: (WORD)
+          into: (qualified_word
+            (WORD))
+          (read_format_clause
+            name: (string))
+          (indicators_clause
+            name: (qualified_word
+              (WORD)))))
+      (period))))

@@ -218,6 +218,52 @@ object computer program collating sequence is ebcdic-code
               word: (WORD)
               value: (EBCDIC))))))))
 ====================================
+special names comma separated crt status
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       configuration section.
+       special-names.
+           decimal-point is comma
+           console is crt, crt status is ws-crt-status.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (configuration_section
+        (special_names_paragraph
+          (special_name
+            (decimal_point_clause))
+          (special_name
+            (mnemonic_name_clause
+              crt: (WORD)))
+          (special_name
+            (crt_status_clause
+              (qualified_word
+                (WORD)))))))))
+====================================
+special names decimal point legacy somma
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       configuration section.
+       special-names. decimal-point is somma.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (configuration_section
+        (special_names_paragraph
+          (special_name
+            (decimal_point_clause)))))))
+
+====================================
 object computer segment-limit is 2.
 ====================================
        identification division.
@@ -320,3 +366,50 @@ object computer disk modules
             (DISK)
             (integer)
             (MODULES)))))))
+
+====================================
+source and object computer as slash 400
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       configuration section.
+       source-computer. AS/400.
+       object-computer. AS/400.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (configuration_section
+        (source_computer_paragraph
+          computer_name: (computer_name_with_slash))
+        (object_computer_paragraph
+          computer_name: (computer_name_with_slash))))))
+
+====================================
+object computer memory without size
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       configuration section.
+       source-computer. IBM-S36 with debugging mode.
+       object-computer. IBM-S36
+                        memory 22528 characters.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (configuration_section
+        (source_computer_paragraph
+          computer_name: (WORD)
+          (with_debugging_mode))
+        (object_computer_paragraph
+          computer_name: (WORD)
+          (object_computer_memory
+            (integer)
+            (CHARACTERS)))))))

@@ -1,4 +1,26 @@
 ====================================
+copy dotted bib of library
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+           COPY WORKDATA.BIB OF FPREV006.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (copy_statement
+          book: (copybook_bib_name)
+          lib_name: (WORD))))
+    (procedure_division)))
+
+====================================
 copy replacing identifier pair
 ====================================
        identification division.
@@ -58,6 +80,39 @@ copy suppress replacing string pair
         body: (cics_body
           command: (cics_command)))
       (period))))
+
+====================================
+copy dds format without of
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       FD  DCLINAT25.
+       01  REG02.
+           COPY DDS-ALL-FORMATS DCLINAT25.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (WORD))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name))
+            (copy_statement
+              book: (WORD)
+              lib_name: (WORD))))))
+    (procedure_division)))
 
 ====================================
 copy replacing multiple pairs

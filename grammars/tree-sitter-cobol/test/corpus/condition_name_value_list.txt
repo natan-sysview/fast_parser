@@ -41,6 +41,42 @@ level 88 space separated numeric value list
             (value_item
               (number
                 (integer)))))))
+      (procedure_division)))
+
+====================================
+level 88 with picture before value
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 RESP-AUX PIC X(1) VALUE SPACES.
+          88 RESP-S PIC X VALUE "S".
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (SPACE))))
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))
+          (value_clause
+            (value_item
+              (string))))))
     (procedure_division)))
 
 ====================================

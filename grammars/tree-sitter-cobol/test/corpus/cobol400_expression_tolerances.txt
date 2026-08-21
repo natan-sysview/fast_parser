@@ -1,0 +1,174 @@
+====================================
+compute with omitted closing parenthesis
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           COMPUTE WPERQBRD ROUNDED =
+                   ((WTOTPROD(09) * 100) / WTOTPROD(07).
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (compute_statement
+        left: (arithmetic_x
+          (qualified_word
+            (WORD))
+          (ROUNDED))
+        right: (unbalanced_compute_expr
+          (qualified_word
+            (WORD))
+          (subref
+            (number
+              (integer)))
+          (number
+            (integer))
+          (qualified_word
+            (WORD))
+          (subref
+            (number
+              (integer)))))
+      (period))))
+
+====================================
+compute rounded missing equal before parenthesized expression
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           COMPUTE WVAL ROUNDED ( OPRVALTOT * QTDPED )
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (compute_statement
+        (legacy_compute_missing_equal
+          left: (arithmetic_x
+            (qualified_word
+              (WORD))
+            (ROUNDED))
+          right: (expr
+            (qualified_word
+              (WORD))
+            (qualified_word
+              (WORD))))))))
+
+====================================
+compute with balanced parenthesis remains generic
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           COMPUTE WPERQBRD ROUNDED =
+                   ((WTOTPROD(09) * 100) / WTOTPROD(07)).
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (compute_statement
+        left: (arithmetic_x
+          (qualified_word
+            (WORD))
+          (ROUNDED))
+        right: (expr
+          (qualified_word
+            (WORD))
+          (subref
+            (number
+              (integer)))
+          (number
+            (integer))
+          (qualified_word
+            (WORD))
+          (subref
+            (number
+              (integer)))))
+      (period))))
+
+====================================
+compute with double omitted closing parenthesis
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           COMPUTE WGRF =
+                   ((WGRF03 - (QTINTEIRO * WCX(CTRCOL OF DESTO09A))
+           COMPUTE QTDECIMAL = (WGRF / 100).
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (compute_statement
+        left: (arithmetic_x
+          (qualified_word
+            (WORD)))
+        right: (unbalanced_compute_expr
+          (qualified_word
+            (WORD))
+          (qualified_word
+            (WORD))
+          (qualified_word
+            (WORD))
+          (subref
+            (qualified_word
+              (WORD)
+              (WORD)))))
+      (compute_statement
+        left: (arithmetic_x
+          (qualified_word
+            (WORD)))
+        right: (expr
+          (qualified_word
+            (WORD))
+          (number
+            (integer))))
+      (period))))
+
+====================================
+compute with internal omitted closing parenthesis
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           COMPUTE WQTQTD2 =
+                (WQTQTD3 - (WQTQTD1 * WCX(Y)
+           MOVE WQTQTD1 TO QTINTEIRO.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (compute_statement
+        left: (arithmetic_x
+          (qualified_word
+            (WORD)))
+        right: (unbalanced_compute_expr
+          (qualified_word
+            (WORD))
+          (qualified_word
+            (WORD))
+          (qualified_word
+            (WORD))
+          (subref
+            (qualified_word
+              (WORD)))))
+      (move_statement
+        src: (qualified_word
+          (WORD))
+        dst: (qualified_word
+          (WORD)))
+      (period))))

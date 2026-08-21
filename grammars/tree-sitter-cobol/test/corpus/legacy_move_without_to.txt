@@ -1,0 +1,113 @@
+====================================
+move with trailing sequence digit
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           MOVE NMBAIRRO OF R-DVASI01L18 TO RCDBAIR3                   2
+           MOVE NMCID OF R-DVASI01L18   TO RCDCID3.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (move_statement
+        src: (qualified_word
+          (WORD)
+          (WORD))
+        dst: (qualified_word
+          (WORD))
+        (legacy_move_trailing_sequence_digit))
+      (move_statement
+        src: (qualified_word
+          (WORD)
+          (WORD))
+        dst: (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+move without to qualified destination
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           MOVE 0 CDEMPVD OF DCERV710TC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (move_statement
+        (move_without_to_body
+          src: (number
+            (integer))
+          dst: (qualified_word
+            (WORD)
+            (WORD))))
+      (period))))
+
+====================================
+move with period before to
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           MOVE CDPRODUTO.    TO PRODUTO-L.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (move_statement
+        src: (qualified_word
+          (WORD))
+        (legacy_period_before_to)
+        dst: (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+move without to multiple destinations
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           MOVE ZEROS WQUANT(W) WQUANTE(W) WDIFERA(W) WCX(W).
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (move_statement
+        (move_without_to_body
+          src: (ZEROS)
+          dst: (qualified_word
+            (WORD))
+          dst: (subref
+            (qualified_word
+              (WORD)))
+          dst: (qualified_word
+            (WORD))
+          dst: (subref
+            (qualified_word
+              (WORD)))
+          dst: (qualified_word
+            (WORD))
+          dst: (subref
+            (qualified_word
+              (WORD)))
+          dst: (qualified_word
+            (WORD))
+          dst: (subref
+            (qualified_word
+              (WORD)))))
+      (period))))

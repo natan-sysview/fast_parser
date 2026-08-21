@@ -73,3 +73,106 @@ condition parenthesized value list
       (continue_statement)
       (END_IF)
       (period))))
+
+====================================
+unbalanced outer if parenthesis before goto
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF (NFDTPRESCT OF MF024CFR16 NOT = WS-DATA1 OR
+              (WS-TIPO-FINAL NOT = 2 AND 5)
+              GO 070-POSICIONA-MF030.
+           IF ((W-DIGITO NOT EQUAL "N" AND "F" AND "R")
+              GO 020-READ-MF024
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (unbalanced_parenthesized_condition
+          (expr
+            (expr
+              (qualified_word
+                (WORD)
+                (WORD))
+              (ne)
+              (qualified_word
+                (WORD)))
+            (OR)
+            (expr
+              (expr
+                (expr
+                  (qualified_word
+                    (WORD))
+                  (ne)
+                  (number
+                    (integer)))
+                (AND)
+                (expr
+                  (number
+                    (integer))))))))
+      (goto_statement
+        to: (label
+          (qualified_word
+            (WORD))))
+      (period)
+      (if_header
+        condition: (unbalanced_parenthesized_condition
+          (expr
+            (expr
+              (qualified_word
+                (WORD))
+              (ne)
+              (string)
+              (abbreviated_literal_tail)
+              (abbreviated_literal_tail)))))
+      (goto_statement
+        to: (label
+          (qualified_word
+            (WORD))))
+      (END_IF)
+      (period))))
+
+====================================
+unbalanced parenthesized expression after or before goto
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF CDSTAT OF DESTO02403 NOT = 'A' OR
+              (WS-DATA1 > DATEST OF DESTO02403
+              GO 075-READ-DESTO02403.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (unbalanced_boolean_condition
+          (expr
+            (qualified_word
+              (WORD)
+              (WORD))
+            (ne)
+            (string))
+          (OR)
+          (unbalanced_parenthesized_expr
+            (expr
+              (qualified_word
+                (WORD))
+              (gt)
+              (qualified_word
+                (WORD)
+                (WORD))))))
+      (goto_statement
+        to: (label
+          (qualified_word
+            (WORD))))
+      (period))))

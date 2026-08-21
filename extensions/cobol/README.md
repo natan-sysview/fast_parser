@@ -28,7 +28,7 @@ Package a local native archive:
 ```bash
 python3 scripts/package_language_extension.py \
   --language cobol \
-  --version 0.1.0-preview.1 \
+  --version 0.1.1-preview.1 \
   --platform macos \
   --arch arm64
 ```

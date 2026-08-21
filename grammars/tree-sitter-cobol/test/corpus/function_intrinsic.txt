@@ -1,0 +1,56 @@
+====================================
+current-date reference modification
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           MOVE FUNCTION CURRENT-DATE(1:8) TO WS-FECHA-SYS.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (move_statement
+        src: (function_
+          (CURRENT_DATE_FUNC)
+          (func_refmod
+            (number
+              (integer))
+            (number
+              (integer))))
+        dst: (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+current-date reference modification with spaced call
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           MOVE FUNCTION CURRENT-DATE (1:4) TO FECHA-CORRIDA(1:4).
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (move_statement
+        src: (function_
+          (CURRENT_DATE_FUNC)
+          (func_refmod
+            (number
+              (integer))
+            (number
+              (integer))))
+        dst: (qualified_word
+          (WORD))
+        dst: (refmod
+          (number
+            (integer))
+          (number
+            (integer))))
+      (period))))

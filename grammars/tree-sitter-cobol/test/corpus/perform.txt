@@ -51,6 +51,62 @@ perform label thru label
       (paragraph_header))))
 
 ====================================
+perform label to label
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       perform 025-grava-log to 025-fim.
+       025-grava-log.
+       025-fim.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (perform_statement_call_proc
+        procedure: (perform_procedure
+          (label
+            (qualified_word
+              (WORD)))
+          (label
+            (qualified_word
+              (WORD)))))
+      (period)
+      (paragraph_header)
+      (paragraph_header))))
+
+====================================
+perform label with trailing sequence digit
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       perform tela-inclui                                      6
+       go delecao.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (perform_statement_call_proc
+        procedure: (perform_procedure
+          (label
+            (qualified_word
+              (WORD))))
+        (legacy_trailing_sequence_digit
+          (integer)))
+      (goto_statement
+        to: (label
+          (qualified_word
+            (WORD))))
+      (period))))
+
+====================================
 perform label FOREVER
 ====================================
        identification division.

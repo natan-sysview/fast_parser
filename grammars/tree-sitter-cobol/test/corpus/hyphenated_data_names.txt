@@ -1,0 +1,82 @@
+====================================
+hyphenated data name in class condition
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF CDLOC-102 IS NOT NUMERIC
+              MOVE "ERRO" TO WS-STATUS-VAR
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (NOT_NUMERIC)))
+      (move_statement
+        src: (string)
+        dst: (qualified_word
+          (WORD)))
+      (END_IF)
+      (period))))
+
+====================================
+qualified name with zero-of typo
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           MOVE CDACESSO 0F DPREV006 TO WS-CDACESSO-G.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (move_statement
+        src: (qualified_word
+          (WORD)
+          (WORD))
+        dst: (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+hyphenated data name with abbreviated numeric list
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           IF CDLOC-102 NOT EQUAL 01 AND 03 AND 13 AND 20
+              MOVE "ERRO" TO WS-STATUS-VAR
+           END-IF.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (ne)
+          (number
+            (integer))
+          (abbreviated_literal_tail)
+          (abbreviated_literal_tail)
+          (abbreviated_literal_tail)))
+      (move_statement
+        src: (string)
+        dst: (qualified_word
+          (WORD)))
+      (END_IF)
+      (period))))

@@ -1,0 +1,59 @@
+====================================
+screen section with blank screen line column value
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       working-storage section.
+       01 W PIC X.
+       screen section.
+       01 TEL-MENU.
+          02 BLANK SCREEN.
+          02 LINE 05 COLUMN 01 VALUE "[1-Cria]".
+          02 LINE 10 COLUMN 01 VALUE "[ ] Opcao" BLINK.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_x))))
+      (screen_section
+        (screen_description
+          (level_number)
+          (entry_name))
+        (screen_description
+          (level_number)
+          (blank_screen_clause))
+        (screen_description
+          (level_number)
+          (line_number
+            (number
+              (integer)))
+          (column_number
+            column_y: (number
+              (integer)))
+          (value_clause
+            (value_item
+              (string))))
+        (screen_description
+          (level_number)
+          (line_number
+            (number
+              (integer)))
+          (column_number
+            column_y: (number
+              (integer)))
+          (value_clause
+            (value_item
+              (string)))
+          (screen_attribute
+            (BLINK)))))
+    (procedure_division)))

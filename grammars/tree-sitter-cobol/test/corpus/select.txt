@@ -1,7 +1,45 @@
 ====================================
-assign
+file control with misaligned single star comment
 ====================================
        identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       file-control.
+       *ARQUIVO DE N.FISCAIS.
+              SELECT I-MF024 ASSIGN TO DATABASE-MF024CFR16
+                     ORGANIZATION IS INDEXED
+                     ACCESS MODE  IS DYNAMIC
+                     FILE STATUS  IS FS1.
+       data division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (misaligned_file_control_comment)
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (INDEXED))
+          (access_mode_clause
+            (DYNAMIC))
+          (file_status_clause
+            file_or_sort: (FILE)
+            reference: (qualified_word
+              (WORD))))))
+    (data_division)))
+
+====================================
+assign
+====================================
+      identification division.
        program-id. a.
        environment division.
        input-output section.
@@ -196,6 +234,73 @@ assign to PRINTER string_literal qualified_word
               (WORD))
             to: (qualified_word
               (WORD)
+              (WORD))))))))
+
+====================================
+select with intermediate period before status
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+           select dlimite assign to database-dlimite
+                  organization is sequential
+                  access mode is sequential.
+                  status is fs1.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (SEQUENTIAL))
+          (access_mode_clause
+            (SEQUENTIAL))
+          (file_status_clause
+            reference: (qualified_word
+              (WORD))))))))
+
+====================================
+select with double final period
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+           select drec002
+                  assign database-drec002
+                  organization indexed
+                  access dynamic
+                  status fs1
+                  record key externally-described-key.             .
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (INDEXED))
+          (access_mode_clause
+            (DYNAMIC))
+          (file_status_clause
+            reference: (qualified_word
+              (WORD)))
+          (record_key_clause
+            reference: (qualified_word
               (WORD))))))))
 ====================================
 access SEQUENTIAL
@@ -561,6 +666,214 @@ sequence
           file_name: (WORD)
           (collating_sequence_clause
             (WORD)))))))
+
+====================================
+select without period before next select
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       FILE-CONTROL.
+       select a assign to database-a
+           organization is sequential
+           access mode is sequential
+       select b assign to database-b
+           organization is indexed
+           access mode is dynamic
+           record key is externally-described-key.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (SEQUENTIAL))
+          (access_mode_clause
+            (SEQUENTIAL)))
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (INDEXED))
+          (access_mode_clause
+            (DYNAMIC))
+          (record_key_clause
+            reference: (qualified_word
+              (WORD))))))))
+
+====================================
+select without period before data division
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       FILE-CONTROL.
+       select a assign to database-a
+           organization is sequential
+       data division.
+       file section.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (SEQUENTIAL)))))
+    (data_division
+      (file_section))))
+
+====================================
+legacy typo organization sequantial
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       FILE-CONTROL.
+       select f assign to database-f
+           organization is sequantial.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (SEQUENTIAL)))))))
+
+====================================
+legacy typo access dymainc
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       FILE-CONTROL.
+       select f assign to disk
+           organization is indexed
+           access mode is dymainc.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (DISK))
+          (organization_clause
+            (INDEXED))
+          (access_mode_clause
+            (DYNAMIC)))))))
+====================================
+input output direct select
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+           select arqcheqe assign to database-arqcheqe75
+                  organization is sequential
+                  access mode is dynamic
+                  file status is fs1.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (SEQUENTIAL))
+          (access_mode_clause
+            (DYNAMIC))
+          (file_status_clause
+            file_or_sort: (FILE)
+            reference: (qualified_word
+              (WORD))))))))
+====================================
+organization line sequential
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       FILE-CONTROL.
+       select workhora assign to "WORKHORA"
+           organization line sequential.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (string))
+          (organization_clause
+            (LINE)
+            (SEQUENTIAL)))))))
+====================================
+lock mode with lock on record
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       FILE-CONTROL.
+       select f assign to "F"
+           organization is indexed
+           lock mode is automatic
+           with lock on record.
+---
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (string))
+          (organization_clause
+            (INDEXED))
+          (lock_mode_clause
+            (lock_mode
+              (AUTOMATIC))))))))
 
 ====================================
 collating sequence

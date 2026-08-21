@@ -1,0 +1,44 @@
+====================================
+fd entry without period before record
+====================================
+       identification division.
+       program-id. a.
+       data division.
+       file section.
+       FD  FECA_SFP
+       01  REG-FECA_SFP.
+           COPY DDS-ALL-FORMATS OF FECA_SFP.
+       working-storage section.
+       77  WS-LIDO PIC 9(05) VALUE ZEROS.
+       procedure division.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (data_division
+      (file_section
+        (file_description
+          (file_type
+            (FD))
+          (file_description_entry
+            (cobol400_word))
+          (record_description_list
+            (data_description
+              (level_number)
+              (entry_name
+                (cobol400_word)))
+            (copy_statement
+              book: (WORD)
+              lib_name: (cobol400_word)))))
+      (working_storage_section
+        (data_description
+          (level_number)
+          (entry_name)
+          (picture_clause
+            (picture_9))
+          (value_clause
+              (value_item
+                  (ZEROS))))))
+    (procedure_division)))

@@ -84,6 +84,34 @@ exec cics syncpoint inline
       (period))))
 
 ====================================
+exec cics reference modification argument
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC CICS
+              ENTER TRACEID(11)
+                    FROM(WS-ASUNTO-TS(11:2))
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_cics_statement
+        body: (cics_body
+          command: (cics_command)
+          (number
+            (integer))
+          (number
+            (integer))
+          (number
+            (integer))))
+      (period))))
+
+====================================
 exec sql stays sql
 ====================================
        identification division.

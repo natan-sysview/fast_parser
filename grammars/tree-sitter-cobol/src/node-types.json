@@ -640,7 +640,17 @@
     "fields": {}
   },
   {
+    "type": "MODIFIED",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "MODULES",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "MULTIPLE",
     "named": true,
     "fields": {}
   },
@@ -780,6 +790,11 @@
     "fields": {}
   },
   {
+    "type": "PRIOR",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "PROCEDURE",
     "named": true,
     "fields": {}
@@ -895,6 +910,11 @@
     "fields": {}
   },
   {
+    "type": "SECURE",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "SEPARATE",
     "named": true,
     "fields": {}
@@ -946,6 +966,11 @@
   },
   {
     "type": "SPACE",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "SPACE_FILL",
     "named": true,
     "fields": {}
   },
@@ -1130,6 +1155,11 @@
     "fields": {}
   },
   {
+    "type": "abbreviated_literal_tail",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "accept_statement",
     "named": true,
     "fields": {
@@ -1268,6 +1298,10 @@
         "types": [
           {
             "type": "WORD",
+            "named": true
+          },
+          {
+            "type": "cobol400_word",
             "named": true
           }
         ]
@@ -2513,6 +2547,10 @@
             "named": true
           },
           {
+            "type": "database_assignment_name",
+            "named": true
+          },
+          {
             "type": "h_string",
             "named": true
           },
@@ -2677,6 +2715,21 @@
     "type": "blank_clause",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "blank_screen_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "BLANK_SCREEN",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "block_contains_clause",
@@ -3210,6 +3263,10 @@
           {
             "type": "WORD",
             "named": true
+          },
+          {
+            "type": "cobol400_word",
+            "named": true
           }
         ]
       }
@@ -3273,6 +3330,354 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "cobol400_read_statement",
+    "named": true,
+    "fields": {
+      "file_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "WORD",
+            "named": true
+          },
+          {
+            "type": "cobol400_word",
+            "named": true
+          }
+        ]
+      },
+      "into": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "indicators_clause",
+          "named": true
+        },
+        {
+          "type": "read_format_clause",
+          "named": true
+        },
+        {
+          "type": "read_next_modified_clause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "cobol400_rewrite_statement",
+    "named": true,
+    "fields": {
+      "format": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "write_format_clause",
+            "named": true
+          }
+        ]
+      },
+      "from": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "&",
+            "named": false
+          },
+          {
+            "type": "ALL",
+            "named": true
+          },
+          {
+            "type": "HIGH_VALUE",
+            "named": true
+          },
+          {
+            "type": "LOW_VALUE",
+            "named": true
+          },
+          {
+            "type": "QUOTE",
+            "named": true
+          },
+          {
+            "type": "SPACE",
+            "named": true
+          },
+          {
+            "type": "TOK_NULL",
+            "named": true
+          },
+          {
+            "type": "ZERO",
+            "named": true
+          },
+          {
+            "type": "ZEROS",
+            "named": true
+          },
+          {
+            "type": "at_hex_literal",
+            "named": true
+          },
+          {
+            "type": "b_string",
+            "named": true
+          },
+          {
+            "type": "dfhvalue_expression",
+            "named": true
+          },
+          {
+            "type": "h_string",
+            "named": true
+          },
+          {
+            "type": "n_string",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          },
+          {
+            "type": "x_string",
+            "named": true
+          }
+        ]
+      },
+      "indicators": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "indicators_clause",
+            "named": true
+          }
+        ]
+      },
+      "lock": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "write_lock",
+            "named": true
+          },
+          {
+            "type": "write_no_lock",
+            "named": true
+          }
+        ]
+      },
+      "record": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "qualified_word",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "cobol400_write_statement",
+    "named": true,
+    "fields": {
+      "add": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "write_add_clause",
+            "named": true
+          }
+        ]
+      },
+      "format": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "write_format_clause",
+            "named": true
+          }
+        ]
+      },
+      "from": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "&",
+            "named": false
+          },
+          {
+            "type": "ALL",
+            "named": true
+          },
+          {
+            "type": "HIGH_VALUE",
+            "named": true
+          },
+          {
+            "type": "LOW_VALUE",
+            "named": true
+          },
+          {
+            "type": "QUOTE",
+            "named": true
+          },
+          {
+            "type": "SPACE",
+            "named": true
+          },
+          {
+            "type": "TOK_NULL",
+            "named": true
+          },
+          {
+            "type": "ZERO",
+            "named": true
+          },
+          {
+            "type": "ZEROS",
+            "named": true
+          },
+          {
+            "type": "at_hex_literal",
+            "named": true
+          },
+          {
+            "type": "b_string",
+            "named": true
+          },
+          {
+            "type": "dfhvalue_expression",
+            "named": true
+          },
+          {
+            "type": "h_string",
+            "named": true
+          },
+          {
+            "type": "n_string",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          },
+          {
+            "type": "x_string",
+            "named": true
+          }
+        ]
+      },
+      "indicators": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "indicators_clause",
+            "named": true
+          }
+        ]
+      },
+      "lock": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "write_lock",
+            "named": true
+          },
+          {
+            "type": "write_no_lock",
+            "named": true
+          }
+        ]
+      },
+      "option": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "write_option",
+            "named": true
+          }
+        ]
+      },
+      "record_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "qualified_word",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -3505,12 +3910,48 @@
     }
   },
   {
+    "type": "commit_statement",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "commitment_control_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "commitment_control_resources",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "commitment_control_resources",
+    "named": true,
+    "fields": {
+      "resources": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "qualified_word",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "compute_statement",
     "named": true,
     "fields": {
       "left": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "arithmetic_x",
@@ -3520,14 +3961,28 @@
       },
       "right": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "expr",
             "named": true
+          },
+          {
+            "type": "unbalanced_compute_expr",
+            "named": true
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "legacy_compute_missing_equal",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -3699,6 +4154,22 @@
     "fields": {}
   },
   {
+    "type": "control_area_clause",
+    "named": true,
+    "fields": {
+      "reference": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "qualified_word",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "copy_replacing_item",
     "named": true,
     "fields": {
@@ -3834,6 +4305,14 @@
             "named": true
           },
           {
+            "type": "cobol400_word",
+            "named": true
+          },
+          {
+            "type": "copybook_bib_name",
+            "named": true
+          },
+          {
             "type": "string",
             "named": true
           }
@@ -3845,6 +4324,10 @@
         "types": [
           {
             "type": "WORD",
+            "named": true
+          },
+          {
+            "type": "cobol400_word",
             "named": true
           },
           {
@@ -3920,6 +4403,10 @@
         },
         {
           "type": "copybook_procedure_definition",
+          "named": true
+        },
+        {
+          "type": "copybook_wrapped_procedure_definition",
           "named": true
         }
       ]
@@ -4045,6 +4532,21 @@
     }
   },
   {
+    "type": "copybook_wrapped_procedure_definition",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "procedure_division",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "crt_status_clause",
     "named": true,
     "fields": {},
@@ -4159,6 +4661,10 @@
         },
         {
           "type": "h_string",
+          "named": true
+        },
+        {
+          "type": "indicator_clause",
           "named": true
         },
         {
@@ -4336,6 +4842,10 @@
         {
           "type": "exec_sql_statement",
           "named": true
+        },
+        {
+          "type": "level_copy_statement",
+          "named": true
         }
       ]
     }
@@ -4387,11 +4897,15 @@
     "named": true,
     "fields": {
       "file_name": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
             "type": "WORD",
+            "named": true
+          },
+          {
+            "type": "cobol400_word",
             "named": true
           }
         ]
@@ -4518,6 +5032,93 @@
     }
   },
   {
+    "type": "display_simple_attr",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "BACKGROUND_COLOR",
+          "named": true
+        },
+        {
+          "type": "BELL",
+          "named": true
+        },
+        {
+          "type": "BLANK_LINE",
+          "named": true
+        },
+        {
+          "type": "BLANK_SCREEN",
+          "named": true
+        },
+        {
+          "type": "BLINK",
+          "named": true
+        },
+        {
+          "type": "EOL",
+          "named": true
+        },
+        {
+          "type": "EOS",
+          "named": true
+        },
+        {
+          "type": "ERASE",
+          "named": true
+        },
+        {
+          "type": "FOREGROUND_COLOR",
+          "named": true
+        },
+        {
+          "type": "HIGHLIGHT",
+          "named": true
+        },
+        {
+          "type": "LOWLIGHT",
+          "named": true
+        },
+        {
+          "type": "OVERLINE",
+          "named": true
+        },
+        {
+          "type": "REVERSE_VIDEO",
+          "named": true
+        },
+        {
+          "type": "UNDERLINE",
+          "named": true
+        },
+        {
+          "type": "ZERO",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "qualified_word",
+          "named": true
+        },
+        {
+          "type": "refmod",
+          "named": true
+        },
+        {
+          "type": "subref",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "display_statement",
     "named": true,
     "fields": {},
@@ -4590,11 +5191,19 @@
           "named": true
         },
         {
+          "type": "display_with_before_at_clause",
+          "named": true
+        },
+        {
           "type": "function_",
           "named": true
         },
         {
           "type": "h_string",
+          "named": true
+        },
+        {
+          "type": "legacy_display_bare_attr",
           "named": true
         },
         {
@@ -4631,6 +5240,21 @@
         },
         {
           "type": "x_string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "display_with_before_at_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "display_simple_attr",
           "named": true
         }
       ]
@@ -5230,6 +5854,14 @@
           {
             "type": "expr",
             "named": true
+          },
+          {
+            "type": "unbalanced_boolean_condition",
+            "named": true
+          },
+          {
+            "type": "unbalanced_parenthesized_condition",
+            "named": true
           }
         ]
       }
@@ -5253,7 +5885,17 @@
   {
     "type": "entry_name",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "cobol400_word",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "environment_division",
@@ -5593,6 +6235,10 @@
           "named": true
         },
         {
+          "type": "abbreviated_literal_tail",
+          "named": true
+        },
+        {
           "type": "at_hex_literal",
           "named": true
         },
@@ -5634,6 +6280,10 @@
         },
         {
           "type": "is_not_class",
+          "named": true
+        },
+        {
+          "type": "is_not_user_class",
           "named": true
         },
         {
@@ -5818,6 +6468,10 @@
       "types": [
         {
           "type": "WORD",
+          "named": true
+        },
+        {
+          "type": "cobol400_word",
           "named": true
         },
         {
@@ -6439,6 +7093,10 @@
       "required": true,
       "types": [
         {
+          "type": "commitment_control_clause",
+          "named": true
+        },
+        {
           "type": "i_o_control_header",
           "named": true
         },
@@ -6525,6 +7183,68 @@
         "types": [
           {
             "type": "expr",
+            "named": true
+          },
+          {
+            "type": "legacy_not_literal_condition",
+            "named": true
+          },
+          {
+            "type": "unbalanced_boolean_condition",
+            "named": true
+          },
+          {
+            "type": "unbalanced_parenthesized_condition",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "legacy_fi_if_keyword",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "indicator_clause",
+    "named": true,
+    "fields": {
+      "indicator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "integer",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "indicators_clause",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "subref",
             "named": true
           }
         ]
@@ -6782,6 +7502,10 @@
       "types": [
         {
           "type": "i_o_control",
+          "named": true
+        },
+        {
+          "type": "misaligned_file_control_comment",
           "named": true
         },
         {
@@ -7684,6 +8408,116 @@
     }
   },
   {
+    "type": "is_not_user_class",
+    "named": true,
+    "fields": {
+      "tail": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "is_not_user_class_tail",
+            "named": true
+          }
+        ]
+      },
+      "x": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "&",
+            "named": false
+          },
+          {
+            "type": "ALL",
+            "named": true
+          },
+          {
+            "type": "HIGH_VALUE",
+            "named": true
+          },
+          {
+            "type": "LOW_VALUE",
+            "named": true
+          },
+          {
+            "type": "QUOTE",
+            "named": true
+          },
+          {
+            "type": "SPACE",
+            "named": true
+          },
+          {
+            "type": "TOK_NULL",
+            "named": true
+          },
+          {
+            "type": "ZERO",
+            "named": true
+          },
+          {
+            "type": "ZEROS",
+            "named": true
+          },
+          {
+            "type": "at_hex_literal",
+            "named": true
+          },
+          {
+            "type": "b_string",
+            "named": true
+          },
+          {
+            "type": "dfhvalue_expression",
+            "named": true
+          },
+          {
+            "type": "function_",
+            "named": true
+          },
+          {
+            "type": "h_string",
+            "named": true
+          },
+          {
+            "type": "linage_counter",
+            "named": true
+          },
+          {
+            "type": "n_string",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          },
+          {
+            "type": "x_string",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "justified_clause",
     "named": true,
     "fields": {},
@@ -7720,6 +8554,10 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "numeric_label",
           "named": true
         },
         {
@@ -7760,6 +8598,249 @@
     "type": "le",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "legacy_compute_missing_equal",
+    "named": true,
+    "fields": {
+      "left": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "arithmetic_x",
+            "named": true
+          }
+        ]
+      },
+      "right": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expr",
+            "named": true
+          },
+          {
+            "type": "unbalanced_compute_expr",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "legacy_not_literal_condition",
+    "named": true,
+    "fields": {
+      "left": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "&",
+            "named": false
+          },
+          {
+            "type": "ALL",
+            "named": true
+          },
+          {
+            "type": "HIGH_VALUE",
+            "named": true
+          },
+          {
+            "type": "LOW_VALUE",
+            "named": true
+          },
+          {
+            "type": "QUOTE",
+            "named": true
+          },
+          {
+            "type": "SPACE",
+            "named": true
+          },
+          {
+            "type": "TOK_NULL",
+            "named": true
+          },
+          {
+            "type": "ZERO",
+            "named": true
+          },
+          {
+            "type": "ZEROS",
+            "named": true
+          },
+          {
+            "type": "at_hex_literal",
+            "named": true
+          },
+          {
+            "type": "b_string",
+            "named": true
+          },
+          {
+            "type": "dfhvalue_expression",
+            "named": true
+          },
+          {
+            "type": "function_",
+            "named": true
+          },
+          {
+            "type": "h_string",
+            "named": true
+          },
+          {
+            "type": "linage_counter",
+            "named": true
+          },
+          {
+            "type": "n_string",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          },
+          {
+            "type": "x_string",
+            "named": true
+          }
+        ]
+      },
+      "right": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "&",
+            "named": false
+          },
+          {
+            "type": "ALL",
+            "named": true
+          },
+          {
+            "type": "HIGH_VALUE",
+            "named": true
+          },
+          {
+            "type": "LOW_VALUE",
+            "named": true
+          },
+          {
+            "type": "QUOTE",
+            "named": true
+          },
+          {
+            "type": "SPACE",
+            "named": true
+          },
+          {
+            "type": "TOK_NULL",
+            "named": true
+          },
+          {
+            "type": "ZERO",
+            "named": true
+          },
+          {
+            "type": "ZEROS",
+            "named": true
+          },
+          {
+            "type": "at_hex_literal",
+            "named": true
+          },
+          {
+            "type": "b_string",
+            "named": true
+          },
+          {
+            "type": "dfhvalue_expression",
+            "named": true
+          },
+          {
+            "type": "h_string",
+            "named": true
+          },
+          {
+            "type": "n_string",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "x_string",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "legacy_period_before_to",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "legacy_trailing_sequence_digit",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "integer",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "level_copy_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "copy_statement",
+          "named": true
+        },
+        {
+          "type": "level_number",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "linage_bottom",
@@ -8088,6 +9169,10 @@
         {
           "type": "exec_sql_statement",
           "named": true
+        },
+        {
+          "type": "level_copy_statement",
+          "named": true
         }
       ]
     }
@@ -8114,6 +9199,10 @@
         },
         {
           "type": "exec_sql_statement",
+          "named": true
+        },
+        {
+          "type": "level_copy_statement",
           "named": true
         }
       ]
@@ -8146,6 +9235,10 @@
         "multiple": false,
         "required": false,
         "types": [
+          {
+            "type": "MULTIPLE",
+            "named": true
+          },
           {
             "type": "RECORD",
             "named": true
@@ -8354,6 +9447,142 @@
   },
   {
     "type": "move_statement",
+    "named": true,
+    "fields": {
+      "dst": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          }
+        ]
+      },
+      "src": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "&",
+            "named": false
+          },
+          {
+            "type": "ALL",
+            "named": true
+          },
+          {
+            "type": "HIGH_VALUE",
+            "named": true
+          },
+          {
+            "type": "LOW_VALUE",
+            "named": true
+          },
+          {
+            "type": "QUOTE",
+            "named": true
+          },
+          {
+            "type": "SPACE",
+            "named": true
+          },
+          {
+            "type": "TOK_NULL",
+            "named": true
+          },
+          {
+            "type": "ZERO",
+            "named": true
+          },
+          {
+            "type": "ZEROS",
+            "named": true
+          },
+          {
+            "type": "at_hex_literal",
+            "named": true
+          },
+          {
+            "type": "b_string",
+            "named": true
+          },
+          {
+            "type": "dfhvalue_expression",
+            "named": true
+          },
+          {
+            "type": "function_",
+            "named": true
+          },
+          {
+            "type": "h_string",
+            "named": true
+          },
+          {
+            "type": "linage_counter",
+            "named": true
+          },
+          {
+            "type": "n_string",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          },
+          {
+            "type": "x_string",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "legacy_move_trailing_sequence_digit",
+          "named": true
+        },
+        {
+          "type": "legacy_period_before_to",
+          "named": true
+        },
+        {
+          "type": "move_without_to_body",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "move_without_to_body",
     "named": true,
     "fields": {
       "dst": {
@@ -8746,6 +9975,10 @@
         "types": [
           {
             "type": "WORD",
+            "named": true
+          },
+          {
+            "type": "cobol400_word",
             "named": true
           }
         ]
@@ -9273,6 +10506,10 @@
           {
             "type": "burroughs_computer_name",
             "named": true
+          },
+          {
+            "type": "computer_name_with_slash",
+            "named": true
           }
         ]
       }
@@ -9466,6 +10703,10 @@
           {
             "type": "WORD",
             "named": true
+          },
+          {
+            "type": "cobol400_word",
+            "named": true
           }
         ]
       },
@@ -9561,6 +10802,10 @@
           "named": true
         },
         {
+          "type": "LINE",
+          "named": true
+        },
+        {
           "type": "RECORD",
           "named": true
         },
@@ -9578,6 +10823,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "orphan_end_exec_statement",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "padding_character_clause",
@@ -9627,7 +10877,15 @@
         "required": false,
         "types": [
           {
+            "type": "cobol400_word",
+            "named": true
+          },
+          {
             "type": "integer",
+            "named": true
+          },
+          {
+            "type": "numeric_label",
             "named": true
           }
         ]
@@ -9872,6 +11130,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "legacy_trailing_sequence_digit",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -10717,6 +11985,10 @@
           "named": true
         },
         {
+          "type": "commit_statement",
+          "named": true
+        },
+        {
           "type": "compute_statement",
           "named": true
         },
@@ -10726,6 +11998,10 @@
         },
         {
           "type": "copy_statement",
+          "named": true
+        },
+        {
+          "type": "decorative_comment_statement",
           "named": true
         },
         {
@@ -10846,6 +12122,10 @@
         },
         {
           "type": "open_statement",
+          "named": true
+        },
+        {
+          "type": "orphan_end_exec_statement",
           "named": true
         },
         {
@@ -11072,6 +12352,10 @@
           "named": true
         },
         {
+          "type": "commit_statement",
+          "named": true
+        },
+        {
           "type": "compute_statement",
           "named": true
         },
@@ -11081,6 +12365,10 @@
         },
         {
           "type": "copy_statement",
+          "named": true
+        },
+        {
+          "type": "decorative_comment_statement",
           "named": true
         },
         {
@@ -11201,6 +12489,10 @@
         },
         {
           "type": "open_statement",
+          "named": true
+        },
+        {
+          "type": "orphan_end_exec_statement",
           "named": true
         },
         {
@@ -11428,6 +12720,10 @@
           "named": true
         },
         {
+          "type": "cobol400_word",
+          "named": true
+        },
+        {
           "type": "h_string",
           "named": true
         },
@@ -11461,6 +12757,121 @@
         {
           "type": "WORD",
           "named": true
+        },
+        {
+          "type": "cobol400_word",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "read_format_clause",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "&",
+            "named": false
+          },
+          {
+            "type": "ALL",
+            "named": true
+          },
+          {
+            "type": "HIGH_VALUE",
+            "named": true
+          },
+          {
+            "type": "LOW_VALUE",
+            "named": true
+          },
+          {
+            "type": "QUOTE",
+            "named": true
+          },
+          {
+            "type": "SPACE",
+            "named": true
+          },
+          {
+            "type": "TOK_NULL",
+            "named": true
+          },
+          {
+            "type": "ZERO",
+            "named": true
+          },
+          {
+            "type": "ZEROS",
+            "named": true
+          },
+          {
+            "type": "at_hex_literal",
+            "named": true
+          },
+          {
+            "type": "b_string",
+            "named": true
+          },
+          {
+            "type": "dfhvalue_expression",
+            "named": true
+          },
+          {
+            "type": "h_string",
+            "named": true
+          },
+          {
+            "type": "n_string",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          },
+          {
+            "type": "x_string",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "read_next_modified_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "MODIFIED",
+          "named": true
+        },
+        {
+          "type": "NEXT",
+          "named": true
         }
       ]
     }
@@ -11471,10 +12882,14 @@
     "fields": {
       "file_name": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "WORD",
+            "named": true
+          },
+          {
+            "type": "cobol400_word",
             "named": true
           }
         ]
@@ -11489,6 +12904,30 @@
           },
           {
             "type": "PREVIOUS",
+            "named": true
+          },
+          {
+            "type": "PRIOR",
+            "named": true
+          }
+        ]
+      },
+      "format": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "read_format_clause",
+            "named": true
+          }
+        ]
+      },
+      "indicators": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "indicators_clause",
             "named": true
           }
         ]
@@ -11534,6 +12973,10 @@
       "multiple": false,
       "required": false,
       "types": [
+        {
+          "type": "cobol400_read_statement",
+          "named": true
+        },
         {
           "type": "with_lock",
           "named": true
@@ -11629,6 +13072,10 @@
         },
         {
           "type": "exec_sql_statement",
+          "named": true
+        },
+        {
+          "type": "level_copy_statement",
           "named": true
         }
       ]
@@ -12365,6 +13812,10 @@
           {
             "type": "WORD",
             "named": true
+          },
+          {
+            "type": "cobol400_word",
+            "named": true
           }
         ]
       },
@@ -12494,7 +13945,7 @@
       },
       "record": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "qualified_word",
@@ -12502,6 +13953,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "cobol400_rewrite_statement",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -12514,6 +13975,10 @@
         "types": [
           {
             "type": "WORD",
+            "named": true
+          },
+          {
+            "type": "cobol400_word",
             "named": true
           }
         ]
@@ -12539,6 +14004,37 @@
     }
   },
   {
+    "type": "screen_attribute",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "BLINK",
+          "named": true
+        },
+        {
+          "type": "HIGHLIGHT",
+          "named": true
+        },
+        {
+          "type": "LOWLIGHT",
+          "named": true
+        },
+        {
+          "type": "REVERSE_VIDEO",
+          "named": true
+        },
+        {
+          "type": "UNDERLINE",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "screen_control",
     "named": true,
     "fields": {},
@@ -12548,6 +14044,60 @@
       "types": [
         {
           "type": "qualified_word",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "screen_description",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "blank_screen_clause",
+          "named": true
+        },
+        {
+          "type": "column_number",
+          "named": true
+        },
+        {
+          "type": "entry_name",
+          "named": true
+        },
+        {
+          "type": "level_number",
+          "named": true
+        },
+        {
+          "type": "line_number",
+          "named": true
+        },
+        {
+          "type": "screen_attribute",
+          "named": true
+        },
+        {
+          "type": "value_clause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "screen_section",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "screen_description",
           "named": true
         }
       ]
@@ -12645,7 +14195,15 @@
         "required": true,
         "types": [
           {
+            "type": "cobol400_word",
+            "named": true
+          },
+          {
             "type": "integer",
+            "named": true
+          },
+          {
+            "type": "numeric_label",
             "named": true
           }
         ]
@@ -12709,6 +14267,10 @@
           {
             "type": "WORD",
             "named": true
+          },
+          {
+            "type": "cobol400_word",
+            "named": true
           }
         ]
       },
@@ -12741,6 +14303,10 @@
         },
         {
           "type": "collating_sequence_clause",
+          "named": true
+        },
+        {
+          "type": "control_area_clause",
           "named": true
         },
         {
@@ -13622,6 +15188,10 @@
           {
             "type": "burroughs_computer_name",
             "named": true
+          },
+          {
+            "type": "computer_name_with_slash",
+            "named": true
           }
         ]
       }
@@ -13851,7 +15421,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "copybook_definition",
@@ -13924,6 +15494,10 @@
         "types": [
           {
             "type": "WORD",
+            "named": true
+          },
+          {
+            "type": "cobol400_word",
             "named": true
           }
         ]
@@ -15025,6 +16599,158 @@
     }
   },
   {
+    "type": "unbalanced_boolean_condition",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "AND",
+          "named": true
+        },
+        {
+          "type": "OR",
+          "named": true
+        },
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "unbalanced_parenthesized_expr",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "unbalanced_compute_expr",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ALL",
+          "named": true
+        },
+        {
+          "type": "HIGH_VALUE",
+          "named": true
+        },
+        {
+          "type": "LOW_VALUE",
+          "named": true
+        },
+        {
+          "type": "QUOTE",
+          "named": true
+        },
+        {
+          "type": "SPACE",
+          "named": true
+        },
+        {
+          "type": "TOK_NULL",
+          "named": true
+        },
+        {
+          "type": "ZERO",
+          "named": true
+        },
+        {
+          "type": "ZEROS",
+          "named": true
+        },
+        {
+          "type": "at_hex_literal",
+          "named": true
+        },
+        {
+          "type": "b_string",
+          "named": true
+        },
+        {
+          "type": "dfhvalue_expression",
+          "named": true
+        },
+        {
+          "type": "function_",
+          "named": true
+        },
+        {
+          "type": "h_string",
+          "named": true
+        },
+        {
+          "type": "linage_counter",
+          "named": true
+        },
+        {
+          "type": "n_string",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "qualified_word",
+          "named": true
+        },
+        {
+          "type": "refmod",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "subref",
+          "named": true
+        },
+        {
+          "type": "x_string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "unbalanced_parenthesized_condition",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "unbalanced_parenthesized_expr",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "unsigned_size_is",
     "named": true,
     "fields": {},
@@ -15423,6 +17149,10 @@
         "types": [
           {
             "type": "WORD",
+            "named": true
+          },
+          {
+            "type": "cobol400_word",
             "named": true
           }
         ]
@@ -15825,6 +17555,14 @@
           "named": true
         },
         {
+          "type": "SECURE",
+          "named": true
+        },
+        {
+          "type": "SPACE_FILL",
+          "named": true
+        },
+        {
           "type": "UNDERLINE",
           "named": true
         },
@@ -15965,8 +17703,146 @@
         {
           "type": "exec_sql_statement",
           "named": true
+        },
+        {
+          "type": "level_copy_statement",
+          "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "write_add_clause",
+    "named": true,
+    "fields": {
+      "from": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "ZERO",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          }
+        ]
+      },
+      "to": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "arithmetic_x",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "write_format_clause",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "&",
+            "named": false
+          },
+          {
+            "type": "ALL",
+            "named": true
+          },
+          {
+            "type": "HIGH_VALUE",
+            "named": true
+          },
+          {
+            "type": "LOW_VALUE",
+            "named": true
+          },
+          {
+            "type": "QUOTE",
+            "named": true
+          },
+          {
+            "type": "SPACE",
+            "named": true
+          },
+          {
+            "type": "TOK_NULL",
+            "named": true
+          },
+          {
+            "type": "ZERO",
+            "named": true
+          },
+          {
+            "type": "ZEROS",
+            "named": true
+          },
+          {
+            "type": "at_hex_literal",
+            "named": true
+          },
+          {
+            "type": "b_string",
+            "named": true
+          },
+          {
+            "type": "dfhvalue_expression",
+            "named": true
+          },
+          {
+            "type": "h_string",
+            "named": true
+          },
+          {
+            "type": "n_string",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "qualified_word",
+            "named": true
+          },
+          {
+            "type": "refmod",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "subref",
+            "named": true
+          },
+          {
+            "type": "x_string",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -16030,6 +17906,26 @@
     "type": "write_statement",
     "named": true,
     "fields": {
+      "add": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "write_add_clause",
+            "named": true
+          }
+        ]
+      },
+      "format": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "write_format_clause",
+            "named": true
+          }
+        ]
+      },
       "from": {
         "multiple": true,
         "required": false,
@@ -16116,6 +18012,16 @@
           }
         ]
       },
+      "indicators": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "indicators_clause",
+            "named": true
+          }
+        ]
+      },
       "lock": {
         "multiple": false,
         "required": false,
@@ -16142,7 +18048,7 @@
       },
       "record_name": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "qualified_word",
@@ -16150,6 +18056,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "cobol400_write_statement",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -16478,7 +18394,15 @@
     "named": false
   },
   {
+    "type": "NULLS",
+    "named": false
+  },
+  {
     "type": "Null",
+    "named": false
+  },
+  {
+    "type": "Nulls",
     "named": false
   },
   {
@@ -16526,6 +18450,10 @@
     "named": false
   },
   {
+    "type": "SCACES",
+    "named": false
+  },
+  {
     "type": "SPACE",
     "named": false
   },
@@ -16538,11 +18466,23 @@
     "named": false
   },
   {
+    "type": "SPCACES",
+    "named": false
+  },
+  {
+    "type": "Scaces",
+    "named": false
+  },
+  {
     "type": "Space",
     "named": false
   },
   {
     "type": "Spaces",
+    "named": false
+  },
+  {
+    "type": "Spcaces",
     "named": false
   },
   {
@@ -16590,6 +18530,10 @@
     "named": true
   },
   {
+    "type": "cobol400_word",
+    "named": true
+  },
+  {
     "type": "comment",
     "named": true,
     "extra": true
@@ -16604,7 +18548,19 @@
     "extra": true
   },
   {
+    "type": "computer_name_with_slash",
+    "named": true
+  },
+  {
     "type": "copy_pseudo_text",
+    "named": true
+  },
+  {
+    "type": "copybook_bib_name",
+    "named": true
+  },
+  {
+    "type": "database_assignment_name",
     "named": true
   },
   {
@@ -16613,6 +18569,10 @@
   },
   {
     "type": "decimal",
+    "named": true
+  },
+  {
+    "type": "decorative_comment_statement",
     "named": true
   },
   {
@@ -16648,6 +18608,22 @@
     "named": true
   },
   {
+    "type": "is_not_user_class_tail",
+    "named": true
+  },
+  {
+    "type": "legacy_display_bare_attr",
+    "named": true
+  },
+  {
+    "type": "legacy_fi_if_keyword",
+    "named": true
+  },
+  {
+    "type": "legacy_move_trailing_sequence_digit",
+    "named": true
+  },
+  {
     "type": "level_number",
     "named": true
   },
@@ -16676,8 +18652,20 @@
     "named": false
   },
   {
+    "type": "misaligned_file_control_comment",
+    "named": true
+  },
+  {
     "type": "null",
     "named": false
+  },
+  {
+    "type": "nulls",
+    "named": false
+  },
+  {
+    "type": "numeric_label",
+    "named": true
   },
   {
     "type": "picture_a",
@@ -16700,8 +18688,8 @@
     "named": true
   },
   {
-    "type": "screen_section",
-    "named": true
+    "type": "scaces",
+    "named": false
   },
   {
     "type": "space",
@@ -16709,6 +18697,10 @@
   },
   {
     "type": "spaces",
+    "named": false
+  },
+  {
+    "type": "spcaces",
     "named": false
   },
   {

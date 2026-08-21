@@ -1,0 +1,167 @@
+====================================
+display with attributes before at
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           DISPLAY "Deseja excluir?" WITH REVERSE-VIDEO AT 1620.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (display_statement
+        (string)
+        (display_with_before_at_clause
+          (display_simple_attr
+            (REVERSE_VIDEO)))
+        (at_line_column
+          at: (number
+            (integer))))
+      (period))))
+
+====================================
+display empty first line continued string
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           DISPLAY "
+      -    "                " AT 2105 WITH HIGHLIGHT.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (display_statement
+        (string)
+        (at_line_column
+          at: (number
+            (integer)))
+        (with_clause
+          (disp_attr
+            (HIGHLIGHT))))
+      (period))))
+
+====================================
+display mixed attributed positioned groups
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           DISPLAY
+           "Header" WITH REVERSE-VIDEO AT 0715
+           "Body" AT 0917
+           FIELD-A AT 1101 WITH HIGHLIGHT.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (display_statement
+        (string)
+        (display_with_before_at_clause
+          (display_simple_attr
+            (REVERSE_VIDEO)))
+        (at_line_column
+          at: (number
+            (integer)))
+        (string)
+        (at_line_column
+          at: (number
+            (integer)))
+        (qualified_word
+          (WORD))
+        (at_line_column
+          at: (number
+            (integer)))
+        (with_clause
+          (disp_attr
+            (HIGHLIGHT))))
+      (period))))
+
+====================================
+display positioned group with bare wvn attribute
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           DISPLAY "< S > Suco    " AT 2060 WVN.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (display_statement
+        (string)
+        (at_line_column
+          at: (number
+            (integer)))
+        (legacy_display_bare_attr))
+      (period))))
+
+====================================
+display grouped literals before at
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           DISPLAY
+           "                                                      "
+           "Plaqueta   :                                          "
+                                                         AT 0915
+           "  " AT 0970 WITH REVERSE-VIDEO.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (display_statement
+        (string)
+        (string)
+        (at_line_column
+          at: (number
+            (integer)))
+        (string)
+        (at_line_column
+          at: (number
+            (integer)))
+        (with_clause
+          (disp_attr
+            (REVERSE_VIDEO))))
+      (period))))
+
+====================================
+display continued string with text after continuation quote
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           DISPLAY "Codigos Validos : <00> <10> <20> <30> <40> <41> <51>
+      -    " <60> <70> <90> " AT 2105 WITH HIGHLIGHT.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (display_statement
+        (string)
+        (at_line_column
+          at: (number
+            (integer)))
+        (with_clause
+          (disp_attr
+            (HIGHLIGHT))))
+      (period))))

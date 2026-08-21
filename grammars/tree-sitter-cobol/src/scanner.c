@@ -1,8 +1,6 @@
 #include <tree_sitter/parser.h>
 #include <wctype.h>
 
-#define MAX_START_WITH_WORDS 64
-
 enum TokenType {
     WHITE_SPACES,
     LINE_PREFIX_COMMENT,
@@ -325,7 +323,7 @@ static bool scan_date_format_clause(TSLexer *lexer) {
 const int number_of_comment_entry_keywords = 9;
 char* any_content_keyword[] = {
     "author",
-    "installlation",
+    "installation",
     "date-written",
     "date-compiled",
     "security",
@@ -335,63 +333,51 @@ char* any_content_keyword[] = {
     "procedure division",
 };
 
+static bool is_horizontal_space(int c) {
+    return c == ' ' || c == '\t';
+}
+
+static char ascii_lower(int c) {
+    if(c >= 'A' && c <= 'Z') {
+        return (char)(c + ('a' - 'A'));
+    }
+    return (char)c;
+}
+
 static bool start_with_word( TSLexer *lexer, char *words[], int number_of_words) {
-    while(lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    while(is_horizontal_space(lexer->lookahead)) {
         lexer->advance(lexer, true);
     }
 
-    if(number_of_words > MAX_START_WITH_WORDS) {
-        return false;
+    char line[128];
+    unsigned int length = 0;
+    bool previous_space = false;
+    while(lexer->get_column(lexer) <= 71 && lexer->lookahead != '\n' && lexer->lookahead != 0) {
+        if(is_horizontal_space(lexer->lookahead)) {
+            if(length > 0 && !previous_space && length < sizeof(line) - 1) {
+                line[length++] = ' ';
+            }
+            previous_space = true;
+        } else if(length < sizeof(line) - 1) {
+            line[length++] = ascii_lower(lexer->lookahead);
+            previous_space = false;
+        }
+        lexer->advance(lexer, true);
     }
-
-    char *keyword_pointer[MAX_START_WITH_WORDS];
-    bool continue_check[MAX_START_WITH_WORDS];
+    while(length > 0 && line[length - 1] == ' ') {
+        length--;
+    }
+    line[length] = 0;
 
     for(int i=0; i<number_of_words; ++i) {
-        keyword_pointer[i] = words[i];
-        continue_check[i] = true;
-    }
-
-    while(true) {
-        // At the end of the line
-        if(lexer->get_column(lexer) > 71 || lexer->lookahead == '\n' || lexer->lookahead == 0) {
-            return false;
+        char *keyword = words[i];
+        unsigned int pos = 0;
+        while(keyword[pos] != 0 && pos < length && line[pos] == keyword[pos]) {
+            pos++;
         }
-
-        // If all keyword matching fails, move to the end of the line
-        bool all_match_failed = true;
-        for(int i=0; i<number_of_words; ++i) {
-            if(continue_check[i]) {
-                all_match_failed = false;
-            }
+        if(keyword[pos] == 0 && (pos == length || line[pos] == ' ' || line[pos] == '.')) {
+            return true;
         }
-
-        if(all_match_failed) {
-            for(; lexer->get_column(lexer) < 71 && lexer->lookahead != '\n' && lexer->lookahead != 0;
-            lexer->advance(lexer, true)) {
-            }
-            return false;
-        }
-
-        // If the head of the line matches any of specified keywords, return true;
-        char c = lexer->lookahead;
-        for(int i=0; i<number_of_words; ++i) {
-            if(*(keyword_pointer[i]) == 0 && continue_check[i]) {
-                return true;
-            }
-        }
-
-        // matching keywords
-        for(int i=0; i<number_of_words; ++i) {
-            char k = *(keyword_pointer[i]);
-            if(continue_check[i]) {
-                continue_check[i] = c == towupper(k) || c == towlower(k);
-            }
-            (keyword_pointer[i])++;
-        }
-
-        // next character
-        lexer->advance(lexer, true);
     }
 
     return false;
@@ -550,7 +536,7 @@ bool tree_sitter_COBOL_external_scanner_scan(void *payload, TSLexer *lexer,
                 return false;
             }
             lexer->advance(lexer, false);
-            while(lexer->lookahead != quote && lexer->lookahead != 0 && lexer->get_column(lexer) < 72) {
+            while(lexer->lookahead != quote && lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != '\r' && lexer->get_column(lexer) < 72) {
                 lexer->advance(lexer, false);
             }
             if(lexer->lookahead == quote) {

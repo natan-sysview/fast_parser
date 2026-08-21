@@ -100,9 +100,40 @@ exec sql host variable subscript
           (sql_host_variable
             name: (qualified_word
               (WORD))
-            subscript: (subref
-              (qualified_word
-                (WORD))))))
+            subscript: (subref))))
+      (period))))
+
+====================================
+exec sql host variable before subselect
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           EXEC SQL
+             INSERT INTO T (A, B)
+             VALUES (:K4-BOLETO,
+                     (SELECT IFNULL(MAX(ITEM), 0)+1 FROM DREC012),
+                     :OBSERV-I.OBS)
+           END-EXEC.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (exec_sql_statement
+        body: (sql_body
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))
+          (number
+            (integer))
+          (number
+            (integer))
+          (sql_host_variable
+            name: (qualified_word
+              (WORD)))))
       (period))))
 
 ====================================

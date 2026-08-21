@@ -1,4 +1,36 @@
 ====================================
+if header without body before paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       CONT-ABRE-CLIMOV.
+           IF FS1 NOT = "00"
+       ROTINA-MENU.
+           PERFORM LIMPA-TELA.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (if_header
+        condition: (expr
+          (qualified_word
+            (WORD))
+          (ne)
+          (string)))
+      (paragraph_header)
+      (perform_statement_call_proc
+        procedure: (perform_procedure
+          (label
+            (qualified_word
+              (WORD)))))
+      (period))))
+
+====================================
 rewrite without period before paragraph
 ====================================
        identification division.
@@ -19,6 +51,354 @@ rewrite without period before paragraph
       (rewrite_statement
         record: (qualified_word
           (WORD)))
+      (paragraph_header)
+      (exit_statement)
+      (period))))
+
+====================================
+perform without period before paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           PERFORM 020-DACORD110 THRU 020-SAI UNTIL WFIM = 1
+       FINALIZACAO.
+           GOBACK.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (perform_statement_call_proc
+        procedure: (perform_procedure
+          (label
+            (qualified_word
+              (WORD)))
+          (THRU)
+          (label
+            (qualified_word
+              (WORD))))
+        option: (perform_option
+          until: (expr
+            (qualified_word
+              (WORD))
+            (eq)
+            (number
+              (integer)))))
+      (paragraph_header)
+      (goback_statement)
+      (period))))
+
+====================================
+write without period before paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       020-IMPRIME-DADOS-01.
+           WRITE REGIMP FORMAT IS "RCAB01"
+       020-IMPRIME-DADOS-02.
+           MOVE PEDNRO TO RPEDNRO.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (write_statement
+        record_name: (qualified_word
+          (WORD))
+        format: (write_format_clause
+          name: (string)))
+      (paragraph_header)
+      (move_statement
+        src: (qualified_word
+          (WORD))
+        dst: (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+section paragraph statements before next paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       280-ARMA-DETALLE section.
+       280-0100-INICIO.
+           MOVE FIELD-A TO FIELD-B
+           DISPLAY FIELD-B.
+       280-9900.
+           EXIT.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (section_header)
+      (paragraph_header)
+      (move_statement
+        src: (qualified_word
+          (WORD))
+        dst: (qualified_word
+          (WORD)))
+      (display_statement
+        (qualified_word
+          (WORD)))
+      (period)
+      (paragraph_header
+        name: (numeric_label))
+      (exit_statement)
+      (period))))
+
+====================================
+exit without period before paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       020-SAI.
+           EXIT
+       800-CABECALHO.
+           DISPLAY "CAB".
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (exit_statement)
+      (paragraph_header)
+      (display_statement
+        (string))
+      (period))))
+
+====================================
+use debugging on all procedures plural
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       declaratives.
+       debug section.
+           use for debugging on all procedures.
+           display debug-item.
+       end declaratives.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (procedure_declaratives
+        (section_header)
+        (use_statement
+          (ALL))
+        (period)
+      (display_statement
+        (qualified_word
+          (WORD)))
+      (period)))))
+
+====================================
+cobol400 paragraph name with underscore
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       020-READ-FPCA_SFP.
+           move zeros to fp-etapa.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header
+        name: (cobol400_word))
+      (move_statement
+        src: (ZEROS)
+        dst: (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+paragraph header without period after statement
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       ABRE-ARQUIVOS.
+           OPEN INPUT F-A.
+       STARTA-DACCA001
+           MOVE 01 TO CDLOCG.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (open_statement
+        (open_arg
+          mode: (INPUT)
+          file_name_list: (WORD)))
+      (period)
+      (paragraph_header)
+      (move_statement
+        src: (number
+          (integer))
+        dst: (qualified_word
+          (WORD)))
+      (period))))
+
+====================================
+paragraph header without period after go
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       CALCULA-DIA.
+           GO CALCULA-VENCIMENTO.
+       VENCIMENTO-SAI
+           EXIT.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (goto_statement
+        to: (label
+          (qualified_word
+            (WORD))))
+      (period)
+      (paragraph_header)
+      (exit_statement)
+      (period))))
+
+====================================
+accept without period before paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       000-DATA.
+           ACCEPT KDAT FROM DATE YYYYMMDD
+      010-INICIALIZACAO.
+          OPEN INPUT DMOVTO.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (accept_statement
+        (qualified_word
+          (WORD))
+        from: (DATE)
+        from: (YYYYMMDD))
+      (paragraph_header)
+      (open_statement
+        (open_arg
+          mode: (INPUT)
+          file_name_list: (WORD)))
+      (period))))
+
+====================================
+compute without period before paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       INICIO-PROGRAMA.
+           ACCEPT KDAT FROM DATE YYYYMMDD.
+           ACCEPT MHORA FROM TIME.
+           COMPUTE WDTOM = (1000000 + ANOD * 10000 + MESR * 100 + DIAR)
+       010-INICIALIZACAO.
+           OPEN INPUT DMOVTO.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (accept_statement
+        (qualified_word
+          (WORD))
+        from: (DATE)
+        from: (YYYYMMDD))
+      (period)
+      (accept_statement
+        (qualified_word
+          (WORD))
+        from: (TIME))
+      (period)
+      (compute_statement
+        left: (arithmetic_x
+          (qualified_word
+            (WORD)))
+        right: (expr
+          (number
+            (integer))
+          (qualified_word
+            (WORD))
+          (number
+            (integer))
+          (qualified_word
+            (WORD))
+          (number
+            (integer))
+          (qualified_word
+            (WORD))))
+      (paragraph_header)
+      (open_statement
+        (open_arg
+          mode: (INPUT)
+          file_name_list: (WORD)))
+      (period))))
+
+====================================
+legacy typo peform before paragraph
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+       A.
+           PEFORM B.
+       B.
+           EXIT.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (paragraph_header)
+      (perform_statement_call_proc
+        procedure: (perform_procedure
+          (label
+            (qualified_word
+              (WORD)))))
+      (period)
       (paragraph_header)
       (exit_statement)
       (period))))

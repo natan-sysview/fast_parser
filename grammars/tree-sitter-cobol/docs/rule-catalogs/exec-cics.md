@@ -49,6 +49,15 @@ The immediate objective is to stop `EXEC CICS ... END-EXEC` from producing casca
      END-EXEC.
 ```
 
+```cobol
+     EXEC CICS
+        WRITEQ TS QUEUE(WS-QUEUE-SALIDA)
+        FROM(WS-SALIDA-FINAL(C-1:WS-TSLENGTH))
+        LENGTH(WS-TSLENGTH)
+        MAIN NOHANDLE
+     END-EXEC.
+```
+
 ## Excluded From First Batch
 
 - Full CICS command grammar.
@@ -105,6 +114,31 @@ Validated on 2026-06-25 against the COBOL inventory of 74,151 non-JCL files.
 
 The rule is valuable but remains experimental because `MISSING` nodes increased and the regression set must stay visible before promotion.
 
+## 2026-08-14 Reference Modification Batch
+
+Residual inventory errors showed many `EXEC CICS` blocks with COBOL reference modification in option arguments, for example `FROM(WS-SALIDA-FINAL(C-1:WS-TSLENGTH))`.
+
+This batch keeps the broad `cics_body` design and adds only `:` to CICS body punctuation. It does not add full CICS option semantics or change global COBOL expression parsing.
+
+Corpus coverage:
+
+- `exec cics reference modification argument`
+- Existing `exec sql stays sql` negative guard
+
+Validation result:
+
+- Corpus: 191/191 passing.
+- Full inventory: 74,242 files.
+- Hard failures: 0.
+- Files with `ERROR`: 2,595 before, 2,426 after.
+- `ERROR` nodes: 3,231 before, 3,062 after.
+- Files with `MISSING`: 2 before, 2 after.
+- `MISSING` nodes: 2 before, 2 after.
+- Changed files: 169 improved, 0 regressed.
+- `EXEC_CICS` family in the audited profile: 165 before, 3 after.
+
+Residual `EXEC_CICS` cases are not reference-modification syntax. Current samples include a commented `EXEC CICS` line containing NUL bytes and a damaged command token `5INK`.
+
 ## Artifacts
 
 - Report: `runs/cobol_exec_cics_repair_report.md`.
@@ -112,3 +146,7 @@ The rule is valuable but remains experimental because `MISSING` nodes increased 
 - Binary validation DB: `runs/cobol_fastparse_binary_validation_exec_cics_full.sqlite`.
 - Regression audit: `audits/exec_cics_repair/top_regressed_files.csv`.
 - Residual family audit: `audits/error_family_classification_after_exec_cics/error_family_summary.csv`.
+- 2026-08-14 reference modification report: `runs/cobol_exec_cics_reference_modification_repair_report.md`.
+- 2026-08-14 diagnostics DB: `runs/candidate_compare_current_exec_cics_reference_modification_20260814.sqlite`.
+- 2026-08-14 comparison audit: `audits/exec_cics_reference_modification_20260814/`.
+- 2026-08-14 residual family audit: `audits/error_family_classification_current_exec_cics_reference_modification_20260814/`.

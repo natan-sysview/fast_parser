@@ -1,0 +1,72 @@
+====================================
+database assignment name with underscore
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       file-control.
+           select FECA_SFP
+                  assign to DATABASE-FECA_SFP
+                  organization is indexed
+                  access is dynamic
+                  status is W-FS7
+                  record key is EXTERNALLY-DESCRIBED-KEY.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (cobol400_word)
+          (assign_clause
+            to: (database_assignment_name))
+          (organization_clause
+            (INDEXED))
+          (access_mode_clause
+            (DYNAMIC))
+          (file_status_clause
+            reference: (qualified_word
+              (WORD)))
+          (record_key_clause
+            reference: (qualified_word
+              (WORD))))))))
+
+====================================
+workstation assignment name
+====================================
+       identification division.
+       program-id. a.
+       environment division.
+       input-output section.
+       file-control.
+           select WSFILE
+                  assign to WORKSTATION-OMF998-SI
+                  organization is transaction
+                  control-area is WS-CTR
+                  file status FILE-STATUS-WSFILE.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (environment_division
+      (input_output_section
+        (select_statement
+          file_name: (WORD)
+          (assign_clause
+            to: (qualified_word
+              (WORD)))
+          (organization_clause
+            (TRANSACTION))
+          (control_area_clause
+            reference: (qualified_word
+              (WORD)))
+          (file_status_clause
+            file_or_sort: (FILE)
+            reference: (qualified_word
+              (WORD))))))))
