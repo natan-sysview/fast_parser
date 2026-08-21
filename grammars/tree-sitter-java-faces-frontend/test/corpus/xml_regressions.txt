@@ -1,0 +1,109 @@
+==================
+XML declarations doctype comments CDATA and entities
+==================
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <!-- a comment -->
+  <script><![CDATA[if (a < b && b > c) { run(); }]]></script>
+  <p>one &amp; two &#169; three</p>
+</html>
+
+---
+
+(document
+  (prolog
+    (XMLDecl
+      (VersionNum)
+      (EncName))
+    (doctypedecl
+      (Name)
+      (ExternalID
+        (PubidLiteral)
+        (SystemLiteral
+          (URI)))))
+  (xml_element
+    (xml_start_tag
+      (tag_name)
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text)))))
+    (content
+      (CharData)
+      (Comment)
+      (CharData)
+      (xml_element
+        (xml_start_tag
+          (tag_name))
+        (content
+          (CDSect
+            (CDStart)
+            (CData)))
+        (xml_end_tag
+          (tag_name)))
+      (CharData)
+      (xml_element
+        (xml_start_tag
+          (tag_name))
+        (content
+          (CharData)
+          (EntityRef
+            (Name))
+          (CharData)
+          (CharRef)
+          (CharData))
+        (xml_end_tag
+          (tag_name)))
+      (CharData))
+    (xml_end_tag
+      (tag_name))))
+
+==================
+Plain XML remains generic
+==================
+
+<catalog xmlns:vendor="https://example.com/vendor">
+  <item id="1" />
+  <vendor:item id="2">text</vendor:item>
+</catalog>
+
+---
+
+(document
+  (xml_element
+    (xml_start_tag
+      (tag_name)
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text)))))
+    (content
+      (CharData)
+      (xml_element
+        (xml_empty_element
+          (tag_name)
+          (plain_attribute
+            (attribute_name)
+            (AttValue
+              (double_quoted_attribute_value
+                (double_quoted_attribute_text))))))
+      (CharData)
+      (qualified_element
+        (qualified_start_tag
+          (tag_name)
+          (plain_attribute
+            (attribute_name)
+            (AttValue
+              (double_quoted_attribute_value
+                (double_quoted_attribute_text)))))
+        (content
+          (CharData))
+        (qualified_end_tag
+          (tag_name)))
+      (CharData))
+    (xml_end_tag
+      (tag_name))))

@@ -1,0 +1,99 @@
+name: Java Faces Frontend Extension CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/java-faces-frontend-ci.yml"
+      - "CMakeLists.txt"
+      - "bindings/python/**"
+      - "extensions/java-faces-frontend/**"
+      - "grammars/tree-sitter-java-faces-frontend/**"
+      - "include/**"
+      - "scripts/validate_java_faces_frontend_extension.py"
+      - "src/**"
+      - "vendor/tree-sitter/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/java-faces-frontend-ci.yml"
+      - "CMakeLists.txt"
+      - "bindings/python/**"
+      - "extensions/java-faces-frontend/**"
+      - "grammars/tree-sitter-java-faces-frontend/**"
+      - "include/**"
+      - "scripts/validate_java_faces_frontend_extension.py"
+      - "src/**"
+      - "vendor/tree-sitter/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke:
+    name: ${{ matrix.platform }} build and FastParse smoke
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: Linux
+            core: bin/libfastparse.so
+            extension: bin/libfastparse_language_java_faces_frontend.so
+          - runner: macos-latest
+            platform: macOS
+            core: bin/libfastparse.dylib
+            extension: bin/libfastparse_language_java_faces_frontend.dylib
+          - runner: windows-latest
+            platform: Windows
+            core: bin/fastparse.dll
+            extension: bin/fastparse_language_java_faces_frontend.dll
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Tree-sitter CLI
+        working-directory: grammars/tree-sitter-java-faces-frontend
+        run: npm ci --no-audit --no-fund
+
+      - name: Run Tree-sitter corpus
+        working-directory: grammars/tree-sitter-java-faces-frontend
+        run: npm test
+
+      - name: Configure native build
+        run: cmake -S . -B build-java-faces-frontend -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build FastParse and Java Faces Frontend extension
+        run: cmake --build build-java-faces-frontend --config Release --target tsmp fastparse_language_java_faces_frontend --parallel
+
+      - name: Validate FastParse extension contract
+        run: >-
+          python scripts/validate_java_faces_frontend_extension.py
+          --library "${{ matrix.core }}"
+          --extension "${{ matrix.extension }}"
+          --workers 8
+          --iterations 24
+
+      - name: Upload native extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-java-faces-frontend-${{ matrix.platform }}
+          path: |
+            ${{ matrix.extension }}
+            extensions/java-faces-frontend/manifest.json
+            extensions/java-faces-frontend/queries/audits.scm
+          if-no-files-found: error

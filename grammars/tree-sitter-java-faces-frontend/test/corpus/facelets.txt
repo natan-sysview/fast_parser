@@ -1,0 +1,648 @@
+==================
+Standard Facelets families
+==================
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets">
+  <ui:define name="content">
+    <h:form id="main">
+      <f:ajax event="change" listener="#{bean.change}" />
+      <h:outputText value="Hello #{bean.name}" />
+    </h:form>
+  </ui:define>
+</ui:composition>
+
+---
+
+(document
+  (prolog
+    (XMLDecl
+      (VersionNum)
+      (EncName))
+    (doctypedecl
+      (Name)))
+  (facelets_element
+    (facelets_start_tag
+      (tag_name)
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text)))))
+    (content
+      (CharData)
+      (facelets_element
+        (facelets_start_tag
+          (tag_name)
+          (plain_attribute
+            (attribute_name)
+            (AttValue
+              (double_quoted_attribute_value
+                (double_quoted_attribute_text)))))
+        (content
+          (CharData)
+          (jsf_html_element
+            (jsf_html_start_tag
+              (tag_name)
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (double_quoted_attribute_text)))))
+            (content
+              (CharData)
+              (jsf_core_element
+                (jsf_core_empty_element
+                  (tag_name)
+                  (plain_attribute
+                    (attribute_name)
+                    (AttValue
+                      (double_quoted_attribute_value
+                        (double_quoted_attribute_text))))
+                  (plain_attribute
+                    (attribute_name)
+                    (AttValue
+                      (double_quoted_attribute_value
+                        (expression_language
+                          (deferred_expression
+                            (el_sequence_expression
+                              (el_assignment_expression
+                                (el_conditional_expression
+                                  (el_or_expression
+                                    (el_and_expression
+                                      (el_equality_expression
+                                        (el_relational_expression
+                                          (el_concatenation_expression
+                                            (el_additive_expression
+                                              (el_multiplicative_expression
+                                                (el_unary_expression
+                                                  (el_value_expression
+                                                    (el_identifier)
+                                                    (el_property_suffix
+                                                      (el_identifier)))))))))))))))))))))
+              (CharData)
+              (jsf_html_element
+                (jsf_html_empty_element
+                  (tag_name)
+                  (plain_attribute
+                    (attribute_name)
+                    (AttValue
+                      (double_quoted_attribute_value
+                        (double_quoted_attribute_text)
+                        (expression_language
+                          (deferred_expression
+                            (el_sequence_expression
+                              (el_assignment_expression
+                                (el_conditional_expression
+                                  (el_or_expression
+                                    (el_and_expression
+                                      (el_equality_expression
+                                        (el_relational_expression
+                                          (el_concatenation_expression
+                                            (el_additive_expression
+                                              (el_multiplicative_expression
+                                                (el_unary_expression
+                                                  (el_value_expression
+                                                    (el_identifier)
+                                                    (el_property_suffix
+                                                      (el_identifier)))))))))))))))))))))
+              (CharData))
+            (jsf_html_end_tag
+              (tag_name)))
+          (CharData))
+        (facelets_end_tag
+          (tag_name)))
+      (CharData))
+    (facelets_end_tag
+      (tag_name))))
+
+==================
+Composite component definition
+==================
+
+<ui:component xmlns:ui="jakarta.faces.facelets"
+              xmlns:cc="jakarta.faces.composite"
+              xmlns:h="jakarta.faces.html">
+  <cc:interface componentType="example.Component">
+    <cc:attribute name="value" required="true" />
+    <cc:facet name="header" />
+  </cc:interface>
+  <cc:implementation>
+    <cc:renderFacet name="header" />
+    <h:outputText value="#{cc.attrs.value}" />
+    <cc:insertChildren />
+  </cc:implementation>
+</ui:component>
+
+---
+
+(document
+  (facelets_element
+    (facelets_start_tag
+      (tag_name)
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text)))))
+    (content
+      (CharData)
+      (composite_component_element
+        (composite_component_start_tag
+          (tag_name)
+          (plain_attribute
+            (attribute_name)
+            (AttValue
+              (double_quoted_attribute_value
+                (double_quoted_attribute_text)))))
+        (content
+          (CharData)
+          (composite_component_element
+            (composite_component_empty_element
+              (tag_name)
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (double_quoted_attribute_text))))
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (double_quoted_attribute_text))))))
+          (CharData)
+          (composite_component_element
+            (composite_component_empty_element
+              (tag_name)
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (double_quoted_attribute_text))))))
+          (CharData))
+        (composite_component_end_tag
+          (tag_name)))
+      (CharData)
+      (composite_component_element
+        (composite_component_start_tag
+          (tag_name))
+        (content
+          (CharData)
+          (composite_component_element
+            (composite_component_empty_element
+              (tag_name)
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (double_quoted_attribute_text))))))
+          (CharData)
+          (jsf_html_element
+            (jsf_html_empty_element
+              (tag_name)
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (expression_language
+                      (deferred_expression
+                        (el_sequence_expression
+                          (el_assignment_expression
+                            (el_conditional_expression
+                              (el_or_expression
+                                (el_and_expression
+                                  (el_equality_expression
+                                    (el_relational_expression
+                                      (el_concatenation_expression
+                                        (el_additive_expression
+                                          (el_multiplicative_expression
+                                            (el_unary_expression
+                                              (el_value_expression
+                                                (el_identifier)
+                                                (el_property_suffix
+                                                  (el_identifier))
+                                                (el_property_suffix
+                                                  (el_identifier)))))))))))))))))))))
+          (CharData)
+          (composite_component_element
+            (composite_component_empty_element
+              (tag_name)))
+          (CharData))
+        (composite_component_end_tag
+          (tag_name)))
+      (CharData))
+    (facelets_end_tag
+      (tag_name))))
+
+==================
+HTML friendly markup and pass through attributes
+==================
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:faces="jakarta.faces"
+      xmlns:pt="jakarta.faces.passthrough"
+      xmlns:h="jakarta.faces.html">
+  <h:body>
+    <input faces:id="age" faces:value="#{user.age}"
+           pt:placeholder="Age" min="#{limits.min}" />
+    <faces:element id="meter" value="#{user.score}" />
+  </h:body>
+</html>
+
+---
+
+(document
+  (xml_element
+    (xml_start_tag
+      (tag_name)
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text)))))
+    (content
+      (CharData)
+      (jsf_html_element
+        (jsf_html_start_tag
+          (tag_name))
+        (content
+          (CharData)
+          (xml_element
+            (xml_empty_element
+              (tag_name)
+              (faces_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (double_quoted_attribute_text))))
+              (faces_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (expression_language
+                      (deferred_expression
+                        (el_sequence_expression
+                          (el_assignment_expression
+                            (el_conditional_expression
+                              (el_or_expression
+                                (el_and_expression
+                                  (el_equality_expression
+                                    (el_relational_expression
+                                      (el_concatenation_expression
+                                        (el_additive_expression
+                                          (el_multiplicative_expression
+                                            (el_unary_expression
+                                              (el_value_expression
+                                                (el_identifier)
+                                                (el_property_suffix
+                                                  (el_identifier)))))))))))))))))))
+              (passthrough_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (double_quoted_attribute_text))))
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (expression_language
+                      (deferred_expression
+                        (el_sequence_expression
+                          (el_assignment_expression
+                            (el_conditional_expression
+                              (el_or_expression
+                                (el_and_expression
+                                  (el_equality_expression
+                                    (el_relational_expression
+                                      (el_concatenation_expression
+                                        (el_additive_expression
+                                          (el_multiplicative_expression
+                                            (el_unary_expression
+                                              (el_value_expression
+                                                (el_identifier)
+                                                (el_property_suffix
+                                                  (el_identifier)))))))))))))))))))))
+          (CharData)
+          (faces_element
+            (faces_empty_element
+              (tag_name)
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (double_quoted_attribute_text))))
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (expression_language
+                      (deferred_expression
+                        (el_sequence_expression
+                          (el_assignment_expression
+                            (el_conditional_expression
+                              (el_or_expression
+                                (el_and_expression
+                                  (el_equality_expression
+                                    (el_relational_expression
+                                      (el_concatenation_expression
+                                        (el_additive_expression
+                                          (el_multiplicative_expression
+                                            (el_unary_expression
+                                              (el_value_expression
+                                                (el_identifier)
+                                                (el_property_suffix
+                                                  (el_identifier)))))))))))))))))))))
+          (CharData))
+        (jsf_html_end_tag
+          (tag_name)))
+      (CharData))
+    (xml_end_tag
+      (tag_name))))
+
+==================
+JSTL and arbitrary tag libraries
+==================
+
+<ui:composition xmlns:ui="jakarta.faces.facelets"
+                xmlns:c="jakarta.tags.core"
+                xmlns:company="https://example.com/components">
+  <c:if test="#{bean.visible}">
+    <company:widget value="#{bean.value}" />
+  </c:if>
+</ui:composition>
+
+---
+
+(document
+  (facelets_element
+    (facelets_start_tag
+      (tag_name)
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text)))))
+    (content
+      (CharData)
+      (jstl_element
+        (jstl_start_tag
+          (tag_name)
+          (plain_attribute
+            (attribute_name)
+            (AttValue
+              (double_quoted_attribute_value
+                (expression_language
+                  (deferred_expression
+                    (el_sequence_expression
+                      (el_assignment_expression
+                        (el_conditional_expression
+                          (el_or_expression
+                            (el_and_expression
+                              (el_equality_expression
+                                (el_relational_expression
+                                  (el_concatenation_expression
+                                    (el_additive_expression
+                                      (el_multiplicative_expression
+                                        (el_unary_expression
+                                          (el_value_expression
+                                            (el_identifier)
+                                            (el_property_suffix
+                                              (el_identifier))))))))))))))))))))
+        (content
+          (CharData)
+          (qualified_element
+            (qualified_empty_element
+              (tag_name)
+              (plain_attribute
+                (attribute_name)
+                (AttValue
+                  (double_quoted_attribute_value
+                    (expression_language
+                      (deferred_expression
+                        (el_sequence_expression
+                          (el_assignment_expression
+                            (el_conditional_expression
+                              (el_or_expression
+                                (el_and_expression
+                                  (el_equality_expression
+                                    (el_relational_expression
+                                      (el_concatenation_expression
+                                        (el_additive_expression
+                                          (el_multiplicative_expression
+                                            (el_unary_expression
+                                              (el_value_expression
+                                                (el_identifier)
+                                                (el_property_suffix
+                                                  (el_identifier)))))))))))))))))))))
+          (CharData))
+        (jstl_end_tag
+          (tag_name)))
+      (CharData))
+    (facelets_end_tag
+      (tag_name))))
+
+==================
+PrimeFaces extension families
+==================
+
+<ui:composition xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions">
+  <p:dataTable value="#{bean.rows}" var="row">
+    <p:column>#{row.name}</p:column>
+  </p:dataTable>
+  <pe:blockUI target="table" />
+</ui:composition>
+
+---
+
+(document
+  (facelets_element
+    (facelets_start_tag
+      (tag_name)
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text)))))
+    (content
+      (CharData)
+      (primefaces_element
+        (primefaces_start_tag
+          (tag_name)
+          (plain_attribute
+            (attribute_name)
+            (AttValue
+              (double_quoted_attribute_value
+                (expression_language
+                  (deferred_expression
+                    (el_sequence_expression
+                      (el_assignment_expression
+                        (el_conditional_expression
+                          (el_or_expression
+                            (el_and_expression
+                              (el_equality_expression
+                                (el_relational_expression
+                                  (el_concatenation_expression
+                                    (el_additive_expression
+                                      (el_multiplicative_expression
+                                        (el_unary_expression
+                                          (el_value_expression
+                                            (el_identifier)
+                                            (el_property_suffix
+                                              (el_identifier)))))))))))))))))))
+          (plain_attribute
+            (attribute_name)
+            (AttValue
+              (double_quoted_attribute_value
+                (double_quoted_attribute_text)))))
+        (content
+          (CharData)
+          (primefaces_element
+            (primefaces_start_tag
+              (tag_name))
+            (content
+              (expression_language
+                (deferred_expression
+                  (el_sequence_expression
+                    (el_assignment_expression
+                      (el_conditional_expression
+                        (el_or_expression
+                          (el_and_expression
+                            (el_equality_expression
+                              (el_relational_expression
+                                (el_concatenation_expression
+                                  (el_additive_expression
+                                    (el_multiplicative_expression
+                                      (el_unary_expression
+                                        (el_value_expression
+                                          (el_identifier)
+                                          (el_property_suffix
+                                            (el_identifier)))))))))))))))))
+            (primefaces_end_tag
+              (tag_name)))
+          (CharData))
+        (primefaces_end_tag
+          (tag_name)))
+      (CharData)
+      (primefaces_extensions_element
+        (primefaces_extensions_empty_element
+          (tag_name)
+          (plain_attribute
+            (attribute_name)
+            (AttValue
+              (double_quoted_attribute_value
+                (double_quoted_attribute_text))))))
+      (CharData))
+    (facelets_end_tag
+      (tag_name))))
+
+==================
+Facelets JSPX style qualified root
+==================
+
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
+          xmlns:ui="http://java.sun.com/jsf/facelets"
+          version="2.1">
+  <ui:composition>
+    Legacy-compatible Facelets JSPX processing mode
+  </ui:composition>
+</jsp:root>
+
+---
+
+(document
+  (qualified_element
+    (qualified_start_tag
+      (tag_name)
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (namespace_declaration
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text))))
+      (plain_attribute
+        (attribute_name)
+        (AttValue
+          (double_quoted_attribute_value
+            (double_quoted_attribute_text)))))
+    (content
+      (CharData)
+      (facelets_element
+        (facelets_start_tag
+          (tag_name))
+        (content
+          (CharData))
+        (facelets_end_tag
+          (tag_name)))
+      (CharData))
+    (qualified_end_tag
+      (tag_name))))

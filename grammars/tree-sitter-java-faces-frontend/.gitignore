@@ -1,0 +1,8 @@
+/build/
+/node_modules/
+*.dylib
+*.so
+*.dll
+*.wasm
+*.sqlite-wal
+*.sqlite-shm

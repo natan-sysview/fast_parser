@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for Jakarta Faces and JavaServer Faces Facelets frontends"
+  },
+  "grammars": [
+    {
+      "name": "java_faces_frontend",
+      "camelcase": "JavaFacesFrontend",
+      "scope": "source.java-faces-frontend",
+      "path": ".",
+      "file-types": [
+        "xhtml",
+        "jsf",
+        "jspx"
+      ],
+      "injection-regex": "^(jsf|facelets|java[-_]faces[-_]frontend)$",
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm"
+    }
+  ],
+  "bindings": {
+    "c": true,
+    "node": false,
+    "rust": false,
+    "python": false,
+    "go": false,
+    "swift": false
+  }
+}

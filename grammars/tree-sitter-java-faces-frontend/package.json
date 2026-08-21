@@ -1,0 +1,37 @@
+{
+  "name": "tree-sitter-java-faces-frontend",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for Jakarta Faces and JavaServer Faces Facelets frontends",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/natan-sysview/fast_parser.git",
+    "directory": "grammars/tree-sitter-java-faces-frontend"
+  },
+  "files": [
+    "common",
+    "grammar.js",
+    "queries",
+    "src",
+    "tree-sitter.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "tree-sitter",
+    "jsf",
+    "facelets",
+    "jakarta-faces",
+    "primefaces",
+    "xhtml",
+    "expression-language"
+  ],
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.25.4"
+  }
+}

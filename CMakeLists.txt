@@ -11,6 +11,7 @@ option(TSMP_BUILD_SHARED "Build TSMP as a shared library" ON)
 option(TSMP_USE_VENDORED_TREE_SITTER "Compile the vendored Tree-sitter runtime" ON)
 set(FASTPARSE_COBOL_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-cobol grammar directory for the experimental COBOL language extension")
 set(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-java-frameworks grammar directory for the experimental Java Frameworks language extension")
+set(FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-java-faces-frontend grammar directory for the Java Faces Frontend language extension")
 set(FASTPARSE_JAVASWING_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-javaswing grammar directory for the Java Swing language extension")
 set(FASTPARSE_PLSQL_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-plsql grammar directory for the PL/SQL language extension")
 set(FASTPARSE_PYTHON_GRAMMAR_DIR "" CACHE PATH "Optional tree-sitter-python grammar directory for the experimental Python language extension")
@@ -28,6 +29,13 @@ if(NOT FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR AND EXISTS "${TSMP_GRAMMARS_DIR}/tr
     set(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR
         "${TSMP_GRAMMARS_DIR}/tree-sitter-java-frameworks"
         CACHE PATH "Optional tree-sitter-java-frameworks grammar directory for the experimental Java Frameworks language extension"
+        FORCE)
+endif()
+
+if(NOT FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR AND EXISTS "${TSMP_GRAMMARS_DIR}/tree-sitter-java-faces-frontend/src/parser.c")
+    set(FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR
+        "${TSMP_GRAMMARS_DIR}/tree-sitter-java-faces-frontend"
+        CACHE PATH "Optional tree-sitter-java-faces-frontend grammar directory for the Java Faces Frontend language extension"
         FORCE)
 endif()
 
@@ -183,6 +191,27 @@ if(FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR)
         PRIVATE
             "${FASTPARSE_JAVA_FRAMEWORKS_GRAMMAR_DIR}/src")
     fastparse_configure_language_extension(fastparse_language_java_frameworks "fastparse_language_java_frameworks")
+endif()
+
+if(FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR)
+    if(NOT EXISTS "${FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR}/src/parser.c")
+        message(FATAL_ERROR "FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR must point to a tree-sitter-java-faces-frontend checkout with src/parser.c")
+    endif()
+    set(FASTPARSE_JAVA_FACES_FRONTEND_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/extensions/java-faces-frontend/fastparse_language_java_faces_frontend.c"
+        "${FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR}/src/parser.c")
+    if(EXISTS "${FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR}/src/scanner.c")
+        list(APPEND FASTPARSE_JAVA_FACES_FRONTEND_SOURCES "${FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR}/src/scanner.c")
+    endif()
+    add_library(fastparse_language_java_faces_frontend SHARED
+        ${FASTPARSE_JAVA_FACES_FRONTEND_SOURCES})
+    if(MSVC)
+        target_compile_options(fastparse_language_java_faces_frontend PRIVATE /bigobj)
+    endif()
+    target_include_directories(fastparse_language_java_faces_frontend
+        PRIVATE
+            "${FASTPARSE_JAVA_FACES_FRONTEND_GRAMMAR_DIR}/src")
+    fastparse_configure_language_extension(fastparse_language_java_faces_frontend "fastparse_language_java_faces_frontend")
 endif()
 
 if(FASTPARSE_JAVASWING_GRAMMAR_DIR)

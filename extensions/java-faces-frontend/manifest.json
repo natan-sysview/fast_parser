@@ -1,0 +1,33 @@
+{
+  "extensionKind": "fastparse-language",
+  "language": "java-faces-frontend",
+  "displayName": "Java Faces Frontend",
+  "version": "0.1.0",
+  "extensionAbi": 1,
+  "coreAbi": "fastparse-c-api/0.5.0",
+  "binarySchemaVersion": 1,
+  "grammar": {
+    "name": "tree-sitter-java-faces-frontend",
+    "source": "grammars/tree-sitter-java-faces-frontend",
+    "revision": "promoted-local",
+    "license": "MIT"
+  },
+  "symbols": {
+    "descriptor": "fastparse_language_extension_descriptor",
+    "treeSitterLanguage": "tree_sitter_java_faces_frontend"
+  },
+  "normalization": {
+    "default": "auto_safe",
+    "supported": ["auto_safe", "none"]
+  },
+  "queries": {
+    "audits": "queries/audits.scm"
+  },
+  "platforms": [
+    "linux-x64",
+    "osx-arm64",
+    "osx-x64",
+    "win-x64"
+  ],
+  "status": "stable"
+}

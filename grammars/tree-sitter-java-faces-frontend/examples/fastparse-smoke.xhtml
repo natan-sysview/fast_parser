@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:cc="jakarta.faces.composite"
+                xmlns:faces="jakarta.faces"
+                xmlns:jsf="jakarta.faces"
+                xmlns:pt="jakarta.faces.passthrough"
+                xmlns:c="jakarta.tags.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:app="https://example.com/components">
+  <cc:interface>
+    <cc:attribute name="value" />
+  </cc:interface>
+  <cc:implementation>
+    <h:form id="form" rendered="#{bean.visible ? true : false}">
+      <f:ajax event="change" listener="#{bean.change}" />
+      <c:if test="#{not empty bean.items}">
+        <p:commandButton value="#{bean.label}" action="#{bean.save}" />
+        <pe:blockUI target="form" />
+        <app:widget value="${bean.immediate}" />
+        <input jsf:id="search" pt:placeholder="Search" />
+        <faces:element id="meter" value="#{bean.score}" />
+      </c:if>
+    </h:form>
+  </cc:implementation>
+</ui:composition>
