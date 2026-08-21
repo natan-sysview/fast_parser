@@ -2765,6 +2765,14 @@
         },
         {
           "type": "SYMBOL",
+          "name": "jsf_backend_type"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "primefaces_backend_type"
+        },
+        {
+          "type": "SYMBOL",
           "name": "identifier"
         },
         {
@@ -2774,6 +2782,30 @@
         {
           "type": "SYMBOL",
           "name": "parenthesized_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "jsf_backend_static_field_access"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "primefaces_backend_static_field_access"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "jsf_context_method_invocation"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "primefaces_backend_method_invocation"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "jsf_backend_object_creation_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "primefaces_backend_object_creation_expression"
         },
         {
           "type": "SYMBOL",
@@ -2979,6 +3011,184 @@
         }
       ]
     },
+    "jsf_backend_object_creation_expression": {
+      "type": "PREC_RIGHT",
+      "value": 15,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "new"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "REPEAT",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_annotation"
+                    }
+                  },
+                  {
+                    "type": "FIELD",
+                    "name": "type_arguments",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "type_arguments"
+                    }
+                  },
+                  {
+                    "type": "REPEAT",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_annotation"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_annotation"
+                }
+              }
+            ]
+          },
+          {
+            "type": "FIELD",
+            "name": "type",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "jsf_backend_type"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "jsf_backend_generic_type"
+                }
+              ]
+            }
+          },
+          {
+            "type": "FIELD",
+            "name": "arguments",
+            "content": {
+              "type": "SYMBOL",
+              "name": "argument_list"
+            }
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "class_body"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "primefaces_backend_object_creation_expression": {
+      "type": "PREC_RIGHT",
+      "value": 15,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "new"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "REPEAT",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_annotation"
+                    }
+                  },
+                  {
+                    "type": "FIELD",
+                    "name": "type_arguments",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "type_arguments"
+                    }
+                  },
+                  {
+                    "type": "REPEAT",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_annotation"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_annotation"
+                }
+              }
+            ]
+          },
+          {
+            "type": "FIELD",
+            "name": "type",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "primefaces_backend_type"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "primefaces_backend_generic_type"
+                }
+              ]
+            }
+          },
+          {
+            "type": "FIELD",
+            "name": "arguments",
+            "content": {
+              "type": "SYMBOL",
+              "name": "argument_list"
+            }
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "class_body"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
     "_unqualified_object_creation_expression": {
       "type": "PREC_RIGHT",
       "value": 0,
@@ -3126,6 +3336,82 @@
           }
         }
       ]
+    },
+    "jsf_backend_static_field_access": {
+      "type": "PREC",
+      "value": 17,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "object",
+            "content": {
+              "type": "SYMBOL",
+              "name": "jsf_backend_type"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "."
+          },
+          {
+            "type": "FIELD",
+            "name": "field",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "identifier"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_reserved_identifier"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "primefaces_backend_static_field_access": {
+      "type": "PREC",
+      "value": 17,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "object",
+            "content": {
+              "type": "SYMBOL",
+              "name": "primefaces_backend_type"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "."
+          },
+          {
+            "type": "FIELD",
+            "name": "field",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "identifier"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_reserved_identifier"
+                }
+              ]
+            }
+          }
+        ]
+      }
     },
     "template_expression": {
       "type": "SEQ",
@@ -3295,6 +3581,80 @@
           }
         }
       ]
+    },
+    "jsf_context_method_invocation": {
+      "type": "PREC",
+      "value": 17,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "object",
+            "content": {
+              "type": "SYMBOL",
+              "name": "jsf_backend_type"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "."
+          },
+          {
+            "type": "FIELD",
+            "name": "name",
+            "content": {
+              "type": "SYMBOL",
+              "name": "jsf_context_method_identifier"
+            }
+          },
+          {
+            "type": "FIELD",
+            "name": "arguments",
+            "content": {
+              "type": "SYMBOL",
+              "name": "argument_list"
+            }
+          }
+        ]
+      }
+    },
+    "primefaces_backend_method_invocation": {
+      "type": "PREC",
+      "value": 17,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "object",
+            "content": {
+              "type": "SYMBOL",
+              "name": "primefaces_backend_type"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "."
+          },
+          {
+            "type": "FIELD",
+            "name": "name",
+            "content": {
+              "type": "SYMBOL",
+              "name": "primefaces_backend_method_identifier"
+            }
+          },
+          {
+            "type": "FIELD",
+            "name": "arguments",
+            "content": {
+              "type": "SYMBOL",
+              "name": "argument_list"
+            }
+          }
+        ]
+      }
     },
     "argument_list": {
       "type": "SEQ",
@@ -5796,11 +6156,31 @@
             },
             {
               "type": "PATTERN",
+              "value": "javax\\.faces(?:\\.[A-Za-z_][A-Za-z0-9_]*)*"
+            },
+            {
+              "type": "PATTERN",
+              "value": "jakarta\\.faces(?:\\.[A-Za-z_][A-Za-z0-9_]*)*"
+            },
+            {
+              "type": "PATTERN",
+              "value": "org\\.primefaces(?:\\.[A-Za-z_][A-Za-z0-9_]*)*"
+            },
+            {
+              "type": "PATTERN",
               "value": "javax\\.transaction(?:\\.[A-Za-z_][A-Za-z0-9_]*)*"
             },
             {
               "type": "PATTERN",
               "value": "jakarta\\.transaction(?:\\.[A-Za-z_][A-Za-z0-9_]*)*"
+            },
+            {
+              "type": "PATTERN",
+              "value": "javax\\.inject(?:\\.[A-Za-z_][A-Za-z0-9_]*)*"
+            },
+            {
+              "type": "PATTERN",
+              "value": "jakarta\\.inject(?:\\.[A-Za-z_][A-Za-z0-9_]*)*"
             },
             {
               "type": "PATTERN",
@@ -6334,6 +6714,130 @@
           {
             "type": "STRING",
             "value": "Context"
+          },
+          {
+            "type": "STRING",
+            "value": "ManagedBean"
+          },
+          {
+            "type": "STRING",
+            "value": "ManagedProperty"
+          },
+          {
+            "type": "STRING",
+            "value": "ApplicationMap"
+          },
+          {
+            "type": "STRING",
+            "value": "FlowMap"
+          },
+          {
+            "type": "STRING",
+            "value": "HeaderMap"
+          },
+          {
+            "type": "STRING",
+            "value": "HeaderValuesMap"
+          },
+          {
+            "type": "STRING",
+            "value": "InitParameterMap"
+          },
+          {
+            "type": "STRING",
+            "value": "RequestCookieMap"
+          },
+          {
+            "type": "STRING",
+            "value": "RequestMap"
+          },
+          {
+            "type": "STRING",
+            "value": "RequestParameterMap"
+          },
+          {
+            "type": "STRING",
+            "value": "RequestParameterValuesMap"
+          },
+          {
+            "type": "STRING",
+            "value": "SessionMap"
+          },
+          {
+            "type": "STRING",
+            "value": "ViewMap"
+          },
+          {
+            "type": "STRING",
+            "value": "NoneScoped"
+          },
+          {
+            "type": "STRING",
+            "value": "RequestScoped"
+          },
+          {
+            "type": "STRING",
+            "value": "SessionScoped"
+          },
+          {
+            "type": "STRING",
+            "value": "ApplicationScoped"
+          },
+          {
+            "type": "STRING",
+            "value": "ViewScoped"
+          },
+          {
+            "type": "STRING",
+            "value": "CustomScoped"
+          },
+          {
+            "type": "STRING",
+            "value": "FacesBehavior"
+          },
+          {
+            "type": "STRING",
+            "value": "FacesComponent"
+          },
+          {
+            "type": "STRING",
+            "value": "FacesConverter"
+          },
+          {
+            "type": "STRING",
+            "value": "FacesValidator"
+          },
+          {
+            "type": "STRING",
+            "value": "ListenerFor"
+          },
+          {
+            "type": "STRING",
+            "value": "ListenersFor"
+          },
+          {
+            "type": "STRING",
+            "value": "NamedEvent"
+          },
+          {
+            "type": "STRING",
+            "value": "ResourceDependency"
+          },
+          {
+            "type": "STRING",
+            "value": "ResourceDependencies"
+          },
+          {
+            "type": "STRING",
+            "value": "FlowScoped"
+          },
+          {
+            "type": "STRING",
+            "value": "Named"
+          },
+          {
+            "type": "STRING",
+            "value": "Inject"
           },
           {
             "type": "STRING",
@@ -8234,6 +8738,22 @@
           "name": "boolean_type"
         },
         {
+          "type": "SYMBOL",
+          "name": "jsf_backend_generic_type"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "primefaces_backend_generic_type"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "jsf_backend_type"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "primefaces_backend_type"
+        },
+        {
           "type": "ALIAS",
           "content": {
             "type": "SYMBOL",
@@ -8251,6 +8771,944 @@
           "name": "generic_type"
         }
       ]
+    },
+    "jsf_backend_type": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "AbortProcessingException"
+            },
+            {
+              "type": "STRING",
+              "value": "ActionEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "ApplicationConfigurationPopulator"
+            },
+            {
+              "type": "STRING",
+              "value": "ApplicationFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "ApplicationWrapper"
+            },
+            {
+              "type": "STRING",
+              "value": "ArrayDataModel"
+            },
+            {
+              "type": "STRING",
+              "value": "AttributeMap"
+            },
+            {
+              "type": "STRING",
+              "value": "BehaviorBase"
+            },
+            {
+              "type": "STRING",
+              "value": "BehaviorEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "BehaviorHolder"
+            },
+            {
+              "type": "STRING",
+              "value": "BehaviorListener"
+            },
+            {
+              "type": "STRING",
+              "value": "BehaviorRenderer"
+            },
+            {
+              "type": "STRING",
+              "value": "ClientBehavior"
+            },
+            {
+              "type": "STRING",
+              "value": "ClientBehaviorBase"
+            },
+            {
+              "type": "STRING",
+              "value": "ClientBehaviorContext"
+            },
+            {
+              "type": "STRING",
+              "value": "ClientBehaviorHolder"
+            },
+            {
+              "type": "STRING",
+              "value": "ClientWindow"
+            },
+            {
+              "type": "STRING",
+              "value": "CollectionDataModel"
+            },
+            {
+              "type": "STRING",
+              "value": "ComponentSystemEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "ComponentSystemEventListener"
+            },
+            {
+              "type": "STRING",
+              "value": "ConfigurableNavigationHandler"
+            },
+            {
+              "type": "STRING",
+              "value": "ConverterException"
+            },
+            {
+              "type": "STRING",
+              "value": "DataModel"
+            },
+            {
+              "type": "STRING",
+              "value": "DateTimeConverter"
+            },
+            {
+              "type": "STRING",
+              "value": "ExceptionHandler"
+            },
+            {
+              "type": "STRING",
+              "value": "ExceptionHandlerFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "ExceptionHandlerWrapper"
+            },
+            {
+              "type": "STRING",
+              "value": "ExternalContext"
+            },
+            {
+              "type": "STRING",
+              "value": "ExternalContextFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "ExternalContextWrapper"
+            },
+            {
+              "type": "STRING",
+              "value": "FactoryFinder"
+            },
+            {
+              "type": "STRING",
+              "value": "FacesContext"
+            },
+            {
+              "type": "STRING",
+              "value": "FacesContextFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "FacesContextWrapper"
+            },
+            {
+              "type": "STRING",
+              "value": "FacesEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "FacesException"
+            },
+            {
+              "type": "STRING",
+              "value": "FacesMessage"
+            },
+            {
+              "type": "STRING",
+              "value": "FacesServlet"
+            },
+            {
+              "type": "STRING",
+              "value": "Flash"
+            },
+            {
+              "type": "STRING",
+              "value": "Flow"
+            },
+            {
+              "type": "STRING",
+              "value": "FlowBuilder"
+            },
+            {
+              "type": "STRING",
+              "value": "FlowCallBuilder"
+            },
+            {
+              "type": "STRING",
+              "value": "FlowHandler"
+            },
+            {
+              "type": "STRING",
+              "value": "FlowHandlerFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlCommandButton"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlCommandLink"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlDataTable"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlForm"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlGraphicImage"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlInputHidden"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlInputSecret"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlInputText"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlInputTextarea"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlMessage"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlMessages"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlOutputFormat"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlOutputLabel"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlOutputLink"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlOutputText"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlPanelGrid"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlPanelGroup"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlSelectBooleanCheckbox"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlSelectManyCheckbox"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlSelectManyListbox"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlSelectManyMenu"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlSelectOneListbox"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlSelectOneMenu"
+            },
+            {
+              "type": "STRING",
+              "value": "HtmlSelectOneRadio"
+            },
+            {
+              "type": "STRING",
+              "value": "Lifecycle"
+            },
+            {
+              "type": "STRING",
+              "value": "LifecycleFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "ListDataModel"
+            },
+            {
+              "type": "STRING",
+              "value": "MethodExpressionActionListener"
+            },
+            {
+              "type": "STRING",
+              "value": "MethodExpressionValueChangeListener"
+            },
+            {
+              "type": "STRING",
+              "value": "NamingContainer"
+            },
+            {
+              "type": "STRING",
+              "value": "NavigationCase"
+            },
+            {
+              "type": "STRING",
+              "value": "NavigationHandler"
+            },
+            {
+              "type": "STRING",
+              "value": "NumberConverter"
+            },
+            {
+              "type": "STRING",
+              "value": "PartialResponseWriter"
+            },
+            {
+              "type": "STRING",
+              "value": "PartialStateHolder"
+            },
+            {
+              "type": "STRING",
+              "value": "PartialViewContext"
+            },
+            {
+              "type": "STRING",
+              "value": "PartialViewContextFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "PhaseEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "PhaseId"
+            },
+            {
+              "type": "STRING",
+              "value": "PhaseListener"
+            },
+            {
+              "type": "STRING",
+              "value": "ProjectStage"
+            },
+            {
+              "type": "STRING",
+              "value": "RenderKit"
+            },
+            {
+              "type": "STRING",
+              "value": "RenderKitFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "RenderKitWrapper"
+            },
+            {
+              "type": "STRING",
+              "value": "ResponseStateManager"
+            },
+            {
+              "type": "STRING",
+              "value": "ResponseStream"
+            },
+            {
+              "type": "STRING",
+              "value": "ResponseWriter"
+            },
+            {
+              "type": "STRING",
+              "value": "ResourceHandler"
+            },
+            {
+              "type": "STRING",
+              "value": "ResourceHandlerWrapper"
+            },
+            {
+              "type": "STRING",
+              "value": "ResourceWrapper"
+            },
+            {
+              "type": "STRING",
+              "value": "SelectItem"
+            },
+            {
+              "type": "STRING",
+              "value": "SelectItemGroup"
+            },
+            {
+              "type": "STRING",
+              "value": "StateHolder"
+            },
+            {
+              "type": "STRING",
+              "value": "StateHolderSaver"
+            },
+            {
+              "type": "STRING",
+              "value": "StateManagerWrapper"
+            },
+            {
+              "type": "STRING",
+              "value": "SystemEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "SystemEventListener"
+            },
+            {
+              "type": "STRING",
+              "value": "UIColumn"
+            },
+            {
+              "type": "STRING",
+              "value": "UICommand"
+            },
+            {
+              "type": "STRING",
+              "value": "UIComponent"
+            },
+            {
+              "type": "STRING",
+              "value": "UIComponentBase"
+            },
+            {
+              "type": "STRING",
+              "value": "UIComponentClassicTagBase"
+            },
+            {
+              "type": "STRING",
+              "value": "UIComponentELTag"
+            },
+            {
+              "type": "STRING",
+              "value": "UIComponentTag"
+            },
+            {
+              "type": "STRING",
+              "value": "UIData"
+            },
+            {
+              "type": "STRING",
+              "value": "UIForm"
+            },
+            {
+              "type": "STRING",
+              "value": "UIGraphic"
+            },
+            {
+              "type": "STRING",
+              "value": "UIInput"
+            },
+            {
+              "type": "STRING",
+              "value": "UIMessage"
+            },
+            {
+              "type": "STRING",
+              "value": "UIMessages"
+            },
+            {
+              "type": "STRING",
+              "value": "UINamingContainer"
+            },
+            {
+              "type": "STRING",
+              "value": "UIOutcomeTarget"
+            },
+            {
+              "type": "STRING",
+              "value": "UIOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "UIPanel"
+            },
+            {
+              "type": "STRING",
+              "value": "UIParameter"
+            },
+            {
+              "type": "STRING",
+              "value": "UISelectBoolean"
+            },
+            {
+              "type": "STRING",
+              "value": "UISelectItem"
+            },
+            {
+              "type": "STRING",
+              "value": "UISelectItems"
+            },
+            {
+              "type": "STRING",
+              "value": "UISelectMany"
+            },
+            {
+              "type": "STRING",
+              "value": "UISelectOne"
+            },
+            {
+              "type": "STRING",
+              "value": "UIViewAction"
+            },
+            {
+              "type": "STRING",
+              "value": "UIViewParameter"
+            },
+            {
+              "type": "STRING",
+              "value": "UIViewRoot"
+            },
+            {
+              "type": "STRING",
+              "value": "UniqueIdVendor"
+            },
+            {
+              "type": "STRING",
+              "value": "ValidatorException"
+            },
+            {
+              "type": "STRING",
+              "value": "ValueChangeEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "ValueChangeListener"
+            },
+            {
+              "type": "STRING",
+              "value": "ViewDeclarationLanguage"
+            },
+            {
+              "type": "STRING",
+              "value": "ViewDeclarationLanguageFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "ViewHandler"
+            },
+            {
+              "type": "STRING",
+              "value": "ViewHandlerWrapper"
+            },
+            {
+              "type": "STRING",
+              "value": "VisitCallback"
+            },
+            {
+              "type": "STRING",
+              "value": "VisitContext"
+            },
+            {
+              "type": "STRING",
+              "value": "VisitContextFactory"
+            },
+            {
+              "type": "STRING",
+              "value": "VisitHint"
+            },
+            {
+              "type": "STRING",
+              "value": "VisitResult"
+            }
+          ]
+        }
+      }
+    },
+    "jsf_context_method_identifier": {
+      "type": "TOKEN",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "addMessage"
+          },
+          {
+            "type": "STRING",
+            "value": "getApplication"
+          },
+          {
+            "type": "STRING",
+            "value": "getAttributes"
+          },
+          {
+            "type": "STRING",
+            "value": "getClientIdsWithMessages"
+          },
+          {
+            "type": "STRING",
+            "value": "getCurrentInstance"
+          },
+          {
+            "type": "STRING",
+            "value": "getCurrentPhaseId"
+          },
+          {
+            "type": "STRING",
+            "value": "getELContext"
+          },
+          {
+            "type": "STRING",
+            "value": "getExceptionHandler"
+          },
+          {
+            "type": "STRING",
+            "value": "getExternalContext"
+          },
+          {
+            "type": "STRING",
+            "value": "getMaximumSeverity"
+          },
+          {
+            "type": "STRING",
+            "value": "getMessageList"
+          },
+          {
+            "type": "STRING",
+            "value": "getMessages"
+          },
+          {
+            "type": "STRING",
+            "value": "getNamingContainerSeparatorChar"
+          },
+          {
+            "type": "STRING",
+            "value": "getPartialViewContext"
+          },
+          {
+            "type": "STRING",
+            "value": "getRenderKit"
+          },
+          {
+            "type": "STRING",
+            "value": "getRenderResponse"
+          },
+          {
+            "type": "STRING",
+            "value": "getResourceLibraryContracts"
+          },
+          {
+            "type": "STRING",
+            "value": "getResponseComplete"
+          },
+          {
+            "type": "STRING",
+            "value": "getResponseStream"
+          },
+          {
+            "type": "STRING",
+            "value": "getResponseWriter"
+          },
+          {
+            "type": "STRING",
+            "value": "getViewRoot"
+          },
+          {
+            "type": "STRING",
+            "value": "isPostback"
+          },
+          {
+            "type": "STRING",
+            "value": "isProcessingEvents"
+          },
+          {
+            "type": "STRING",
+            "value": "isProjectStage"
+          },
+          {
+            "type": "STRING",
+            "value": "isReleased"
+          },
+          {
+            "type": "STRING",
+            "value": "isValidationFailed"
+          },
+          {
+            "type": "STRING",
+            "value": "release"
+          },
+          {
+            "type": "STRING",
+            "value": "renderResponse"
+          },
+          {
+            "type": "STRING",
+            "value": "responseComplete"
+          },
+          {
+            "type": "STRING",
+            "value": "setCurrentPhaseId"
+          },
+          {
+            "type": "STRING",
+            "value": "setExceptionHandler"
+          },
+          {
+            "type": "STRING",
+            "value": "setProcessingEvents"
+          },
+          {
+            "type": "STRING",
+            "value": "setResourceLibraryContracts"
+          },
+          {
+            "type": "STRING",
+            "value": "setResponseStream"
+          },
+          {
+            "type": "STRING",
+            "value": "setResponseWriter"
+          },
+          {
+            "type": "STRING",
+            "value": "setViewRoot"
+          },
+          {
+            "type": "STRING",
+            "value": "validationFailed"
+          }
+        ]
+      }
+    },
+    "primefaces_backend_type": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "AbstractChartModel"
+            },
+            {
+              "type": "STRING",
+              "value": "AjaxBehavior"
+            },
+            {
+              "type": "STRING",
+              "value": "BarChartModel"
+            },
+            {
+              "type": "STRING",
+              "value": "Carousel"
+            },
+            {
+              "type": "STRING",
+              "value": "ChartModel"
+            },
+            {
+              "type": "STRING",
+              "value": "DefaultStreamedContent"
+            },
+            {
+              "type": "STRING",
+              "value": "DefaultMenuItem"
+            },
+            {
+              "type": "STRING",
+              "value": "DefaultMenuModel"
+            },
+            {
+              "type": "STRING",
+              "value": "DefaultSubMenu"
+            },
+            {
+              "type": "STRING",
+              "value": "DefaultTreeNode"
+            },
+            {
+              "type": "STRING",
+              "value": "Dialog"
+            },
+            {
+              "type": "STRING",
+              "value": "DynamicMenuModel"
+            },
+            {
+              "type": "STRING",
+              "value": "FileUploadEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "FilterMeta"
+            },
+            {
+              "type": "STRING",
+              "value": "LineChartModel"
+            },
+            {
+              "type": "STRING",
+              "value": "LazyDataModel"
+            },
+            {
+              "type": "STRING",
+              "value": "MenuElement"
+            },
+            {
+              "type": "STRING",
+              "value": "MenuItem"
+            },
+            {
+              "type": "STRING",
+              "value": "MenuModel"
+            },
+            {
+              "type": "STRING",
+              "value": "PieChartModel"
+            },
+            {
+              "type": "STRING",
+              "value": "PrimeFaces"
+            },
+            {
+              "type": "STRING",
+              "value": "RequestContext"
+            },
+            {
+              "type": "STRING",
+              "value": "ScheduleEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "ScheduleModel"
+            },
+            {
+              "type": "STRING",
+              "value": "SelectEvent"
+            },
+            {
+              "type": "STRING",
+              "value": "SortMeta"
+            },
+            {
+              "type": "STRING",
+              "value": "StreamedContent"
+            },
+            {
+              "type": "STRING",
+              "value": "TreeNode"
+            }
+          ]
+        }
+      }
+    },
+    "primefaces_backend_method_identifier": {
+      "type": "TOKEN",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "ajax"
+          },
+          {
+            "type": "STRING",
+            "value": "closeDialog"
+          },
+          {
+            "type": "STRING",
+            "value": "current"
+          },
+          {
+            "type": "STRING",
+            "value": "execute"
+          },
+          {
+            "type": "STRING",
+            "value": "executeScript"
+          },
+          {
+            "type": "STRING",
+            "value": "getCurrentInstance"
+          },
+          {
+            "type": "STRING",
+            "value": "openDialog"
+          },
+          {
+            "type": "STRING",
+            "value": "resetInputs"
+          },
+          {
+            "type": "STRING",
+            "value": "scrollTo"
+          },
+          {
+            "type": "STRING",
+            "value": "showMessageInDialog"
+          },
+          {
+            "type": "STRING",
+            "value": "update"
+          }
+        ]
+      }
+    },
+    "jsf_backend_generic_type": {
+      "type": "PREC",
+      "value": 11,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "jsf_backend_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "type_arguments"
+          }
+        ]
+      }
+    },
+    "primefaces_backend_generic_type": {
+      "type": "PREC",
+      "value": 11,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "primefaces_backend_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "type_arguments"
+          }
+        ]
+      }
     },
     "annotated_type": {
       "type": "SEQ",

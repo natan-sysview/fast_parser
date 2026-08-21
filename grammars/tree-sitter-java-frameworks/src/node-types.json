@@ -70,6 +70,22 @@
         "named": true
       },
       {
+        "type": "jsf_backend_generic_type",
+        "named": true
+      },
+      {
+        "type": "jsf_backend_type",
+        "named": true
+      },
+      {
+        "type": "primefaces_backend_generic_type",
+        "named": true
+      },
+      {
+        "type": "primefaces_backend_type",
+        "named": true
+      },
+      {
         "type": "scoped_type_identifier",
         "named": true
       },
@@ -254,6 +270,22 @@
         "named": true
       },
       {
+        "type": "jsf_backend_object_creation_expression",
+        "named": true
+      },
+      {
+        "type": "jsf_backend_static_field_access",
+        "named": true
+      },
+      {
+        "type": "jsf_backend_type",
+        "named": true
+      },
+      {
+        "type": "jsf_context_method_invocation",
+        "named": true
+      },
+      {
         "type": "method_invocation",
         "named": true
       },
@@ -267,6 +299,22 @@
       },
       {
         "type": "parenthesized_expression",
+        "named": true
+      },
+      {
+        "type": "primefaces_backend_method_invocation",
+        "named": true
+      },
+      {
+        "type": "primefaces_backend_object_creation_expression",
+        "named": true
+      },
+      {
+        "type": "primefaces_backend_static_field_access",
+        "named": true
+      },
+      {
+        "type": "primefaces_backend_type",
         "named": true
       },
       {
@@ -2552,6 +2600,153 @@
     }
   },
   {
+    "type": "jsf_backend_generic_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "jsf_backend_type",
+          "named": true
+        },
+        {
+          "type": "type_arguments",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "jsf_backend_object_creation_expression",
+    "named": true,
+    "fields": {
+      "arguments": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "jsf_backend_generic_type",
+            "named": true
+          },
+          {
+            "type": "jsf_backend_type",
+            "named": true
+          }
+        ]
+      },
+      "type_arguments": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_arguments",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "class_body",
+          "named": true
+        },
+        {
+          "type": "framework_annotation",
+          "named": true
+        },
+        {
+          "type": "framework_marker_annotation",
+          "named": true
+        },
+        {
+          "type": "marker_annotation",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "jsf_backend_static_field_access",
+    "named": true,
+    "fields": {
+      "field": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "object": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "jsf_backend_type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "jsf_context_method_invocation",
+    "named": true,
+    "fields": {
+      "arguments": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "jsf_context_method_identifier",
+            "named": true
+          }
+        ]
+      },
+      "object": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "jsf_backend_type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "labeled_statement",
     "named": true,
     "fields": {},
@@ -3128,6 +3323,153 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "primefaces_backend_generic_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "primefaces_backend_type",
+          "named": true
+        },
+        {
+          "type": "type_arguments",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "primefaces_backend_method_invocation",
+    "named": true,
+    "fields": {
+      "arguments": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "primefaces_backend_method_identifier",
+            "named": true
+          }
+        ]
+      },
+      "object": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "primefaces_backend_type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "primefaces_backend_object_creation_expression",
+    "named": true,
+    "fields": {
+      "arguments": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "primefaces_backend_generic_type",
+            "named": true
+          },
+          {
+            "type": "primefaces_backend_type",
+            "named": true
+          }
+        ]
+      },
+      "type_arguments": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_arguments",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "class_body",
+          "named": true
+        },
+        {
+          "type": "framework_annotation",
+          "named": true
+        },
+        {
+          "type": "framework_marker_annotation",
+          "named": true
+        },
+        {
+          "type": "marker_annotation",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "primefaces_backend_static_field_access",
+    "named": true,
+    "fields": {
+      "field": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "object": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "primefaces_backend_type",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -4667,6 +5009,14 @@
     "named": true
   },
   {
+    "type": "jsf_backend_type",
+    "named": true
+  },
+  {
+    "type": "jsf_context_method_identifier",
+    "named": true
+  },
+  {
     "type": "line_comment",
     "named": true,
     "extra": true
@@ -4714,6 +5064,14 @@
   {
     "type": "permits",
     "named": false
+  },
+  {
+    "type": "primefaces_backend_method_identifier",
+    "named": true
+  },
+  {
+    "type": "primefaces_backend_type",
+    "named": true
   },
   {
     "type": "private",

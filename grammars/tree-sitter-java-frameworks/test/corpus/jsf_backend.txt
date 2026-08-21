@@ -1,0 +1,484 @@
+========================================
+JSF backend annotations and imports
+========================================
+
+package demo;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.FacesConverter;
+import javax.faces.component.UIComponent;
+import javax.faces.convert.Converter;
+import org.primefaces.context.RequestContext;
+
+@ManagedBean(name = "clienteBean")
+@ViewScoped
+public class ClienteBean {
+  @ManagedProperty(value = "#{sesionControlador}")
+  private Object sesion;
+
+  void show() {
+    FacesContext.getCurrentInstance().addMessage(null, null);
+    RequestContext.getCurrentInstance().update("panel");
+  }
+}
+
+@FacesConverter(value = "clienteConverter")
+class ClienteConverter implements Converter {
+  public Object getAsObject(FacesContext context, UIComponent component, String value) {
+    return null;
+  }
+}
+
+---
+
+(program
+  (package_declaration
+    (identifier))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (class_declaration
+    (modifiers
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (element_value_pair
+            (identifier)
+            (string_literal
+              (string_fragment)))))
+      (framework_marker_annotation
+        (framework_annotation_identifier)))
+    (identifier)
+    (class_body
+      (field_declaration
+        (modifiers
+          (framework_annotation
+            (framework_annotation_identifier)
+            (annotation_argument_list
+              (element_value_pair
+                (identifier)
+                (string_literal
+                  (string_fragment))))))
+        (type_identifier)
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (expression_statement
+            (method_invocation
+              (jsf_context_method_invocation
+                (jsf_backend_type)
+                (jsf_context_method_identifier)
+                (argument_list))
+              (identifier)
+              (argument_list
+                (null_literal)
+                (null_literal))))
+          (expression_statement
+            (method_invocation
+              (primefaces_backend_method_invocation
+                (primefaces_backend_type)
+                (primefaces_backend_method_identifier)
+                (argument_list))
+              (identifier)
+              (argument_list
+                (string_literal
+                  (string_fragment)))))))))
+  (class_declaration
+    (modifiers
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (element_value_pair
+            (identifier)
+            (string_literal
+              (string_fragment))))))
+    (identifier)
+    (super_interfaces
+      (type_list
+        (type_identifier)))
+    (class_body
+      (method_declaration
+        (modifiers)
+        (type_identifier)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (jsf_backend_type)
+            (identifier))
+          (formal_parameter
+            (jsf_backend_type)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (return_statement
+            (null_literal)))))))
+
+========================================
+JSF backend contracts and factories
+========================================
+
+package demo;
+
+import javax.faces.FacesException;
+import javax.faces.application.Application;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.ExternalContextFactory;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.SystemEvent;
+import javax.faces.event.SystemEventListener;
+
+public class CustomExternalContextFactory extends ExternalContextFactory {
+  public ExternalContext getExternalContext(Object context, Object request, Object response) throws FacesException {
+    return null;
+  }
+}
+
+class StartupListener implements SystemEventListener {
+  public void processEvent(SystemEvent event) throws AbortProcessingException {
+    new FacesMessage(FacesMessage.SEVERITY_INFO, "ready", "ready");
+  }
+
+  public boolean isListenerForSource(Object source) {
+    return source instanceof Application;
+  }
+}
+
+---
+
+(program
+  (package_declaration
+    (identifier))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (class_declaration
+    (modifiers)
+    (identifier)
+    (superclass
+      (jsf_backend_type))
+    (class_body
+      (method_declaration
+        (modifiers)
+        (jsf_backend_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (throws
+          (jsf_backend_type))
+        (block
+          (return_statement
+            (null_literal))))))
+  (class_declaration
+    (identifier)
+    (super_interfaces
+      (type_list
+        (jsf_backend_type)))
+    (class_body
+      (method_declaration
+        (modifiers)
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (jsf_backend_type)
+            (identifier)))
+        (throws
+          (jsf_backend_type))
+        (block
+          (expression_statement
+            (jsf_backend_object_creation_expression
+              (jsf_backend_type)
+              (argument_list
+                (jsf_backend_static_field_access
+                  (jsf_backend_type)
+                  (identifier))
+                (string_literal
+                  (string_fragment))
+                (string_literal
+                  (string_fragment)))))))
+      (method_declaration
+        (modifiers)
+        (boolean_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (block
+          (return_statement
+            (instanceof_expression
+              (identifier)
+              (type_identifier))))))))
+
+========================================
+Jakarta Faces validator and PrimeFaces backend
+========================================
+
+package demo;
+
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.validator.FacesValidator;
+import jakarta.faces.validator.Validator;
+import jakarta.faces.validator.ValidatorException;
+import jakarta.inject.Named;
+import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.LazyDataModel;
+
+@Named("amountBean")
+@jakarta.faces.view.ViewScoped
+class AmountBean {
+  private LazyDataModel<Customer> model;
+
+  void refresh() {
+    PrimeFaces.current().ajax().update("amountForm");
+    new DefaultTreeNode("root", null);
+  }
+}
+
+@FacesValidator("amountValidator")
+class AmountValidator implements Validator<BigDecimal> {
+  public void validate(FacesContext context, UIComponent component, BigDecimal value) throws ValidatorException {
+  }
+}
+
+---
+
+(program
+  (package_declaration
+    (identifier))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (class_declaration
+    (modifiers
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (string_literal
+            (string_fragment))))
+      (framework_marker_annotation
+        (framework_qualified_annotation_name
+          (framework_qualified_name))))
+    (identifier)
+    (class_body
+      (field_declaration
+        (modifiers)
+        (primefaces_backend_generic_type
+          (primefaces_backend_type)
+          (type_arguments
+            (type_identifier)))
+        (variable_declarator
+          (identifier)))
+      (method_declaration
+        (void_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (expression_statement
+            (method_invocation
+              (method_invocation
+                (primefaces_backend_method_invocation
+                  (primefaces_backend_type)
+                  (primefaces_backend_method_identifier)
+                  (argument_list))
+                (identifier)
+                (argument_list))
+              (identifier)
+              (argument_list
+                (string_literal
+                  (string_fragment)))))
+          (expression_statement
+            (primefaces_backend_object_creation_expression
+              (primefaces_backend_type)
+              (argument_list
+                (string_literal
+                  (string_fragment))
+                (null_literal))))))))
+  (class_declaration
+    (modifiers
+      (framework_annotation
+        (framework_annotation_identifier)
+        (annotation_argument_list
+          (string_literal
+            (string_fragment)))))
+    (identifier)
+    (super_interfaces
+      (type_list
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (type_identifier)))))
+    (class_body
+      (method_declaration
+        (modifiers)
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (jsf_backend_type)
+            (identifier))
+          (formal_parameter
+            (jsf_backend_type)
+            (identifier))
+          (formal_parameter
+            (type_identifier)
+            (identifier)))
+        (throws
+          (jsf_backend_type))
+        (block)))))
+
+========================================
+PrimeFaces backend menu model and events
+========================================
+
+package demo;
+
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.menu.DefaultMenuItem;
+import org.primefaces.model.menu.DefaultMenuModel;
+import org.primefaces.model.menu.DefaultSubMenu;
+import org.primefaces.model.menu.DynamicMenuModel;
+import org.primefaces.model.menu.MenuElement;
+import org.primefaces.model.menu.MenuModel;
+
+abstract class MenuBean {
+  private MenuModel menu = new DefaultMenuModel();
+  private MenuModel navigation = new DynamicMenuModel();
+
+  protected MenuElement buildNode() {
+    DefaultMenuItem item = new DefaultMenuItem();
+    return new DefaultSubMenu("root");
+  }
+
+  public void select(SelectEvent event) {
+  }
+}
+
+---
+
+(program
+  (package_declaration
+    (identifier))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (framework_import_declaration
+    (framework_qualified_name))
+  (class_declaration
+    (modifiers)
+    (identifier)
+    (class_body
+      (field_declaration
+        (modifiers)
+        (primefaces_backend_type)
+        (variable_declarator
+          (identifier)
+          (primefaces_backend_object_creation_expression
+            (primefaces_backend_type)
+            (argument_list))))
+      (field_declaration
+        (modifiers)
+        (primefaces_backend_type)
+        (variable_declarator
+          (identifier)
+          (primefaces_backend_object_creation_expression
+            (primefaces_backend_type)
+            (argument_list))))
+      (method_declaration
+        (modifiers)
+        (primefaces_backend_type)
+        (identifier)
+        (formal_parameters)
+        (block
+          (local_variable_declaration
+            (primefaces_backend_type)
+            (variable_declarator
+              (identifier)
+              (primefaces_backend_object_creation_expression
+                (primefaces_backend_type)
+                (argument_list))))
+          (return_statement
+            (primefaces_backend_object_creation_expression
+              (primefaces_backend_type)
+              (argument_list
+                (string_literal
+                  (string_fragment)))))))
+      (method_declaration
+        (modifiers)
+        (void_type)
+        (identifier)
+        (formal_parameters
+          (formal_parameter
+            (primefaces_backend_type)
+            (identifier)))
+        (block)))))

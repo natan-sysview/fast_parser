@@ -13,6 +13,7 @@ Implemented catalogs:
 - `framework_usage_evidence.md`: safe framework evidence through imports, annotations, and JDBC URL literals.
 - `framework_query_families.md`: family-level query captures for framework imports, annotations, calls, constructors, and literals.
 - `framework_support_matrix.md`: final support matrix by framework family, public corpus coverage, negative contract, and stable-release gate.
+- `jsf_backend.md`: JavaServer Faces and PrimeFaces backend syntax nodes, captures, exclusions, and validation evidence.
 
 Validation workflow:
 

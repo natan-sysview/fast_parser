@@ -1,0 +1,94 @@
+name: Java Frameworks Extension CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/java-frameworks-extension-ci.yml"
+      - "bindings/python/**"
+      - "extensions/java-frameworks/**"
+      - "grammars/tree-sitter-java-frameworks/**"
+      - "include/**"
+      - "scripts/package_language_extension.py"
+      - "scripts/validate_language_extension_smoke.py"
+      - "src/**"
+      - "vendor/tree-sitter/**"
+      - "CMakeLists.txt"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/java-frameworks-extension-ci.yml"
+      - "bindings/python/**"
+      - "extensions/java-frameworks/**"
+      - "grammars/tree-sitter-java-frameworks/**"
+      - "include/**"
+      - "scripts/package_language_extension.py"
+      - "scripts/validate_language_extension_smoke.py"
+      - "src/**"
+      - "vendor/tree-sitter/**"
+      - "CMakeLists.txt"
+
+jobs:
+  build-smoke:
+    name: ${{ matrix.os_name }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os_name: Linux
+            runner: ubuntu-latest
+            platform: linux
+            arch: x64
+            archive_glob: dist/languages/*.tar.gz
+          - os_name: macOS
+            runner: macos-14
+            platform: macos
+            arch: arm64
+            archive_glob: dist/languages/*.tar.gz
+          - os_name: Windows
+            runner: windows-latest
+            platform: windows
+            arch: x64
+            archive_glob: dist/languages/*.zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Linux build tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+
+      - name: Configure native build
+        run: cmake -S . -B build-java-frameworks -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build FastParse core
+        run: cmake --build build-java-frameworks --config Release --target tsmp
+
+      - name: Build and package java-frameworks extension
+        run: >
+          python scripts/package_language_extension.py
+          --language java-frameworks
+          --version 0.1.0-ci.${{ github.run_number }}
+          --platform ${{ matrix.platform }}
+          --arch ${{ matrix.arch }}
+          --build-dir build-java-frameworks
+
+      - name: Validate FastParse can load and query extension
+        run: python scripts/validate_language_extension_smoke.py --language java-frameworks
+
+      - name: Upload java-frameworks extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-java-frameworks-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ${{ matrix.archive_glob }}

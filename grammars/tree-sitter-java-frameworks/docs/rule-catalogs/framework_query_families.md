@@ -46,6 +46,9 @@ Early tests showed that promoting those names into grammar tokens can create par
 | Logging | `framework.logging.import` |
 | Apache Commons | `framework.apache_commons.import`, `framework.apache_commons.qualified_type`, `framework.apache_commons.qualified_access` |
 | Servlet | `framework.servlet.import` |
+| JavaServer Faces backend | `framework.jsf.import`, `framework.jsf.annotation`, `framework.jsf.qualified_type`, `framework.jsf.type`, `framework.jsf.constructor`, `framework.jsf.static_field.*`, `framework.jsf.context_call.*`, `framework.jsf.annotated_class.*`, `framework.jsf.contract_class.*`, `framework.jsf.contract_method.*` |
+| PrimeFaces backend | `framework.primefaces.import`, `framework.primefaces.qualified_type`, `framework.primefaces.type`, `framework.primefaces.constructor`, `framework.primefaces.static_field.*`, `framework.primefaces.backend_call.*` |
+| CDI backing-bean support | `framework.cdi.import`, `framework.cdi.annotation` |
 | Bean Validation | `framework.validation.import`, `framework.validation.annotation` |
 | JUnit / Mockito | `framework.junit.import`, `framework.junit.annotation`, `framework.mockito.import`, `framework.mockito.annotation` |
 | Swagger | `framework.swagger.import`, `framework.swagger.annotation` |
@@ -170,6 +173,61 @@ Observed low-volume families:
 - Driver class constants such as Oracle and SQL Server driver class names are now covered by query.
 - The latest false-negative audit reviewed 2224 non-wrapper framework Java files, found 1822 files with framework text evidence, and found 0 likely family misses.
 - Client-local annotations and Java base annotations remain excluded from official framework captures.
+
+## Current JSF / PrimeFaces Backend Audit
+
+Audit artifacts:
+
+- `runs/jsf_backend_completion_primefaces_query_audit.md`
+- `runs/jsf_backend_completion_primefaces_validation.md`
+- `runs/jsf_backend_completion_all_java_frameworks_validation.md`
+- `runs/jsf_backend_completion_mifel_query_regression.md`
+
+Summary:
+
+- Corpus: 7/7 passed.
+- Inventory files: 196 Java files from the Monex PrimeFaces source root.
+- Parse validation: 0 hard failures, 0 `ERROR` nodes, 0 `MISSING` nodes.
+- Query failures: 0.
+- Files with any framework capture: 106.
+- Full Java/frameworks parse regression: 3706 files, 0 hard failures, 0
+  `ERROR` nodes, 0 `MISSING` nodes.
+
+New JSF/PrimeFaces captures:
+
+| Capture | Count | Files |
+| --- | ---: | ---: |
+| `framework.jsf.annotated_class.annotation` | 24 | 14 |
+| `framework.jsf.annotated_class.name` | 24 | 14 |
+| `framework.jsf.import` | 62 | 20 |
+| `framework.jsf.type` | 41 | 9 |
+| `framework.jsf.annotation` | 37 | 15 |
+| `framework.jsf.contract_method.name` | 13 | 4 |
+| `framework.jsf.contract_method.parameter_type` | 13 | 4 |
+| `framework.jsf.constructor` | 8 | 4 |
+| `framework.jsf.contract_class.name` | 4 | 4 |
+| `framework.jsf.extended_type` | 3 | 3 |
+| `framework.jsf.implemented_type` | 1 | 1 |
+| `framework.jsf.qualified_type` | 6 | 1 |
+| `framework.jsf.context_call.target` | 3 | 1 |
+| `framework.jsf.context_call.method` | 3 | 1 |
+| `framework.jsf.static_field.target` | 2 | 1 |
+| `framework.jsf.static_field.name` | 2 | 1 |
+| `framework.primefaces.import` | 23 | 11 |
+| `framework.primefaces.type` | 55 | 10 |
+| `framework.primefaces.constructor` | 10 | 4 |
+| `framework.primefaces.backend_call.target` | 5 | 3 |
+| `framework.primefaces.backend_call.method` | 5 | 3 |
+
+Regression query audit against the original Mifel framework inventory:
+
+- Inventory files: 2264.
+- Files with any framework capture: 1824.
+- Query failures: 0.
+- JSF captures: 0 after excluding ambiguous bare names such as
+  `javax.validation.Validator`.
+- PrimeFaces imported type closure: 0 missing imported PrimeFaces simple type
+  names in the current Java backend corpus.
 
 ## Expansion Rules
 

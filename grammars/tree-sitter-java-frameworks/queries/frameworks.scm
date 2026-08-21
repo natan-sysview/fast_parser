@@ -104,6 +104,18 @@
  (#match? @framework.servlet.import "^(javax|jakarta)\\.servlet\\."))
 
 ((framework_import_declaration
+  name: (framework_qualified_name) @framework.jsf.import)
+ (#match? @framework.jsf.import "^(javax|jakarta)\\.faces\\."))
+
+((framework_import_declaration
+  name: (framework_qualified_name) @framework.primefaces.import)
+ (#match? @framework.primefaces.import "^org\\.primefaces\\."))
+
+((framework_import_declaration
+  name: (framework_qualified_name) @framework.cdi.import)
+ (#match? @framework.cdi.import "^(javax|jakarta)\\.inject\\."))
+
+((framework_import_declaration
   name: (framework_qualified_name) @framework.mail.import)
  (#match? @framework.mail.import "^(javax|jakarta)\\.(mail|activation)\\."))
 
@@ -205,6 +217,63 @@
 ((field_access) @framework.apache_commons.qualified_access
  (#match? @framework.apache_commons.qualified_access "^org\\.apache\\.commons\\."))
 
+((scoped_type_identifier) @framework.jsf.qualified_type
+ (#match? @framework.jsf.qualified_type "^(javax|jakarta)\\.faces\\."))
+
+((scoped_type_identifier) @framework.primefaces.qualified_type
+ (#match? @framework.primefaces.qualified_type "^org\\.primefaces\\."))
+
+((jsf_backend_type) @framework.jsf.type)
+
+((jsf_backend_generic_type
+  (jsf_backend_type) @framework.jsf.generic_type))
+
+((primefaces_backend_type) @framework.primefaces.type)
+
+((primefaces_backend_generic_type
+  (primefaces_backend_type) @framework.primefaces.generic_type))
+
+((jsf_backend_static_field_access
+  object: (jsf_backend_type) @framework.jsf.static_field.target
+  field: (identifier) @framework.jsf.static_field.name))
+
+((primefaces_backend_static_field_access
+  object: (primefaces_backend_type) @framework.primefaces.static_field.target
+  field: (identifier) @framework.primefaces.static_field.name))
+
+((class_declaration
+  (modifiers
+    (framework_marker_annotation
+      name: (_) @framework.jsf.annotated_class.annotation))
+  name: (identifier) @framework.jsf.annotated_class.name)
+ (#match? @framework.jsf.annotated_class.annotation "^(ManagedBean|FacesConverter|FacesValidator|FacesComponent|FacesBehavior|ListenerFor|ListenersFor|NamedEvent|ResourceDependency|ResourceDependencies|NoneScoped|RequestScoped|SessionScoped|ApplicationScoped|ViewScoped|CustomScoped|FlowScoped)$"))
+
+((class_declaration
+  (modifiers
+    (framework_annotation
+      name: (_) @framework.jsf.annotated_class.annotation))
+  name: (identifier) @framework.jsf.annotated_class.name)
+ (#match? @framework.jsf.annotated_class.annotation "^(ManagedBean|FacesConverter|FacesValidator|FacesComponent|FacesBehavior|ListenerFor|ListenersFor|NamedEvent|ResourceDependency|ResourceDependencies|NoneScoped|RequestScoped|SessionScoped|ApplicationScoped|ViewScoped|CustomScoped|FlowScoped)$"))
+
+((class_declaration
+  name: (identifier) @framework.jsf.contract_class.name
+  superclass: (superclass
+    (jsf_backend_type) @framework.jsf.extended_type)))
+
+((class_declaration
+  name: (identifier) @framework.jsf.contract_class.name
+  interfaces: (super_interfaces
+    (type_list
+      (jsf_backend_type) @framework.jsf.implemented_type)))
+ (#match? @framework.jsf.implemented_type "^(Converter|Validator|PhaseListener|ActionListener|ValueChangeListener|SystemEventListener|ComponentSystemEventListener|StateHolder|PartialStateHolder|UniqueIdVendor|NamingContainer)$"))
+
+((method_declaration
+  name: (identifier) @framework.jsf.contract_method.name
+  parameters: (formal_parameters
+    (formal_parameter
+      type: (jsf_backend_type) @framework.jsf.contract_method.parameter_type)))
+ (#match? @framework.jsf.contract_method.name "^(getAsObject|getAsString|validate|beforePhase|afterPhase|getPhaseId|processAction|processEvent|processValueChange|saveState|restoreState|isListenerForSource)$"))
+
 ((scoped_type_identifier) @framework.oracle_driver.qualified_type
  (#match? @framework.oracle_driver.qualified_type "^oracle\\.(jdbc|sql)\\."))
 
@@ -286,6 +355,30 @@
 ((framework_annotation
   name: (_) @framework.jaxrs.annotation)
  (#match? @framework.jaxrs.annotation "^(Path|GET|POST|PUT|DELETE|Produces|Consumes|Context)$"))
+
+((framework_marker_annotation
+  name: (_) @framework.jsf.annotation)
+ (#match? @framework.jsf.annotation "^(ManagedBean|ManagedProperty|NoneScoped|RequestScoped|SessionScoped|ApplicationScoped|ViewScoped|CustomScoped|FacesBehavior|FacesComponent|FacesConverter|FacesValidator|ListenerFor|ListenersFor|NamedEvent|ResourceDependency|ResourceDependencies|FlowScoped)$"))
+
+((framework_annotation
+  name: (_) @framework.jsf.annotation)
+ (#match? @framework.jsf.annotation "^(ManagedBean|ManagedProperty|NoneScoped|RequestScoped|SessionScoped|ApplicationScoped|ViewScoped|CustomScoped|FacesBehavior|FacesComponent|FacesConverter|FacesValidator|ListenerFor|ListenersFor|NamedEvent|ResourceDependency|ResourceDependencies|FlowScoped)$"))
+
+((framework_marker_annotation
+  name: (framework_qualified_annotation_name) @framework.jsf.annotation)
+ (#match? @framework.jsf.annotation "^(javax|jakarta)\\.faces\\."))
+
+((framework_annotation
+  name: (framework_qualified_annotation_name) @framework.jsf.annotation)
+ (#match? @framework.jsf.annotation "^(javax|jakarta)\\.faces\\."))
+
+((framework_marker_annotation
+  name: (_) @framework.cdi.annotation)
+ (#match? @framework.cdi.annotation "^(Named|Inject)$"))
+
+((framework_annotation
+  name: (_) @framework.cdi.annotation)
+ (#match? @framework.cdi.annotation "^(Named|Inject)$"))
 
 ((framework_marker_annotation
   name: (_) @framework.lombok.annotation)
@@ -489,6 +582,27 @@
  (#eq? @framework.nimbus_jose.call.target "JWEObject")
  (#eq? @framework.nimbus_jose.call.method "parse"))
 
+((jsf_context_method_invocation
+  object: (jsf_backend_type) @framework.jsf.context_call.target
+  name: (jsf_context_method_identifier) @framework.jsf.context_call.method)
+ (#eq? @framework.jsf.context_call.target "FacesContext"))
+
+((primefaces_backend_method_invocation
+  object: (primefaces_backend_type) @framework.primefaces.backend_call.target
+  name: (primefaces_backend_method_identifier) @framework.primefaces.backend_call.method))
+
+((method_invocation
+  object: (identifier) @framework.jsf.call.target
+  name: (identifier) @framework.jsf.call.method)
+ (#eq? @framework.jsf.call.target "FacesContext")
+ (#match? @framework.jsf.call.method "^(getCurrentInstance|addMessage|responseComplete)$"))
+
+((method_invocation
+  object: (identifier) @framework.primefaces.call.target
+  name: (identifier) @framework.primefaces.call.method)
+ (#match? @framework.primefaces.call.target "^(RequestContext|PrimeFaces)$")
+ (#match? @framework.primefaces.call.method "^(getCurrentInstance|current|execute|executeScript|ajax|update|resetInputs|scrollTo)$"))
+
 ((object_creation_expression
   type: (type_identifier) @framework.xstream.constructor)
  (#eq? @framework.xstream.constructor "XStream"))
@@ -528,3 +642,17 @@
 ((object_creation_expression
   type: (type_identifier) @framework.json.constructor)
  (#eq? @framework.json.constructor "JSONObject"))
+
+((jsf_backend_object_creation_expression
+  type: (jsf_backend_type) @framework.jsf.constructor))
+
+((jsf_backend_object_creation_expression
+  type: (jsf_backend_generic_type
+    (jsf_backend_type) @framework.jsf.constructor)))
+
+((primefaces_backend_object_creation_expression
+  type: (primefaces_backend_type) @framework.primefaces.constructor))
+
+((primefaces_backend_object_creation_expression
+  type: (primefaces_backend_generic_type
+    (primefaces_backend_type) @framework.primefaces.constructor)))

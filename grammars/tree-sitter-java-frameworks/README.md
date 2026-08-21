@@ -48,6 +48,16 @@ Primary framework evidence nodes:
 - `framework_qualified_annotation_name`
 - `framework_scoped_annotation_name`
 - `jdbc_connection_string`
+- `jsf_backend_type`
+- `jsf_backend_generic_type`
+- `jsf_context_method_invocation`
+- `jsf_backend_static_field_access`
+- `jsf_backend_object_creation_expression`
+- `primefaces_backend_type`
+- `primefaces_backend_generic_type`
+- `primefaces_backend_method_invocation`
+- `primefaces_backend_static_field_access`
+- `primefaces_backend_object_creation_expression`
 
 The family-by-family support contract is documented in `docs/rule-catalogs/framework_support_matrix.md`.
 
