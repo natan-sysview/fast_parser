@@ -297,6 +297,63 @@ if (tabbedDocument.RootElement.GetProperty("hasErrors").GetBoolean())
     throw new InvalidOperationException("published COBOL language NuGet tab-expanded diagnostics smoke found errors");
 }
 
+void AssertAutoSafeCobolClean(string name, string text)
+{
+    var result = parser.ParseBytes(
+        Encoding.UTF8.GetBytes(text),
+        new ParseOptions
+        {
+            Language = "cobol",
+            Format = FastParseFormat.Diagnostics,
+            Normalization = FastParseNormalization.AutoSafe
+        });
+
+    using var document = result.JsonDocument();
+    if (document.RootElement.GetProperty("hasErrors").GetBoolean())
+    {
+        throw new InvalidOperationException($"published COBOL language NuGet fixed-layout normalization smoke failed: {name}");
+    }
+}
+
+AssertAutoSafeCobolClean("left-shifted program", """
+ IDENTIFICATION DIVISION.
+ PROGRAM-ID. KNORRBK.
+ DATA DIVISION.
+ WORKING-STORAGE SECTION.
+ 01 WS-A PIC X.
+ PROCEDURE DIVISION.
+     GOBACK.
+""");
+
+AssertAutoSafeCobolClean("perform thru before paragraph", """
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PCL.
+       PROCEDURE DIVISION.
+       INICIO-PROGRAMA.
+           PERFORM 000-TELA        THRU 000-SAI
+      *
+       010-INICIALIZACAO.
+           GOBACK.
+       000-TELA.
+           EXIT.
+       000-SAI.
+           EXIT.
+""");
+
+AssertAutoSafeCobolClean("continuation to target", """
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. VCP.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 MSGTXT PIC X(80).
+       PROCEDURE DIVISION.
+           IF MSGTXT = SPACES THEN
+              MOVE 'IDENTIFICADOR (,991) NAO FOI INFORMADO'
+      -                             TO MSGTXT
+           ELSE
+              GOBACK.
+""");
+
 Console.WriteLine("FastParser published language NuGet smoke OK");
 Console.WriteLine(parser.Version);
 Console.WriteLine(parser.LibraryPath);

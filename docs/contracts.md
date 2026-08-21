@@ -567,6 +567,9 @@ Current COBOL fixed legacy cleanup:
 - Expands tab characters to fixed-width spaces so fixed-column COBOL layout remains parseable.
 - Removes final legacy EOF/control markers: `0x1A`, `0x7F`, and NUL.
 - Removes final invalid trailer records `FHA` and a lone `*` in column 1.
+- Prepares a conservative fixed-column parser view for sources shifted toward column 1.
+- Adds an in-memory terminator for `PERFORM ... THRU` ranges followed by an area-A paragraph header.
+- Normalizes continuation-marker lines where `-` is followed by `TO` in legacy fixed layout.
 - Does not remove valid fixed-format code records.
 - Does not write normalized source to disk.
 

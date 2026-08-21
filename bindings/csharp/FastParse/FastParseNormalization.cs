@@ -11,6 +11,6 @@ public enum FastParseNormalization
     /// <summary>Do not alter source bytes before parsing.</summary>
     None = 1,
 
-    /// <summary>Apply COBOL fixed-format legacy cleanup such as trailing control-Z and invalid trailer markers.</summary>
+    /// <summary>Apply COBOL fixed-format legacy cleanup and conservative parser-view repairs.</summary>
     CobolFixedLegacy = 2
 }

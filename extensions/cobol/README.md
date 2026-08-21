@@ -1,6 +1,6 @@
 # FastParse COBOL Language Extension
 
-Status: `Preview`
+Status: `Stable`
 
 This extension registers the canonical FastParse parse language:
 
@@ -28,7 +28,7 @@ Package a local native archive:
 ```bash
 python3 scripts/package_language_extension.py \
   --language cobol \
-  --version 0.1.1-preview.1 \
+  --version 0.1.1 \
   --platform macos \
   --arch arm64
 ```
@@ -45,4 +45,4 @@ result = parser.parse_text(cobol_source, language="cobol")
 
 The grammar accepts full COBOL programs, copybook fragments, and COBOL sources with embedded `EXEC SQL ... END-EXEC` blocks. Fixed-column and legacy layout normalization is handled before parsing by FastParse or the lab validation tools.
 
-For NuGet publication, publish the core `FastParser` package and `FastParser.Language.Cobol` as a matched pair. Raw enterprise COBOL can include CP037/EBCDIC files and tab-indented copybooks; those cases require a core version whose `auto_safe` / `cobol_fixed_legacy` normalization decodes detected CP037/EBCDIC input, expands tabs, and removes legacy trailer records in memory.
+For NuGet publication, publish the core `FastParser` package and `FastParser.Language.Cobol` as a matched pair. Raw enterprise COBOL can include CP037/EBCDIC files, tab-indented copybooks, fixed-column sources shifted toward column 1, missing statement terminators before area-A paragraph headers, and continuation marker variants; those cases require a core version whose `auto_safe` / `cobol_fixed_legacy` normalization prepares a conservative in-memory parser view.

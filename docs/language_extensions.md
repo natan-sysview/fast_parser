@@ -381,7 +381,7 @@ parser.load_language_extension("bin/libfastparse_language_cobol.dylib")
 result = parser.parse_bytes(source, language="cobol", fields=["rule", "diagnostics"])
 ```
 
-COBOL is packaged as `FastParser.Language.Cobol` when the release workflow builds all required native RIDs. Publish it against the matching `FastParser` core version: the language package carries the native Tree-sitter grammar, while the core package carries COBOL source normalization such as CP037/EBCDIC decoding, tab expansion, and legacy trailer cleanup. Package smoke tests validate bundled loading and representative raw-layout inputs; corpus-level parse quality remains a separate diagnostics benchmark.
+COBOL is packaged as `FastParser.Language.Cobol` when the release workflow builds all required native RIDs. Publish it against the matching `FastParser` core version: the language package carries the native Tree-sitter grammar, while the core package carries COBOL source normalization such as CP037/EBCDIC decoding, tab expansion, legacy trailer cleanup, and conservative fixed-column parser-view repairs. Package smoke tests validate bundled loading and representative raw-layout inputs; corpus-level parse quality remains a separate diagnostics benchmark.
 
 ## Experimental Python Extension
 

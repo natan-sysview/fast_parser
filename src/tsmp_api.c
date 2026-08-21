@@ -242,6 +242,216 @@ static int slice_has_tab(const unsigned char *source, size_t start, size_t end)
     return 0;
 }
 
+static unsigned char ascii_upper_byte(unsigned char byte)
+{
+    return byte >= 'a' && byte <= 'z' ? (unsigned char)(byte - 32) : byte;
+}
+
+static int ascii_is_space_no_newline(unsigned char byte)
+{
+    return byte == ' ' || byte == '\t' || byte == '\r';
+}
+
+static int ascii_is_label_char(unsigned char byte)
+{
+    return (byte >= 'A' && byte <= 'Z') ||
+           (byte >= 'a' && byte <= 'z') ||
+           (byte >= '0' && byte <= '9') ||
+           byte == '-' ||
+           byte == '_';
+}
+
+static int bytes_starts_with_ci(const unsigned char *source, size_t len, const char *needle)
+{
+    size_t needle_len = strlen(needle);
+    if (len < needle_len) return 0;
+    for (size_t i = 0; i < needle_len; i++) {
+        if (ascii_upper_byte(source[i]) != ascii_upper_byte((unsigned char)needle[i])) return 0;
+    }
+    return 1;
+}
+
+static size_t line_content_end(const unsigned char *source, size_t start, size_t end)
+{
+    while (end > start && (source[end - 1] == '\n' || source[end - 1] == '\r')) {
+        end--;
+    }
+    return end;
+}
+
+static size_t line_trim_end_no_newline(const unsigned char *source, size_t start, size_t end)
+{
+    end = line_content_end(source, start, end);
+    while (end > start && ascii_is_space_no_newline(source[end - 1])) {
+        end--;
+    }
+    return end;
+}
+
+static size_t line_ltrim_spaces(const unsigned char *source, size_t start, size_t end)
+{
+    end = line_content_end(source, start, end);
+    while (start < end && ascii_is_space_no_newline(source[start])) {
+        start++;
+    }
+    return start;
+}
+
+static int cobol_line_is_comment_or_blank(const unsigned char *source, size_t start, size_t end)
+{
+    size_t first = line_ltrim_spaces(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    if (first >= trimmed_end) return 1;
+    return source[first] == '*' || source[first] == '/';
+}
+
+static int cobol_next_code_line(
+    const unsigned char *source,
+    size_t source_len,
+    size_t after,
+    size_t *out_start,
+    size_t *out_end)
+{
+    size_t pos = after;
+    while (pos < source_len) {
+        size_t line_start = pos;
+        while (pos < source_len && source[pos] != '\n') {
+            pos++;
+        }
+        size_t line_end = pos < source_len ? pos + 1 : pos;
+        if (!cobol_line_is_comment_or_blank(source, line_start, line_end)) {
+            *out_start = line_start;
+            *out_end = line_end;
+            return 1;
+        }
+        pos = line_end;
+    }
+    return 0;
+}
+
+static int cobol_line_is_paragraph_header(const unsigned char *source, size_t start, size_t end)
+{
+    size_t content_end = line_trim_end_no_newline(source, start, end);
+    size_t first = line_ltrim_spaces(source, start, end);
+    if (first >= content_end || source[content_end - 1] != '.') return 0;
+    if (first - start > 10) return 0;
+
+    size_t label_end = content_end - 1;
+    while (label_end > first && ascii_is_space_no_newline(source[label_end - 1])) {
+        label_end--;
+    }
+    if (label_end <= first) return 0;
+
+    for (size_t i = first; i < label_end; i++) {
+        if (!ascii_is_label_char(source[i])) return 0;
+    }
+
+    if (bytes_starts_with_ci(source + first, label_end - first, "IF") ||
+        bytes_starts_with_ci(source + first, label_end - first, "ELSE") ||
+        bytes_starts_with_ci(source + first, label_end - first, "END-") ||
+        bytes_starts_with_ci(source + first, label_end - first, "MOVE") ||
+        bytes_starts_with_ci(source + first, label_end - first, "PERFORM")) {
+        return 0;
+    }
+
+    return 1;
+}
+
+static int cobol_line_has_perform_thru_range(const unsigned char *source, size_t start, size_t end)
+{
+    size_t pos = line_ltrim_spaces(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    if (trimmed_end <= pos || source[trimmed_end - 1] == '.') return 0;
+    if (!bytes_starts_with_ci(source + pos, trimmed_end - pos, "PERFORM")) return 0;
+    pos += strlen("PERFORM");
+    if (pos >= trimmed_end || !ascii_is_space_no_newline(source[pos])) return 0;
+
+    int saw_thru = 0;
+    while (pos < trimmed_end) {
+        while (pos < trimmed_end && ascii_is_space_no_newline(source[pos])) pos++;
+        size_t word_start = pos;
+        while (pos < trimmed_end && ascii_is_label_char(source[pos])) pos++;
+        size_t word_len = pos - word_start;
+        if (word_len == 0) return 0;
+        if ((word_len == 4 && bytes_starts_with_ci(source + word_start, word_len, "THRU")) ||
+            (word_len == 3 && bytes_starts_with_ci(source + word_start, word_len, "THU"))) {
+            saw_thru = 1;
+        }
+    }
+    return saw_thru;
+}
+
+static int cobol_should_shift_left_fixed_source(const unsigned char *source, size_t start, size_t end)
+{
+    size_t pos = start;
+    int inspected = 0;
+    while (pos < end && inspected < 100) {
+        size_t line_start = pos;
+        while (pos < end && source[pos] != '\n') pos++;
+        size_t line_end = pos < end ? pos + 1 : pos;
+        pos = line_end;
+        inspected++;
+
+        size_t first = line_ltrim_spaces(source, line_start, line_end);
+        size_t trimmed_end = line_trim_end_no_newline(source, line_start, line_end);
+        if (first >= trimmed_end) continue;
+        if (first - line_start >= 7) continue;
+
+        size_t len = trimmed_end - first;
+        if (bytes_starts_with_ci(source + first, len, "PROGRAM-ID")) return 1;
+        if (bytes_starts_with_ci(source + first, len, "IDENTIFICATION") ||
+            bytes_starts_with_ci(source + first, len, "ENVIRONMENT") ||
+            bytes_starts_with_ci(source + first, len, "DATA") ||
+            bytes_starts_with_ci(source + first, len, "PROCEDURE")) {
+            for (size_t i = first; i + 8 <= trimmed_end; i++) {
+                if (bytes_starts_with_ci(source + i, trimmed_end - i, "DIVISION")) return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+static int cobol_looks_fixed_layout(const unsigned char *source, size_t start, size_t end)
+{
+    size_t pos = start;
+    int sampled = 0;
+    int fixed_like = 0;
+    while (pos < end && sampled < 200) {
+        size_t line_start = pos;
+        while (pos < end && source[pos] != '\n') pos++;
+        size_t line_end = pos < end ? pos + 1 : pos;
+        pos = line_end;
+
+        size_t trimmed_end = line_trim_end_no_newline(source, line_start, line_end);
+        if (line_ltrim_spaces(source, line_start, line_end) >= trimmed_end) continue;
+        sampled++;
+        if (trimmed_end - line_start < 7) continue;
+
+        int prefix_ok = 1;
+        for (size_t i = 0; i < 6; i++) {
+            unsigned char byte = source[line_start + i];
+            if (!(byte == ' ' || (byte >= '0' && byte <= '9'))) {
+                prefix_ok = 0;
+                break;
+            }
+        }
+        unsigned char indicator = source[line_start + 6];
+        if (prefix_ok &&
+            (indicator == ' ' || indicator == '*' || indicator == '/' || indicator == '-' ||
+             indicator == 'D' || indicator == 'd')) {
+            fixed_like++;
+        }
+    }
+    return sampled >= 3 && fixed_like * 100 >= sampled * 60;
+}
+
+static int cobol_needs_fixed_legacy_view(const unsigned char *source, size_t start, size_t end)
+{
+    if (cobol_should_shift_left_fixed_source(source, start, end)) return 1;
+    if (cobol_looks_fixed_layout(source, start, end)) return 1;
+    return 0;
+}
+
 static int copy_cobol_parser_input(
     const unsigned char *source,
     size_t start,
@@ -250,10 +460,16 @@ static int copy_cobol_parser_input(
     size_t *out_len)
 {
     size_t input_len = end > start ? end - start : 0;
-    size_t capacity = input_len * 8 + 1;
-    unsigned char *output = malloc(capacity);
-    if (!output) return TSMP_ERROR_OUT_OF_MEMORY;
+    size_t line_count = 1;
+    for (size_t i = start; i < end; i++) {
+        if (source[i] == '\n') line_count++;
+    }
 
+    size_t expanded_capacity = input_len * 8 + 1;
+    unsigned char *expanded = malloc(expanded_capacity);
+    if (!expanded) return TSMP_ERROR_OUT_OF_MEMORY;
+
+    size_t expanded_len = 0;
     size_t offset = 0;
     size_t column = 0;
     for (size_t i = start; i < end; i++) {
@@ -261,21 +477,84 @@ static int copy_cobol_parser_input(
         if (byte == '\t') {
             size_t spaces = 8 - (column % 8);
             for (size_t s = 0; s < spaces; s++) {
-                output[offset++] = ' ';
+                expanded[offset++] = ' ';
             }
             column += spaces;
             continue;
         }
 
-        output[offset++] = byte;
+        expanded[offset++] = byte;
         if (byte == '\r' || byte == '\n') {
             column = 0;
         } else {
             column++;
         }
     }
-    output[offset] = '\0';
+    expanded[offset] = '\0';
+    expanded_len = offset;
 
+    int shift_left = cobol_should_shift_left_fixed_source(expanded, 0, expanded_len);
+    int fixed_layout = shift_left || cobol_looks_fixed_layout(expanded, 0, expanded_len);
+    size_t capacity = expanded_len + line_count * 8 + 1;
+    unsigned char *output = malloc(capacity);
+    if (!output) {
+        free(expanded);
+        return TSMP_ERROR_OUT_OF_MEMORY;
+    }
+
+    offset = 0;
+    size_t pos = 0;
+    while (pos < expanded_len) {
+        size_t line_start = pos;
+        while (pos < expanded_len && expanded[pos] != '\n') pos++;
+        size_t line_end = pos < expanded_len ? pos + 1 : pos;
+        size_t content_end = line_content_end(expanded, line_start, line_end);
+        size_t current_start = line_start;
+
+        if (shift_left && line_ltrim_spaces(expanded, line_start, line_end) < content_end) {
+            memset(output + offset, ' ', 6);
+            offset += 6;
+        }
+
+        size_t current_end = content_end;
+
+        int blank_indicator_hyphen = 0;
+        if (fixed_layout && content_end > line_start + 8 &&
+            expanded[line_start + 6] == '-' &&
+            ascii_is_space_no_newline(expanded[line_start + 7])) {
+            size_t after_spaces = line_start + 7;
+            while (after_spaces < content_end && ascii_is_space_no_newline(expanded[after_spaces])) {
+                after_spaces++;
+            }
+            if (bytes_starts_with_ci(expanded + after_spaces, content_end - after_spaces, "TO")) {
+                blank_indicator_hyphen = 1;
+            }
+        }
+
+        for (size_t i = current_start; i < current_end; i++) {
+            if (blank_indicator_hyphen && i == line_start + 6) {
+                output[offset++] = ' ';
+            } else {
+                output[offset++] = expanded[i];
+            }
+        }
+
+        if (cobol_line_has_perform_thru_range(expanded, line_start, content_end)) {
+            size_t next_start = 0;
+            size_t next_end = 0;
+            if (cobol_next_code_line(expanded, expanded_len, line_end, &next_start, &next_end) &&
+                cobol_line_is_paragraph_header(expanded, next_start, next_end)) {
+                output[offset++] = '.';
+            }
+        }
+
+        for (size_t i = content_end; i < line_end; i++) {
+            output[offset++] = expanded[i];
+        }
+        pos = line_end;
+    }
+    output[offset] = '\0';
+    free(expanded);
     *out_data = output;
     *out_len = offset;
     return TSMP_OK;
@@ -336,7 +615,7 @@ static int normalize_cobol_fixed_legacy(
         break;
     }
 
-    if (!changed && !slice_has_tab(working, start, end)) {
+    if (!changed && !slice_has_tab(working, start, end) && !cobol_needs_fixed_legacy_view(working, start, end)) {
         free(decoded);
         return TSMP_OK;
     }

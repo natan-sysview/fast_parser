@@ -27,7 +27,7 @@ By default, TSMP does not:
 
 The parent application decides how to read bytes from disk, network, database, editor memory, or any other source.
 
-The V2 API can apply explicit language-specific normalization before parsing. For `language = "cobol"` with `auto_safe` or `cobol_fixed_legacy`, FastParse may decode detected CP037/EBCDIC bytes to UTF-8, expand tab characters to fixed-width spaces, and remove known non-source trailer records in memory. Use `normalization = none` when byte-for-byte original offsets are required.
+The V2 API can apply explicit language-specific normalization before parsing. For `language = "cobol"` with `auto_safe` or `cobol_fixed_legacy`, FastParse may decode detected CP037/EBCDIC bytes to UTF-8, expand tab characters to fixed-width spaces, remove known non-source trailer records, and prepare a conservative fixed-column parser view for common legacy layouts. Use `normalization = none` when byte-for-byte original offsets are required.
 
 ## Empty Input
 

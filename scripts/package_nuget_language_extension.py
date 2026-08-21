@@ -148,7 +148,7 @@ def write_nuspec(language: str, version: str, core_version: str, staging: Path) 
     <version>{escape(version)}</version>
     <authors>natan-sysview</authors>
     <description>FastParse {escape(language)} language extension native assets.</description>
-    <releaseNotes>Preview FastParse language extension for {escape(language)}.</releaseNotes>
+    <releaseNotes>FastParse language extension for {escape(language)}.</releaseNotes>
     <packageTypes>
       <packageType name="Dependency" />
     </packageTypes>

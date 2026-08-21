@@ -590,6 +590,65 @@ class TsmpContractTests(unittest.TestCase):
         self.assertNotIn(b"FHA", result.data)
         self.assertNotIn(b"\\u001a", result.data)
 
+    def test_cobol_auto_safe_normalization_handles_fixed_layout_view_repairs(self) -> None:
+        extension_path = cobol_language_extension_path()
+        if not extension_path.exists():
+            self.skipTest(f"COBOL extension is not built: {extension_path}")
+
+        parser = Tsmp(default_library_path())
+        load_cobol_extension(parser, extension_path)
+        sources = {
+            "left_shifted_program": (
+                b" IDENTIFICATION DIVISION.\n"
+                b" PROGRAM-ID. KNORRBK.\n"
+                b" DATA DIVISION.\n"
+                b" WORKING-STORAGE SECTION.\n"
+                b" 01 WS-A PIC X.\n"
+                b" PROCEDURE DIVISION.\n"
+                b"     GOBACK.\n"
+            ),
+            "perform_thru_before_paragraph": (
+                b"       IDENTIFICATION DIVISION.\n"
+                b"       PROGRAM-ID. PCL.\n"
+                b"       PROCEDURE DIVISION.\n"
+                b"       INICIO-PROGRAMA.\n"
+                b"           PERFORM 000-TELA        THRU 000-SAI\n"
+                b"      *\n"
+                b"       010-INICIALIZACAO.\n"
+                b"           GOBACK.\n"
+                b"       000-TELA.\n"
+                b"           EXIT.\n"
+                b"       000-SAI.\n"
+                b"           EXIT.\n"
+            ),
+            "continuation_to_target": (
+                b"       IDENTIFICATION DIVISION.\n"
+                b"       PROGRAM-ID. VCP.\n"
+                b"       DATA DIVISION.\n"
+                b"       WORKING-STORAGE SECTION.\n"
+                b"       01 MSGTXT PIC X(80).\n"
+                b"       PROCEDURE DIVISION.\n"
+                b"           IF MSGTXT = SPACES THEN\n"
+                b"              MOVE 'IDENTIFICADOR (,991) NAO FOI INFORMADO'\n"
+                b"      -                             TO MSGTXT\n"
+                b"           ELSE\n"
+                b"              GOBACK.\n"
+            ),
+        }
+
+        for name, source in sources.items():
+            with self.subTest(name=name):
+                result = parser.parse_bytes(
+                    source,
+                    language="cobol",
+                    output_format="diagnostics",
+                    normalization="auto_safe",
+                )
+                document = result.json()
+                self.assertFalse(document["hasErrors"])
+                self.assertEqual(document["errorNodeCount"], 0)
+                self.assertEqual(document["missingNodeCount"], 0)
+
     def test_cobol_normalization_can_be_disabled(self) -> None:
         extension_path = cobol_language_extension_path()
         if not extension_path.exists():
