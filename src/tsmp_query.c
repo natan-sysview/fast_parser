@@ -283,12 +283,43 @@ static size_t line_ltrim_spaces(const unsigned char *source, size_t start, size_
     return start;
 }
 
-static int cobol_line_is_comment_or_blank(const unsigned char *source, size_t start, size_t end)
+static int cobol_line_has_fixed_prefix(const unsigned char *source, size_t start, size_t end)
+{
+    size_t content_end = line_content_end(source, start, end);
+    if (content_end <= start + 7) return 0;
+    for (size_t i = 0; i < 6; i++) {
+        unsigned char byte = source[start + i];
+        if (!(byte == ' ' ||
+              (byte >= '0' && byte <= '9') ||
+              (byte >= 'A' && byte <= 'Z') ||
+              (byte >= 'a' && byte <= 'z'))) {
+            return 0;
+        }
+    }
+    unsigned char indicator = source[start + 6];
+    return indicator == ' ' || indicator == '*' || indicator == '/' || indicator == '-' ||
+           indicator == 'D' || indicator == 'd' || (indicator >= '0' && indicator <= '9');
+}
+
+static size_t cobol_line_ltrim_code(const unsigned char *source, size_t start, size_t end)
 {
     size_t first = line_ltrim_spaces(source, start, end);
+    if (first == start && cobol_line_has_fixed_prefix(source, start, end)) {
+        first = start + 7;
+        size_t content_end = line_content_end(source, start, end);
+        while (first < content_end && ascii_is_space_no_newline(source[first])) {
+            first++;
+        }
+    }
+    return first;
+}
+
+static int cobol_line_is_comment_or_blank(const unsigned char *source, size_t start, size_t end)
+{
+    size_t first = cobol_line_ltrim_code(source, start, end);
     size_t trimmed_end = line_trim_end_no_newline(source, start, end);
     if (first >= trimmed_end) return 1;
-    return source[first] == '*' || source[first] == '/';
+    return (source[first] == '*' || source[first] == '/') && first - start <= 6;
 }
 
 static int cobol_next_code_line(
@@ -315,14 +346,45 @@ static int cobol_next_code_line(
     return 0;
 }
 
+static int cobol_previous_code_line(
+    const unsigned char *source,
+    size_t before,
+    size_t *out_start,
+    size_t *out_end)
+{
+    size_t current_end = before;
+    while (current_end > 0) {
+        size_t line_end = current_end;
+        if (line_end > 0 && source[line_end - 1] == '\n') line_end--;
+        if (line_end > 0 && source[line_end - 1] == '\r') line_end--;
+
+        size_t line_start = line_end;
+        while (line_start > 0 && source[line_start - 1] != '\n') line_start--;
+        current_end = line_start > 0 ? line_start - 1 : 0;
+
+        if (!cobol_line_is_comment_or_blank(source, line_start, line_end)) {
+            *out_start = line_start;
+            *out_end = line_end;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static int cobol_line_is_paragraph_header(const unsigned char *source, size_t start, size_t end)
 {
     size_t content_end = line_trim_end_no_newline(source, start, end);
-    size_t first = line_ltrim_spaces(source, start, end);
-    if (first >= content_end || source[content_end - 1] != '.') return 0;
+    size_t first = cobol_line_ltrim_code(source, start, end);
+    if (first >= content_end) return 0;
     if (first - start > 10) return 0;
 
-    size_t label_end = content_end - 1;
+    size_t first_period = first;
+    while (first_period < content_end && source[first_period] != '.') {
+        first_period++;
+    }
+    if (first_period >= content_end) return 0;
+
+    size_t label_end = first_period;
     while (label_end > first && ascii_is_space_no_newline(source[label_end - 1])) {
         label_end--;
     }
@@ -336,7 +398,11 @@ static int cobol_line_is_paragraph_header(const unsigned char *source, size_t st
         bytes_starts_with_ci(source + first, label_end - first, "ELSE") ||
         bytes_starts_with_ci(source + first, label_end - first, "END-") ||
         bytes_starts_with_ci(source + first, label_end - first, "MOVE") ||
-        bytes_starts_with_ci(source + first, label_end - first, "PERFORM")) {
+        bytes_starts_with_ci(source + first, label_end - first, "PERFORM") ||
+        bytes_starts_with_ci(source + first, label_end - first, "DISPLAY") ||
+        bytes_starts_with_ci(source + first, label_end - first, "EXIT") ||
+        bytes_starts_with_ci(source + first, label_end - first, "GOBACK") ||
+        bytes_starts_with_ci(source + first, label_end - first, "STOP")) {
         return 0;
     }
 
@@ -345,7 +411,7 @@ static int cobol_line_is_paragraph_header(const unsigned char *source, size_t st
 
 static int cobol_line_has_perform_thru_range(const unsigned char *source, size_t start, size_t end)
 {
-    size_t pos = line_ltrim_spaces(source, start, end);
+    size_t pos = cobol_line_ltrim_code(source, start, end);
     size_t trimmed_end = line_trim_end_no_newline(source, start, end);
     if (trimmed_end <= pos || source[trimmed_end - 1] == '.') return 0;
     if (!bytes_starts_with_ci(source + pos, trimmed_end - pos, "PERFORM")) return 0;
@@ -365,6 +431,537 @@ static int cobol_line_has_perform_thru_range(const unsigned char *source, size_t
         }
     }
     return saw_thru;
+}
+
+static int cobol_line_starts_statement_that_can_end_before_paragraph(
+    const unsigned char *source,
+    size_t start,
+    size_t end)
+{
+    size_t pos = cobol_line_ltrim_code(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    if (trimmed_end <= pos) return 0;
+
+    size_t word_start = pos;
+    while (pos < trimmed_end && ascii_is_label_char(source[pos])) pos++;
+    size_t word_len = pos - word_start;
+    if (word_len == 0) return 0;
+
+    static const char *const statements[] = {
+        "ACCEPT", "ADD", "CALL", "CLOSE", "COMPUTE", "DELETE", "DISPLAY",
+        "DIVIDE", "EVALUATE", "GO", "GOBACK", "INITIALIZE", "INSPECT",
+        "MOVE", "MULTIPLY", "OPEN", "PERFORM", "READ", "REWRITE",
+        "SEARCH", "SET", "SORT", "START", "STOP", "STRING", "SUBTRACT",
+        "UNSTRING", "WRITE"
+    };
+
+    for (size_t i = 0; i < sizeof(statements) / sizeof(statements[0]); i++) {
+        size_t statement_len = strlen(statements[i]);
+        if (word_len == statement_len &&
+            bytes_starts_with_ci(source + word_start, word_len, statements[i])) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int cobol_line_has_unbalanced_quotes(const unsigned char *source, size_t start, size_t end)
+{
+    size_t pos = cobol_line_ltrim_code(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    int single_quotes = 0;
+    int double_quotes = 0;
+    for (; pos < trimmed_end; pos++) {
+        if (source[pos] == '\'') single_quotes = !single_quotes;
+        if (source[pos] == '"') double_quotes = !double_quotes;
+    }
+    return single_quotes || double_quotes;
+}
+
+static int cobol_line_starts_with_word(const unsigned char *source, size_t start, size_t end, const char *word)
+{
+    size_t pos = cobol_line_ltrim_code(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    size_t word_len = strlen(word);
+    if (trimmed_end - pos < word_len) return 0;
+    if (!bytes_starts_with_ci(source + pos, trimmed_end - pos, word)) return 0;
+    return pos + word_len >= trimmed_end || !ascii_is_label_char(source[pos + word_len]);
+}
+
+static int cobol_line_ends_with_word(const unsigned char *source, size_t start, size_t end, const char *word)
+{
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    size_t word_len = strlen(word);
+    if (trimmed_end < start + word_len) return 0;
+    size_t word_start = trimmed_end - word_len;
+    if (word_start > start && ascii_is_label_char(source[word_start - 1])) return 0;
+    if (!bytes_starts_with_ci(source + word_start, word_len, word)) return 0;
+    return 1;
+}
+
+static int cobol_line_contains_word(
+    const unsigned char *source,
+    size_t start,
+    size_t end,
+    const char *word)
+{
+    size_t pos = cobol_line_ltrim_code(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    size_t word_len = strlen(word);
+    while (pos + word_len <= trimmed_end) {
+        if ((pos == start || !ascii_is_label_char(source[pos - 1])) &&
+            bytes_starts_with_ci(source + pos, trimmed_end - pos, word) &&
+            (pos + word_len == trimmed_end || !ascii_is_label_char(source[pos + word_len]))) {
+            return 1;
+        }
+        pos++;
+    }
+    return 0;
+}
+
+static int cobol_line_has_pending_start_key(
+    const unsigned char *source,
+    size_t start,
+    size_t end)
+{
+    if (!cobol_line_starts_with_word(source, start, end, "START")) return 0;
+    if (!cobol_line_contains_word(source, start, end, "KEY")) return 0;
+    return cobol_line_ends_with_word(source, start, end, "KEY") ||
+           cobol_line_ends_with_word(source, start, end, "EQUAL") ||
+           cobol_line_ends_with_word(source, start, end, "GREATER") ||
+           cobol_line_ends_with_word(source, start, end, "LESS") ||
+           cobol_line_ends_with_word(source, start, end, "THAN") ||
+           cobol_line_ends_with_word(source, start, end, "NOT");
+}
+
+static int cobol_line_should_append_dummy_display_at(
+    const unsigned char *source,
+    size_t source_len,
+    size_t start,
+    size_t end)
+{
+    if (!cobol_line_starts_with_word(source, start, end, "DISPLAY")) return 0;
+    if (!cobol_line_ends_with_word(source, start, end, "AT")) return 0;
+    size_t next_start = 0;
+    size_t next_end = 0;
+    return cobol_next_code_line(source, source_len, end, &next_start, &next_end) &&
+           cobol_line_starts_statement_that_can_end_before_paragraph(source, next_start, next_end);
+}
+
+static int cobol_if_open_paren_balance_before_line(
+    const unsigned char *source,
+    size_t line_start,
+    size_t line_end,
+    int *out_balance)
+{
+    size_t scan_end = line_end;
+    int inspected = 0;
+    size_t if_start = 0;
+    while (scan_end > 0 && inspected < 40) {
+        size_t prev_end = scan_end;
+        if (prev_end > 0 && source[prev_end - 1] == '\n') prev_end--;
+        if (prev_end > 0 && source[prev_end - 1] == '\r') prev_end--;
+        size_t prev_start = prev_end;
+        while (prev_start > 0 && source[prev_start - 1] != '\n') prev_start--;
+        inspected++;
+        if (cobol_line_is_paragraph_header(source, prev_start, prev_end)) return 0;
+        if (cobol_line_starts_with_word(source, prev_start, prev_end, "IF")) {
+            if_start = prev_start;
+            break;
+        }
+        scan_end = prev_start > 0 ? prev_start - 1 : 0;
+    }
+    if (if_start == 0 && !cobol_line_starts_with_word(source, if_start, line_end, "IF")) return 0;
+
+    int balance = 0;
+    int single_quote = 0;
+    int double_quote = 0;
+    for (size_t i = if_start; i < line_end; i++) {
+        unsigned char ch = source[i];
+        if (ch == '\'' && !double_quote) single_quote = !single_quote;
+        if (ch == '"' && !single_quote) double_quote = !double_quote;
+        if (single_quote || double_quote) continue;
+        if (ch == '(') balance++;
+        if (ch == ')' && balance > 0) balance--;
+    }
+    if (balance <= 0 || balance > 8) return 0;
+    *out_balance = balance;
+    return 1;
+}
+
+static int cobol_line_should_append_if_close_parens(
+    const unsigned char *source,
+    size_t source_len,
+    size_t start,
+    size_t end,
+    int *out_count)
+{
+    if (cobol_line_starts_statement_that_can_end_before_paragraph(source, start, end)) return 0;
+    size_t next_start = 0;
+    size_t next_end = 0;
+    if (!cobol_next_code_line(source, source_len, end, &next_start, &next_end)) return 0;
+    if (!cobol_line_starts_statement_that_can_end_before_paragraph(source, next_start, next_end)) return 0;
+    return cobol_if_open_paren_balance_before_line(source, start, end, out_count);
+}
+
+static int cobol_source_starts_with_procedure_copybook(
+    const unsigned char *source,
+    size_t source_len)
+{
+    size_t first_start = 0;
+    size_t first_end = 0;
+    if (!cobol_next_code_line(source, source_len, 0, &first_start, &first_end)) return 0;
+    if (!cobol_line_is_paragraph_header(source, first_start, first_end)) return 0;
+
+    size_t pos = first_start;
+    size_t trimmed_end = line_trim_end_no_newline(source, first_start, first_end);
+    size_t len = trimmed_end > pos ? trimmed_end - pos : 0;
+    if (bytes_starts_with_ci(source + pos, len, "IDENTIFICATION") ||
+        bytes_starts_with_ci(source + pos, len, "ENVIRONMENT") ||
+        bytes_starts_with_ci(source + pos, len, "DATA") ||
+        bytes_starts_with_ci(source + pos, len, "PROCEDURE")) {
+        return 0;
+    }
+    return 1;
+}
+
+static int cobol_line_period_before_at_position(
+    const unsigned char *source,
+    size_t start,
+    size_t end,
+    size_t *out_period)
+{
+    if (!cobol_line_starts_with_word(source, start, end, "DISPLAY")) return 0;
+    size_t pos = cobol_line_ltrim_code(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    while (pos + 2 < trimmed_end) {
+        if (source[pos] == '.' &&
+            ascii_is_space_no_newline(source[pos + 1])) {
+            size_t at_pos = pos + 1;
+            while (at_pos < trimmed_end && ascii_is_space_no_newline(source[at_pos])) at_pos++;
+            if (bytes_starts_with_ci(source + at_pos, trimmed_end - at_pos, "AT")) {
+                *out_period = pos;
+                return 1;
+            }
+        }
+        pos++;
+    }
+    return 0;
+}
+
+static int cobol_line_has_suffix_period_after_area_b(
+    const unsigned char *source,
+    size_t start,
+    size_t end)
+{
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    if (trimmed_end <= start + 72) return 0;
+    if (source[start + 72] != '.') return 0;
+    for (size_t i = start + 73; i < trimmed_end; i++) {
+        if (!ascii_is_space_no_newline(source[i])) return 0;
+    }
+    return 1;
+}
+
+static int cobol_line_is_else_only(const unsigned char *source, size_t start, size_t end)
+{
+    size_t pos = cobol_line_ltrim_code(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    return trimmed_end - pos == 4 && bytes_starts_with_ci(source + pos, trimmed_end - pos, "ELSE");
+}
+
+static int cobol_line_is_bare_label_with_period(const unsigned char *source, size_t start, size_t end)
+{
+    size_t pos = cobol_line_ltrim_code(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    if (trimmed_end <= pos || source[trimmed_end - 1] != '.') return 0;
+    for (size_t i = pos; i + 1 < trimmed_end; i++) {
+        if (!ascii_is_label_char(source[i])) return 0;
+    }
+    return trimmed_end - pos > 1;
+}
+
+static int cobol_line_should_insert_go_after_else(const unsigned char *source, size_t start, size_t end)
+{
+    if (!cobol_line_is_bare_label_with_period(source, start, end)) return 0;
+    size_t prev_start = 0;
+    size_t prev_end = 0;
+    return cobol_previous_code_line(source, start, &prev_start, &prev_end) &&
+           cobol_line_is_else_only(source, prev_start, prev_end);
+}
+
+static int cobol_line_leading_level_prefix_digit(
+    const unsigned char *source,
+    size_t start,
+    size_t end,
+    size_t *out_digit)
+{
+    size_t pos = line_ltrim_spaces(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    if (pos >= trimmed_end || pos - start > 8) return 0;
+    if (source[pos] < '0' || source[pos] > '9') return 0;
+
+    size_t after_digit = pos + 1;
+    if (after_digit >= trimmed_end || !ascii_is_space_no_newline(source[after_digit])) return 0;
+    while (after_digit < trimmed_end && ascii_is_space_no_newline(source[after_digit])) after_digit++;
+    if (after_digit + 1 >= trimmed_end) return 0;
+    if (source[after_digit] < '0' || source[after_digit] > '9') return 0;
+    if (source[after_digit + 1] < '0' || source[after_digit + 1] > '9') return 0;
+    if (after_digit + 2 < trimmed_end && !ascii_is_space_no_newline(source[after_digit + 2])) return 0;
+
+    int level = (source[after_digit] - '0') * 10 + (source[after_digit + 1] - '0');
+    if (!((level >= 1 && level <= 49) || level == 66 || level == 77 || level == 88)) return 0;
+    *out_digit = pos;
+    return 1;
+}
+
+static int cobol_display_statement_is_open_before_line(
+    const unsigned char *source,
+    size_t before)
+{
+    size_t current_end = before;
+    int inspected = 0;
+    while (current_end > 0 && inspected < 120) {
+        size_t line_end = current_end;
+        if (line_end > 0 && source[line_end - 1] == '\n') line_end--;
+        if (line_end > 0 && source[line_end - 1] == '\r') line_end--;
+
+        size_t line_start = line_end;
+        while (line_start > 0 && source[line_start - 1] != '\n') line_start--;
+        current_end = line_start > 0 ? line_start - 1 : 0;
+        inspected++;
+
+        if (cobol_line_is_comment_or_blank(source, line_start, line_end)) continue;
+        if (cobol_line_is_paragraph_header(source, line_start, line_end)) return 0;
+
+        size_t trimmed_end = line_trim_end_no_newline(source, line_start, line_end);
+        if (trimmed_end > line_start && source[trimmed_end - 1] == '.') return 0;
+        if (cobol_line_starts_with_word(source, line_start, line_end, "DISPLAY")) return 1;
+        if (cobol_line_starts_with_word(source, line_start, line_end, "EXEC")) return 0;
+    }
+    return 0;
+}
+
+static int cobol_move_statement_is_open_before_line(
+    const unsigned char *source,
+    size_t before)
+{
+    size_t current_end = before;
+    int inspected = 0;
+    while (current_end > 0 && inspected < 30) {
+        size_t line_end = current_end;
+        if (line_end > 0 && source[line_end - 1] == '\n') line_end--;
+        if (line_end > 0 && source[line_end - 1] == '\r') line_end--;
+
+        size_t line_start = line_end;
+        while (line_start > 0 && source[line_start - 1] != '\n') line_start--;
+        current_end = line_start > 0 ? line_start - 1 : 0;
+        inspected++;
+
+        if (cobol_line_is_comment_or_blank(source, line_start, line_end)) continue;
+        if (cobol_line_is_paragraph_header(source, line_start, line_end)) return 0;
+
+        size_t trimmed_end = line_trim_end_no_newline(source, line_start, line_end);
+        if (trimmed_end > line_start && source[trimmed_end - 1] == '.') return 0;
+        if (cobol_line_starts_with_word(source, line_start, line_end, "MOVE")) return 1;
+        if (cobol_line_starts_with_word(source, line_start, line_end, "EXEC")) return 0;
+    }
+    return 0;
+}
+
+static int cobol_compute_statement_is_open_before_line(
+    const unsigned char *source,
+    size_t before)
+{
+    size_t current_end = before;
+    int inspected = 0;
+    while (current_end > 0 && inspected < 120) {
+        size_t line_end = current_end;
+        if (line_end > 0 && source[line_end - 1] == '\n') line_end--;
+        if (line_end > 0 && source[line_end - 1] == '\r') line_end--;
+
+        size_t line_start = line_end;
+        while (line_start > 0 && source[line_start - 1] != '\n') line_start--;
+        current_end = line_start > 0 ? line_start - 1 : 0;
+        inspected++;
+
+        if (cobol_line_is_comment_or_blank(source, line_start, line_end)) continue;
+        if (cobol_line_is_paragraph_header(source, line_start, line_end)) return 0;
+
+        size_t trimmed_end = line_trim_end_no_newline(source, line_start, line_end);
+        if (trimmed_end > line_start && source[trimmed_end - 1] == '.') return 0;
+        if (cobol_line_starts_with_word(source, line_start, line_end, "COMPUTE")) return 1;
+        if (cobol_line_starts_with_word(source, line_start, line_end, "EXEC")) return 0;
+    }
+    return 0;
+}
+
+static int cobol_line_should_get_period_before_paragraph(
+    const unsigned char *source,
+    size_t source_len,
+    size_t start,
+    size_t end)
+{
+    size_t pos = cobol_line_ltrim_code(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    if (trimmed_end <= pos || source[trimmed_end - 1] == '.') return 0;
+    if (cobol_line_is_comment_or_blank(source, start, end)) return 0;
+    if (trimmed_end > start + 6 && source[start + 6] == '-') return 0;
+    if (bytes_starts_with_ci(source + pos, trimmed_end - pos, "EXEC")) return 0;
+    if (!cobol_line_starts_statement_that_can_end_before_paragraph(source, start, end) &&
+        !cobol_display_statement_is_open_before_line(source, start) &&
+        !cobol_move_statement_is_open_before_line(source, start) &&
+        !cobol_compute_statement_is_open_before_line(source, start)) {
+        return 0;
+    }
+
+    unsigned char last = source[trimmed_end - 1];
+    if (last == '(' || last == ',' || last == '+' || last == '-' || last == '*' ||
+        last == '/' || last == '=') {
+        return 0;
+    }
+    if (cobol_line_has_unbalanced_quotes(source, start, end)) return 0;
+
+    size_t next_start = 0;
+    size_t next_end = 0;
+    if (!cobol_next_code_line(source, source_len, end, &next_start, &next_end)) return 0;
+    if (cobol_line_is_paragraph_header(source, next_start, next_end) &&
+        cobol_line_has_pending_start_key(source, start, end)) {
+        return 0;
+    }
+    return cobol_line_is_paragraph_header(source, next_start, next_end);
+}
+
+static int cobol_line_should_get_period_before_next_statement(
+    const unsigned char *source,
+    size_t source_len,
+    size_t start,
+    size_t end)
+{
+    size_t pos = cobol_line_ltrim_code(source, start, end);
+    size_t trimmed_end = line_trim_end_no_newline(source, start, end);
+    if (trimmed_end <= pos || source[trimmed_end - 1] == '.') return 0;
+    if (cobol_line_is_comment_or_blank(source, start, end)) return 0;
+    if (trimmed_end > start + 6 && source[start + 6] == '-') return 0;
+    if (!cobol_line_starts_statement_that_can_end_before_paragraph(source, start, end) &&
+        !cobol_display_statement_is_open_before_line(source, start) &&
+        !cobol_move_statement_is_open_before_line(source, start) &&
+        !cobol_compute_statement_is_open_before_line(source, start)) {
+        return 0;
+    }
+
+    unsigned char last = source[trimmed_end - 1];
+    if (last == '(' || last == ',' || last == '+' || last == '-' || last == '*' ||
+        last == '/' || last == '=') {
+        return 0;
+    }
+    if (cobol_line_has_unbalanced_quotes(source, start, end)) return 0;
+
+    size_t next_start = 0;
+    size_t next_end = 0;
+    return cobol_next_code_line(source, source_len, end, &next_start, &next_end) &&
+           cobol_line_starts_statement_that_can_end_before_paragraph(source, next_start, next_end);
+}
+
+static int cobol_line_should_get_standalone_period_after_suffix(
+    const unsigned char *source,
+    size_t source_len,
+    size_t start,
+    size_t end)
+{
+    if (!cobol_line_has_suffix_period_after_area_b(source, start, end)) return 0;
+    if (cobol_line_is_comment_or_blank(source, start, end)) return 0;
+    if (!cobol_line_starts_statement_that_can_end_before_paragraph(source, start, end) &&
+        !cobol_display_statement_is_open_before_line(source, start) &&
+        !cobol_move_statement_is_open_before_line(source, start) &&
+        !cobol_compute_statement_is_open_before_line(source, start)) {
+        return 0;
+    }
+
+    size_t next_start = 0;
+    size_t next_end = 0;
+    if (!cobol_next_code_line(source, source_len, end, &next_start, &next_end)) return 0;
+    return cobol_line_is_paragraph_header(source, next_start, next_end) ||
+           cobol_line_starts_statement_that_can_end_before_paragraph(source, next_start, next_end);
+}
+
+static int cobol_needs_period_before_paragraph_repair(
+    const unsigned char *source,
+    size_t start,
+    size_t end)
+{
+    size_t pos = start;
+    while (pos < end) {
+        size_t line_start = pos;
+        while (pos < end && source[pos] != '\n') pos++;
+        size_t line_end = pos < end ? pos + 1 : pos;
+        int close_parens = 0;
+        if (cobol_line_should_get_period_before_paragraph(source, end, line_start, line_end) ||
+            cobol_line_should_get_period_before_next_statement(source, end, line_start, line_end) ||
+            cobol_line_should_get_standalone_period_after_suffix(source, end, line_start, line_end) ||
+            cobol_line_should_append_if_close_parens(source, end, line_start, line_end, &close_parens)) {
+            return 1;
+        }
+        pos = line_end;
+    }
+    return 0;
+}
+
+static int cobol_needs_else_bare_label_repair(
+    const unsigned char *source,
+    size_t start,
+    size_t end)
+{
+    size_t pos = start;
+    while (pos < end) {
+        size_t line_start = pos;
+        while (pos < end && source[pos] != '\n') pos++;
+        size_t line_end = pos < end ? pos + 1 : pos;
+        if (cobol_line_should_insert_go_after_else(source, line_start, line_end)) {
+            return 1;
+        }
+        pos = line_end;
+    }
+    return 0;
+}
+
+static int cobol_needs_leading_level_prefix_digit_repair(
+    const unsigned char *source,
+    size_t start,
+    size_t end)
+{
+    size_t pos = start;
+    while (pos < end) {
+        size_t line_start = pos;
+        while (pos < end && source[pos] != '\n') pos++;
+        size_t line_end = pos < end ? pos + 1 : pos;
+        size_t digit = 0;
+        if (cobol_line_leading_level_prefix_digit(source, line_start, line_end, &digit)) {
+            return 1;
+        }
+        pos = line_end;
+    }
+    return 0;
+}
+
+static int cobol_needs_display_line_repair(
+    const unsigned char *source,
+    size_t start,
+    size_t end)
+{
+    size_t pos = start;
+    while (pos < end) {
+        size_t line_start = pos;
+        while (pos < end && source[pos] != '\n') pos++;
+        size_t line_end = pos < end ? pos + 1 : pos;
+        size_t period = 0;
+        if (cobol_line_should_append_dummy_display_at(source, end, line_start, line_end) ||
+            cobol_line_period_before_at_position(source, line_start, line_end, &period)) {
+            return 1;
+        }
+        pos = line_end;
+    }
+    return 0;
 }
 
 static int cobol_should_shift_left_fixed_source(const unsigned char *source, size_t start, size_t end)
@@ -416,7 +1013,10 @@ static int cobol_looks_fixed_layout(const unsigned char *source, size_t start, s
         int prefix_ok = 1;
         for (size_t i = 0; i < 6; i++) {
             unsigned char byte = source[line_start + i];
-            if (!(byte == ' ' || (byte >= '0' && byte <= '9'))) {
+            if (!(byte == ' ' ||
+                  (byte >= '0' && byte <= '9') ||
+                  (byte >= 'A' && byte <= 'Z') ||
+                  (byte >= 'a' && byte <= 'z'))) {
                 prefix_ok = 0;
                 break;
             }
@@ -424,7 +1024,7 @@ static int cobol_looks_fixed_layout(const unsigned char *source, size_t start, s
         unsigned char indicator = source[line_start + 6];
         if (prefix_ok &&
             (indicator == ' ' || indicator == '*' || indicator == '/' || indicator == '-' ||
-             indicator == 'D' || indicator == 'd')) {
+             indicator == 'D' || indicator == 'd' || (indicator >= '0' && indicator <= '9'))) {
             fixed_like++;
         }
     }
@@ -481,7 +1081,10 @@ static int copy_cobol_parser_input(
 
     int shift_left = cobol_should_shift_left_fixed_source(expanded, 0, expanded_len);
     int fixed_layout = shift_left || cobol_looks_fixed_layout(expanded, 0, expanded_len);
-    size_t capacity = expanded_len + line_count * 8 + 1;
+    int wrap_procedure_copybook = cobol_source_starts_with_procedure_copybook(expanded, expanded_len);
+    static const unsigned char procedure_copybook_prefix[] = "       PROCEDURE DIVISION.\n";
+    size_t prefix_len = wrap_procedure_copybook ? sizeof(procedure_copybook_prefix) - 1 : 0;
+    size_t capacity = expanded_len + line_count * 24 + prefix_len + 1;
     unsigned char *output = malloc(capacity);
     if (!output) {
         free(expanded);
@@ -489,6 +1092,10 @@ static int copy_cobol_parser_input(
     }
 
     offset = 0;
+    if (wrap_procedure_copybook) {
+        memcpy(output + offset, procedure_copybook_prefix, prefix_len);
+        offset += prefix_len;
+    }
     size_t pos = 0;
     while (pos < expanded_len) {
         size_t line_start = pos;
@@ -496,6 +1103,23 @@ static int copy_cobol_parser_input(
         size_t line_end = pos < expanded_len ? pos + 1 : pos;
         size_t content_end = line_content_end(expanded, line_start, line_end);
         size_t current_start = line_start;
+        size_t code_start = cobol_line_ltrim_code(expanded, line_start, content_end);
+        int insert_go_after_else = cobol_line_should_insert_go_after_else(expanded, line_start, content_end);
+        int append_dummy_display_at =
+            cobol_line_should_append_dummy_display_at(expanded, expanded_len, line_start, content_end);
+        size_t period_before_at = 0;
+        int blank_period_before_at =
+            cobol_line_period_before_at_position(expanded, line_start, content_end, &period_before_at);
+        int append_if_close_parens = 0;
+        cobol_line_should_append_if_close_parens(
+            expanded,
+            expanded_len,
+            line_start,
+            content_end,
+            &append_if_close_parens);
+        size_t level_prefix_digit = 0;
+        int blank_level_prefix_digit =
+            cobol_line_leading_level_prefix_digit(expanded, line_start, content_end, &level_prefix_digit);
 
         if (shift_left && line_ltrim_spaces(expanded, line_start, line_end) < content_end) {
             memset(output + offset, ' ', 6);
@@ -512,26 +1136,87 @@ static int copy_cobol_parser_input(
             while (after_spaces < content_end && ascii_is_space_no_newline(expanded[after_spaces])) {
                 after_spaces++;
             }
-            if (bytes_starts_with_ci(expanded + after_spaces, content_end - after_spaces, "TO")) {
+            int previous_line_has_open_quote = 0;
+            if (after_spaces < content_end &&
+                (expanded[after_spaces] == '"' || expanded[after_spaces] == '\'')) {
+                size_t prev_start = 0;
+                size_t prev_end = 0;
+                previous_line_has_open_quote =
+                    cobol_previous_code_line(expanded, line_start, &prev_start, &prev_end) &&
+                    cobol_line_has_unbalanced_quotes(expanded, prev_start, prev_end);
+            }
+            if (bytes_starts_with_ci(expanded + after_spaces, content_end - after_spaces, "TO") ||
+                (after_spaces < content_end &&
+                 (expanded[after_spaces] == '"' || expanded[after_spaces] == '\'') &&
+                 !previous_line_has_open_quote)) {
                 blank_indicator_hyphen = 1;
             }
         }
 
         for (size_t i = current_start; i < current_end; i++) {
-            if (blank_indicator_hyphen && i == line_start + 6) {
+            if (insert_go_after_else && i == code_start) {
+                output[offset++] = 'G';
+                output[offset++] = 'O';
+                output[offset++] = ' ';
+            }
+            if (blank_level_prefix_digit && i == level_prefix_digit) {
+                output[offset++] = ' ';
+            } else if (blank_period_before_at && i == period_before_at) {
+                output[offset++] = ' ';
+            } else if (!shift_left && fixed_layout && i >= line_start && i < line_start + 6 && content_end > line_start + 6) {
+                output[offset++] = ' ';
+            } else if (!shift_left && fixed_layout && i == line_start + 6 &&
+                       expanded[i] >= '0' && expanded[i] <= '9') {
+                output[offset++] = ' ';
+            } else if (blank_indicator_hyphen && i == line_start + 6) {
                 output[offset++] = ' ';
             } else {
                 output[offset++] = expanded[i];
             }
         }
+        if (append_dummy_display_at) {
+            output[offset++] = ' ';
+            output[offset++] = '0';
+            output[offset++] = '0';
+            output[offset++] = '0';
+            output[offset++] = '0';
+        }
+        for (int i = 0; i < append_if_close_parens; i++) {
+            output[offset++] = ')';
+        }
 
-        if (cobol_line_has_perform_thru_range(expanded, line_start, content_end)) {
+        if (cobol_line_should_get_standalone_period_after_suffix(
+                expanded,
+                expanded_len,
+                line_start,
+                content_end)) {
+            output[offset++] = '\n';
+            output[offset++] = ' ';
+            output[offset++] = ' ';
+            output[offset++] = ' ';
+            output[offset++] = ' ';
+            output[offset++] = ' ';
+            output[offset++] = ' ';
+            output[offset++] = ' ';
+            output[offset++] = '.';
+        } else if (cobol_line_has_perform_thru_range(expanded, line_start, content_end)) {
             size_t next_start = 0;
             size_t next_end = 0;
             if (cobol_next_code_line(expanded, expanded_len, line_end, &next_start, &next_end) &&
                 cobol_line_is_paragraph_header(expanded, next_start, next_end)) {
                 output[offset++] = '.';
             }
+        } else if (cobol_line_should_get_period_before_paragraph(
+                       expanded,
+                       expanded_len,
+                       line_start,
+                       content_end) ||
+                   cobol_line_should_get_period_before_next_statement(
+                       expanded,
+                       expanded_len,
+                       line_start,
+                       content_end)) {
+            output[offset++] = '.';
         }
 
         for (size_t i = content_end; i < line_end; i++) {
@@ -596,7 +1281,12 @@ static int normalize_cobol_fixed_legacy(
         break;
     }
 
-    if (!changed && !slice_has_tab(working, start, end) && !cobol_needs_fixed_legacy_view(working, start, end)) {
+    if (!changed && !slice_has_tab(working, start, end) &&
+        !cobol_needs_fixed_legacy_view(working, start, end) &&
+        !cobol_needs_period_before_paragraph_repair(working, start, end) &&
+        !cobol_needs_else_bare_label_repair(working, start, end) &&
+        !cobol_needs_leading_level_prefix_digit_repair(working, start, end) &&
+        !cobol_needs_display_line_repair(working, start, end)) {
         free(decoded);
         return TSMP_OK;
     }

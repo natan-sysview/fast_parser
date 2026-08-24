@@ -3968,6 +3968,10 @@
             "named": true
           },
           {
+            "type": "legacy_compute_expr",
+            "named": true
+          },
+          {
             "type": "unbalanced_compute_expr",
             "named": true
           }
@@ -4509,6 +4513,26 @@
           "named": true
         },
         {
+          "type": "at_end",
+          "named": true
+        },
+        {
+          "type": "else_header",
+          "named": true
+        },
+        {
+          "type": "else_if_header",
+          "named": true
+        },
+        {
+          "type": "eop",
+          "named": true
+        },
+        {
+          "type": "evaluate_header",
+          "named": true
+        },
+        {
           "type": "exit_statement",
           "named": true
         },
@@ -4517,7 +4541,51 @@
           "named": true
         },
         {
+          "type": "if_header",
+          "named": true
+        },
+        {
+          "type": "invalid_key",
+          "named": true
+        },
+        {
           "type": "move_statement",
+          "named": true
+        },
+        {
+          "type": "not_at_end",
+          "named": true
+        },
+        {
+          "type": "not_eop",
+          "named": true
+        },
+        {
+          "type": "not_invalid_key",
+          "named": true
+        },
+        {
+          "type": "not_on_exception",
+          "named": true
+        },
+        {
+          "type": "not_on_overflow",
+          "named": true
+        },
+        {
+          "type": "not_on_size_error",
+          "named": true
+        },
+        {
+          "type": "on_exception",
+          "named": true
+        },
+        {
+          "type": "on_overflow",
+          "named": true
+        },
+        {
+          "type": "on_size_error",
           "named": true
         },
         {
@@ -4525,7 +4593,23 @@
           "named": true
         },
         {
+          "type": "perform_statement_call_proc",
+          "named": true
+        },
+        {
+          "type": "perform_statement_loop",
+          "named": true
+        },
+        {
           "type": "period",
+          "named": true
+        },
+        {
+          "type": "when",
+          "named": true
+        },
+        {
+          "type": "when_other",
           "named": true
         }
       ]
@@ -8630,6 +8714,37 @@
     }
   },
   {
+    "type": "legacy_concatenated_string_source",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "b_string",
+          "named": true
+        },
+        {
+          "type": "h_string",
+          "named": true
+        },
+        {
+          "type": "n_string",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "x_string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "legacy_not_literal_condition",
     "named": true,
     "fields": {
@@ -8768,6 +8883,10 @@
             "named": true
           },
           {
+            "type": "abbreviated_literal_tail",
+            "named": true
+          },
+          {
             "type": "at_hex_literal",
             "named": true
           },
@@ -8807,6 +8926,21 @@
     "type": "legacy_period_before_to",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "legacy_split_perform_label",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "label",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "legacy_trailing_sequence_digit",
@@ -9525,6 +9659,10 @@
           },
           {
             "type": "h_string",
+            "named": true
+          },
+          {
+            "type": "legacy_concatenated_string_source",
             "named": true
           },
           {
@@ -11101,6 +11239,10 @@
         },
         {
           "type": "label",
+          "named": true
+        },
+        {
+          "type": "legacy_split_perform_label",
           "named": true
         }
       ]
@@ -18609,6 +18751,10 @@
   },
   {
     "type": "is_not_user_class_tail",
+    "named": true
+  },
+  {
+    "type": "legacy_compute_expr",
     "named": true
   },
   {

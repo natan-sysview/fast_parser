@@ -64,6 +64,7 @@ module.exports = grammar({
     copybook_wrapped_procedure_definition: $ => $.procedure_division,
 
     copybook_procedure_definition: $ => prec.right(seq(
+      optional(alias($._copybook_paragraph_header, $.paragraph_header)),
       $._copybook_procedure_statement,
       repeat(choice(
         $._copybook_procedure_statement,
@@ -79,14 +80,19 @@ module.exports = grammar({
       seq(alias($._exec_sql_include_statement, $.exec_sql_statement), optional(seq($._data_period, optional($._data_period)))),
     )),
 
-    _copybook_procedure_statement: $ => seq(
-      choice(
-        $.accept_statement,
-        $.exit_statement,
-        $.goto_statement,
-        $.move_statement,
+    _copybook_procedure_statement: $ => choice(
+      $.goto_statement,
+      $.perform_statement_call_proc,
+      $._start_handler,
+      $._end_statement,
+      seq(
+        choice(
+          $.accept_statement,
+          $.exit_statement,
+          $.move_statement
+        ),
+        $._end_statement
       ),
-      $._end_statement
     ),
 
     _copybook_paragraph_header: $ => seq(
@@ -1178,8 +1184,8 @@ module.exports = grammar({
       ),*/
     ),
 
-    level_number: $ => /[0-9][0-9]?/,
-    level_number_88: $ => token(prec(1, /88/)),
+    level_number: $ => token(prec(3, /[0-9][0-9]?/)),
+    level_number_88: $ => token(prec(4, /88/)),
 
     entry_name: $ => choice(
       $._FILLER,
@@ -1527,7 +1533,7 @@ module.exports = grammar({
     value_clause: $ => prec.right(seq(
       choice($._VALUE, $._VALUES),
       optional(choice($._IS, $._ARE)),
-      repeat1($.value_item),
+      $.value_item,
       optional($._WHEN),
       optional($._SET),
       optional($._TO),
@@ -2326,7 +2332,7 @@ module.exports = grammar({
         $._COMPUTE,
         field('left', repeat1($.arithmetic_x)),
         choice('=', $._EQUAL),
-        field('right', choice($.expr, $.unbalanced_compute_expr)),
+        field('right', choice($.expr, $.unbalanced_compute_expr, $.legacy_compute_expr)),
       ),
       $.legacy_compute_missing_equal
     ),
@@ -2594,7 +2600,10 @@ module.exports = grammar({
     legacy_not_literal_condition: $ => prec(2, seq(
       field('left', $._x),
       $._NOT,
-      field('right', $._abbreviated_comparison_literal_operand)
+      field('right', seq(
+        $._abbreviated_comparison_literal_operand,
+        repeat($.abbreviated_literal_tail)
+      ))
     )),
 
     else_if_header: $ => prec.right(1, seq(
@@ -2642,6 +2651,8 @@ module.exports = grammar({
       seq("(", "(", $._expr_calc),
       seq("(", $._expr_calc, choice('+', '-', '*', '/'), "(", $._expr_calc)
     )),
+
+    legacy_compute_expr: $ => token(prec(3, /\(\(\([^.]*/)),
 
     _expr_calc_binary: $ => choice(
       prec.left(1, seq($._expr_calc, '+', $._expr_calc)),
@@ -2700,6 +2711,12 @@ module.exports = grammar({
     ),
 
     abbreviated_literal_tail: $ => choice(
+      token(prec(1,
+        /[ \t\r\n]+('[^'\n]*'|"[^"\n]*")([ \t]+([aA][nN][dD]|[oO][rR])[ \t]+('[^'\n]*'|"[^"\n]*"|[sS][pP][aA][cC][eE][s]?|[zZ][eE][rR][oO]([sS]|[eE][sS])?|[qQ][uU][oO][tT][eE]|[hH][iI][gG][hH]-[vV][aA][lL][uU][eE][sS]?|[lL][oO][wW]-[vV][aA][lL][uU][eE][sS]?))+/
+      )),
+      token(prec(1,
+        /('[^'\n]*'|"[^"\n]*")([ \t]+([aA][nN][dD]|[oO][rR])[ \t]+('[^'\n]*'|"[^"\n]*"|[sS][pP][aA][cC][eE][s]?|[zZ][eE][rR][oO]([sS]|[eE][sS])?|[qQ][uU][oO][tT][eE]|[hH][iI][gG][hH]-[vV][aA][lL][uU][eE][sS]?|[lL][oO][wW]-[vV][aA][lL][uU][eE][sS]?))+/
+      )),
       token(
         /[oO][rR][ \t]*\r?\n[ \t]+[+-]?[0-9]+(\.[0-9]+)?([ \t]+|\r?\n)/
       ),
@@ -2941,12 +2958,14 @@ module.exports = grammar({
 
     _move_body: $ => seq(
       optional($._CORRESPONDING),
-      field('src', $._x),
+      field('src', choice($.legacy_concatenated_string_source, $._x)),
       optional($.legacy_period_before_to),
       $._TO,
       field('dst', $._target_x_list),
       optional($.legacy_move_trailing_sequence_digit)
     ),
+
+    legacy_concatenated_string_source: $ => prec(1, seq($._string, repeat1($._string))),
 
     legacy_period_before_to: $ => '.',
 
@@ -3045,8 +3064,10 @@ module.exports = grammar({
 
     perform_procedure: $ => seq(
       $.label,
-      optional(seq(choice($.THRU, $._TO), $.label)),
+      optional(seq(choice($.THRU, $._TO), choice($.label, $.legacy_split_perform_label))),
     ),
+
+    legacy_split_perform_label: $ => prec(1, seq($.label, $.label)),
 
     perform_option: $ => choice(
       $.FOREVER,
@@ -3633,9 +3654,9 @@ module.exports = grammar({
     ),
 
     //todo
-    number: $ => choice($.integer, $.decimal),
-    integer: $ => /[+-]?[0-9,]+/,
-    decimal: $ => /[+-]?[0-9]*\.[0-9]+/,
+    number: $ => choice($.decimal, $.integer),
+    integer: $ => token(prec(1, /[+-]?[0-9]+/)),
+    decimal: $ => token(prec(2, /[+-]?([0-9]+[,.][0-9]+|[,.][0-9]+)/)),
     _string: $ => choice(
       $.string,
       $.x_string,

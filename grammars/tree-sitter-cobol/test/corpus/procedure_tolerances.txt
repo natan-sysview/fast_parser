@@ -182,6 +182,32 @@ exit without period before paragraph
       (period))))
 
 ====================================
+start key continuation in area a
+====================================
+       identification division.
+       program-id. a.
+       procedure division.
+           START DPREV412 KEY IS NOT LESS THAN
+       KEY-DPREV412.
+           GOBACK.
+---
+
+(start
+  (program_definition
+    (identification_division
+      (program_name))
+    (procedure_division
+      (start_statement
+        file_name: (WORD)
+        (start_key
+          op: (ge)
+          keys: (qualified_word
+            (WORD))))
+      (period)
+      (goback_statement)
+      (period))))
+
+====================================
 use debugging on all procedures plural
 ====================================
        identification division.
@@ -204,10 +230,10 @@ use debugging on all procedures plural
         (use_statement
           (ALL))
         (period)
-      (display_statement
-        (qualified_word
-          (WORD)))
-      (period)))))
+        (display_statement
+          (qualified_word
+            (WORD)))
+        (period)))))
 
 ====================================
 cobol400 paragraph name with underscore
