@@ -258,6 +258,211 @@ jobs:
           name: fastparse-${{ steps.version.outputs.value }}-npm
           path: dist/npm/*.tgz
 
+
+  java-jni:
+    name: Java JNI ${{ matrix.platform }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+            archive_glob: dist/java-jni/*.tar.gz
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+            archive_glob: dist/java-jni/*.tar.gz
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+            archive_glob: dist/java-jni/*.tar.gz
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+            archive_glob: dist/java-jni/*.zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Java JNI archive
+        run: >
+          python scripts/package_java_jni.py
+          --version "${{ steps.version.outputs.value }}"
+          --platform ${{ matrix.platform }}
+          --arch ${{ matrix.arch }}
+
+      - name: Upload Java JNI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-java-jni-${{ steps.version.outputs.value }}-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ${{ matrix.archive_glob }}
+
+  maven-package:
+    name: Maven Package
+    needs:
+      - package
+      - java-jni
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download core and JNI archives
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          pattern: fastparse*${{ steps.version.outputs.value }}-*
+          merge-multiple: true
+
+      - name: Configure Maven Central credentials
+        if: startsWith(github.ref, 'refs/tags/') && vars.MAVEN_PUBLISH == 'true'
+        shell: bash
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <servers>
+              <server>
+                <id>central</id>
+                <username>${CENTRAL_USERNAME}</username>
+                <password>${CENTRAL_PASSWORD}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+        env:
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+
+      - name: Import GPG key
+        if: startsWith(github.ref, 'refs/tags/') && vars.MAVEN_PUBLISH == 'true'
+        shell: bash
+        run: |
+          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Build Maven package
+        shell: bash
+        run: |
+          version="${{ steps.version.outputs.value }}"
+          archives=(
+            --archive "release-artifacts/fastparse-${version}-linux-x64.tar.gz"
+            --archive "release-artifacts/fastparse-${version}-macos-x64.tar.gz"
+            --archive "release-artifacts/fastparse-${version}-macos-arm64.tar.gz"
+            --archive "release-artifacts/fastparse-${version}-windows-x64.zip"
+            --jni-archive "release-artifacts/fastparse-java-jni-${version}-linux-x64.tar.gz"
+            --jni-archive "release-artifacts/fastparse-java-jni-${version}-macos-x64.tar.gz"
+            --jni-archive "release-artifacts/fastparse-java-jni-${version}-macos-arm64.tar.gz"
+            --jni-archive "release-artifacts/fastparse-java-jni-${version}-windows-x64.zip"
+          )
+          if [ "${{ startsWith(github.ref, 'refs/tags/') && vars.MAVEN_PUBLISH == 'true' }}" = "true" ]; then
+            python scripts/package_maven.py --version "$version" --require-all-rids --deploy "${archives[@]}"
+          else
+            python scripts/package_maven.py --version "$version" --require-all-rids "${archives[@]}"
+          fi
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Validate Maven package
+        run: python scripts/validate_maven_package.py "dist/maven/fastparse-${{ steps.version.outputs.value }}.jar" --require-all-rids
+
+      - name: Upload Maven artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-${{ steps.version.outputs.value }}-maven
+          path: |
+            dist/maven/*.jar
+            dist/maven/*.pom
+            dist/maven/*.asc
+            dist/maven/*.zip
+
+  published-maven-smoke:
+    name: Published Maven Smoke ${{ matrix.platform }}-${{ matrix.arch }}
+    needs: maven-package
+    if: startsWith(github.ref, 'refs/tags/') && vars.MAVEN_PUBLISH == 'true'
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate published Maven package
+        run: python scripts/validate_published_maven.py --version "${{ steps.version.outputs.value }}"
+
   python-wheel:
     name: Python Wheel ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
@@ -1547,6 +1752,7 @@ jobs:
       - package
       - nuget-package
       - python-wheel
+      - maven-package
       - language-extension
       - java-frameworks-language-extension
       - javaswing-language-extension

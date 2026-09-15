@@ -2,6 +2,8 @@
 
 Use this guide when an AI agent needs to integrate FastParser into a .NET application.
 
+For Java/JVM integration, use the JNI binding in `bindings/java/fastparse`.
+
 ## Install
 
 ```bash
@@ -202,6 +204,56 @@ dotnet add package FastParser.Language.Cobol
 pip install fastparse-language-cobol
 cargo add fastparse-language-cobol
 ```
+
+## Java/JNI Binding
+
+FastParse has a Java binding scaffold at:
+
+```text
+bindings/java/fastparse
+```
+
+The Java API package is:
+
+```java
+import dev.fastparse.FastParseClient;
+```
+
+The intended Maven Central coordinates are:
+
+```text
+io.github.natan-sysview:fastparse
+```
+
+This GitHub-backed `groupId` is used because FastParse does not currently own a dedicated DNS namespace such as `fastparse.dev`. Keep artifact names FastParse-branded:
+
+```text
+fastparse
+fastparse-language-cobol
+fastparse-language-javaswing
+fastparse-language-python
+```
+
+The binding uses JNI, targets Java 8+ bytecode, and should not use Panama-only APIs. Local validation:
+
+```bash
+cd /Users/natanbarronlugo/Desktop/Proyectos/fast_parser
+python3 scripts/validate_java_binding.py
+```
+
+Minimal Java flow with explicit local native paths:
+
+```java
+try (FastParseClient client = FastParseClient.open(coreLibraryPath, jniLibraryPath)) {
+    ParseResult result = client.parseText("class Hello { void run() {} }");
+    System.out.println(result.getNodeCount());
+    System.out.println(result.asUtf8String());
+}
+```
+
+For Java 8 source compatibility, do not use `var` in checked-in examples; use explicit types.
+
+The Java loader may extract packaged native libraries to a JVM temp/cache directory so `System.load(...)` can load them. Normal parse calls still remain memory-first: the parent application owns file/database IO, and FastParse receives bytes/strings in RAM.
 
 After installing an extension, bindings should load it through a bundled-language API such as:
 

@@ -22,6 +22,8 @@ bindings/csharp/**/bin/
 bindings/csharp/**/obj/
 examples/csharp/**/bin/
 examples/csharp/**/obj/
+bindings/java/**/target/
+bindings/java/**/src/main/resources/dev/fastparse/native/
 bin/libtsmp.dylib
 bin/libtsmp.so
 bin/tsmp.dll
@@ -31,6 +33,9 @@ bin/fastparse.dll
 bin/libfastparse_language_*.dylib
 bin/libfastparse_language_*.so
 bin/fastparse_language_*.dll
+bin/libfastparse_jni.dylib
+bin/libfastparse_jni.so
+bin/fastparse_jni.dll
 bin/libts_multi_parser.dylib
 bin/libts_multi_parser.so
 

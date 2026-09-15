@@ -78,6 +78,29 @@ Run examples:
 ```bash
 python3 examples/python/01_parse_string/parse_string.py --summary
 dotnet run --project examples/csharp/01_parse_string/FastParse.ParseStringExample.csproj
+python3 scripts/validate_java_binding.py
+```
+
+Java/JNI binding sources live in:
+
+```text
+bindings/java/fastparse
+```
+
+The Java binding targets Java 8+ and uses JNI to call the native FastParse C ABI. During local development, use explicit native paths or run `scripts/validate_java_binding.py`. Maven Central publication uses the GitHub-backed namespace:
+
+```text
+io.github.natan-sysview:fastparse
+```
+
+
+
+The release workflow builds Java JNI bridges for Linux x64, macOS x64, macOS arm64, and Windows x64, injects the native resources into the Maven artifact, validates the JAR layout, and publishes only when `MAVEN_PUBLISH=true` is configured in GitHub repository variables.
+
+Java package imports stay FastParse-branded:
+
+```java
+import dev.fastparse.FastParseClient;
 ```
 
 ## C API
