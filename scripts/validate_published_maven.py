@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 import subprocess
 import tempfile
 import textwrap
@@ -83,6 +84,17 @@ def wait_for_version(version: str, timeout_seconds: int, interval_seconds: int) 
         time.sleep(interval_seconds)
 
 
+def maven_command() -> str:
+    candidates = ["mvn.cmd", "mvn"] if os.name == "nt" else ["mvn"]
+    for candidate in candidates:
+        resolved = shutil.which(candidate)
+        if resolved:
+            return resolved
+    raise FileNotFoundError(
+        "Maven executable not found on PATH. Expected mvn.cmd or mvn on Windows, mvn on Unix."
+    )
+
+
 def run(command: list[str], cwd: Path, env: dict[str, str]) -> str:
     completed = subprocess.run(command, cwd=str(cwd), env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     if completed.returncode != 0:
@@ -133,7 +145,7 @@ def main() -> int:
         env = os.environ.copy()
         env.pop("FASTPARSE_LIBRARY_PATH", None)
         env.pop("TSMP_LIBRARY_PATH", None)
-        out = run(["mvn", "-q", "compile", "exec:java"], project, env)
+        out = run([maven_command(), "-q", "compile", "exec:java"], project, env)
         if "FastParse published Maven smoke OK" not in out:
             raise AssertionError(f"published Maven smoke failed:\n{out}")
         print(out)
