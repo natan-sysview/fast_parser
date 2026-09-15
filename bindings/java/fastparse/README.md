@@ -116,8 +116,26 @@ Required GitHub repository secrets:
 
 - `CENTRAL_USERNAME`
 - `CENTRAL_PASSWORD`
-- `GPG_PRIVATE_KEY`
+- `GPG_PRIVATE_KEY` with the full ASCII-armored private key, or `GPG_PRIVATE_KEY_B64` with the base64-encoded ASCII-armored private key
 - `GPG_PASSPHRASE`
+
+Recommended private-key export for GitHub Actions:
+
+```bash
+gpg --armor --export-secret-keys <KEY_ID> > fastparse-maven-private-key.asc
+pbcopy < fastparse-maven-private-key.asc
+```
+
+The copied value must start with `-----BEGIN PGP PRIVATE KEY BLOCK-----` and end with `-----END PGP PRIVATE KEY BLOCK-----`.
+Do not paste the public key, Maven XML, or a Maven Central token into `GPG_PRIVATE_KEY`.
+
+Alternative base64 form:
+
+```bash
+gpg --armor --export-secret-keys <KEY_ID> | base64 | pbcopy
+```
+
+Paste that value into `GPG_PRIVATE_KEY_B64`.
 
 Publishing is intentionally gated by the repository variable:
 

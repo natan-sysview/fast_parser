@@ -383,9 +383,36 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') && vars.MAVEN_PUBLISH == 'true'
         shell: bash
         run: |
-          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
+          set -euo pipefail
+          key_file="$(mktemp)"
+          cleanup() {
+            rm -f "$key_file"
+          }
+          trap cleanup EXIT
+
+          if [ -n "${GPG_PRIVATE_KEY_B64:-}" ]; then
+            printf '%s' "$GPG_PRIVATE_KEY_B64" | tr -d '[:space:]' | base64 --decode > "$key_file"
+          elif [ -n "${GPG_PRIVATE_KEY:-}" ]; then
+            if printf '%s' "$GPG_PRIVATE_KEY" | grep -q '\\n'; then
+              printf '%b' "$GPG_PRIVATE_KEY" > "$key_file"
+            else
+              printf '%s\n' "$GPG_PRIVATE_KEY" > "$key_file"
+            fi
+          else
+            echo "::error::Missing GPG_PRIVATE_KEY or GPG_PRIVATE_KEY_B64 secret. Export the ASCII-armored private key with gpg --armor --export-secret-keys."
+            exit 1
+          fi
+
+          if ! grep -q 'BEGIN PGP PRIVATE KEY BLOCK' "$key_file"; then
+            echo "::error::GPG key secret is not an ASCII-armored private key. It must start with -----BEGIN PGP PRIVATE KEY BLOCK-----."
+            exit 1
+          fi
+
+          gpg --batch --import "$key_file"
+          gpg --batch --list-secret-keys --keyid-format LONG
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
       - name: Build Maven package
         shell: bash
