@@ -1,0 +1,7599 @@
+==================
+Basic select
+==================
+
+SELECT * FROM empleados;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Legacy double comma parameter separator
+==================
+
+CREATE OR REPLACE PACKAGE pkg_legacy IS
+  PROCEDURE p_demo(
+    p_status OUT VARCHAR2,
+    , p_date IN DATE DEFAULT SYSDATE
+  );
+END pkg_legacy;
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (referenced_element
+      (identifier))
+    (kw_is)
+    (newline)
+    (procedure_declaration
+      (kw_procedure)
+      (identifier)
+      (parameter_declaration
+        (newline)
+        (parameter_declaration_element
+          (identifier)
+          (kw_out)
+          (datatype
+            (kw_varchar2)))
+        (newline)
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (kw_date))
+          (default_expression
+            (kw_default)
+            (expression
+              (referenced_element
+                (identifier)))))
+        (newline)))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier))))
+  (newline))
+
+==================
+Procedure with nested procedure and function
+==================
+
+CREATE OR REPLACE PROCEDURE outer_p IS
+  PROCEDURE inner_p IS
+  BEGIN
+    NULL;
+  END;
+  FUNCTION inner_f RETURN NUMBER IS
+  BEGIN
+    RETURN 1;
+  END;
+BEGIN
+  inner_p;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    prc_name: (identifier)
+    (kw_is)
+    (newline)
+    (nested_procedure_definition
+      (kw_procedure)
+      prc_name: (identifier)
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (null_statement
+            (kw_null)))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (nested_function_definition
+      (kw_function)
+      fnc_name: (identifier)
+      (return_declaration
+        (kw_return)
+        (datatype
+          (kw_number)))
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)
+            (expression
+              (number))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (referenced_element
+          ref_name: (identifier)))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Function with nested function and procedure
+==================
+
+CREATE OR REPLACE FUNCTION outer_f RETURN NUMBER IS
+  FUNCTION inner_f RETURN NUMBER IS
+  BEGIN
+    RETURN 1;
+  END;
+  PROCEDURE inner_p IS
+  BEGIN
+    NULL;
+  END;
+BEGIN
+  inner_p;
+  RETURN inner_f;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_function
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_function)
+    fnc_name: (identifier)
+    (return_declaration
+      (kw_return)
+      (datatype
+        (kw_number)))
+    (kw_is)
+    (newline)
+    (nested_function_definition
+      (kw_function)
+      fnc_name: (identifier)
+      (return_declaration
+        (kw_return)
+        (datatype
+          (kw_number)))
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)
+            (expression
+              (number))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (nested_procedure_definition
+      (kw_procedure)
+      prc_name: (identifier)
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (null_statement
+            (kw_null)))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (referenced_element
+          ref_name: (identifier)))
+      (newline)
+      (statement
+        (return_statement
+          (kw_return)
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Package body members stay non nested
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg_demo IS
+  PROCEDURE member_p IS
+  BEGIN
+    NULL;
+  END;
+  FUNCTION member_f RETURN NUMBER IS
+  BEGIN
+    RETURN 1;
+  END;
+END pkg_demo;
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (procedure_definition
+      (kw_procedure)
+      prc_name: (identifier)
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (null_statement
+            (kw_null)))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (function_definition
+      (kw_function)
+      fnc_name: (identifier)
+      (return_declaration
+        (kw_return)
+        (datatype
+          (kw_number)))
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)
+            (expression
+              (number))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        ref_name: (identifier))))
+  (newline))
+
+==================
+Legacy P ISR layout export file
+==================
+
+  CREATE OR REPLACE PROCEDURE "SEUS"."P_ISR_LAYOUT_CONTABLE" (
+    d_feoperini IN DATE) IS
+BEGIN
+  vmessage := 'fixed layout export';
+END;
+
+---
+
+(source_file
+  (newline)
+  (legacy_pisr_layout_export_file))
+
+==================
+Legacy block end stray suffix
+==================
+
+CREATE OR REPLACE PROCEDURE p_demo IS
+BEGIN
+  BEGIN
+    NULL;
+  END;x
+  v_value := 1;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    (identifier)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (legacy_plsql_block_statement_with_stray_suffix
+          (plsql_block
+            (kw_begin)
+            (newline)
+            (statement
+              (null_statement
+                (kw_null)))
+            (newline)
+            (end_obj
+              (kw_end)))))
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            (identifier))
+          (expression
+            (number))))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Anonymous block before ELSE is normal IF syntax
+==================
+
+CREATE OR REPLACE PROCEDURE p_demo IS
+BEGIN
+  IF v_flag = 1 THEN
+    BEGIN
+      NULL;
+    EXCEPTION
+      WHEN OTHERS THEN
+        NULL;
+    END;
+  ELSE
+    v_value := 1;
+  END IF;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    prc_name: (identifier)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (number))
+          (kw_then)
+          (newline)
+          (statement
+            (plsql_block
+              (kw_begin)
+              (newline)
+              (statement
+                (null_statement
+                  (kw_null)))
+              (newline)
+              (exception_block
+                (kw_exception)
+                (newline)
+                (exception_handler
+                  (kw_when)
+                  (kw_others)
+                  (kw_then)
+                  (newline)
+                  (statement
+                    (null_statement
+                      (kw_null)))))
+              (newline)
+              (end_obj
+                (kw_end))))
+          (newline)
+          (kw_else)
+          (newline)
+          (statement
+            (assignment_statement
+              (referenced_element
+                ref_name: (identifier))
+              (expression
+                (number))))
+          (newline)
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Legacy fetch exit without separator
+==================
+
+CREATE OR REPLACE PROCEDURE p_demo IS
+  v_cursor SYS_REFCURSOR;
+  v_result VARCHAR2(100);
+BEGIN
+  FETCH v_cursor INTO v_result
+  EXIT WHEN v_cursor%NOTFOUND;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    (identifier)
+    (kw_is)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (referenced_element
+          (identifier))))
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_varchar2)
+        (number)))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (legacy_fetch_exit_without_separator
+          (fetch_statement
+            (kw_fetch)
+            (referenced_element
+              (identifier))
+            (into_clause
+              (kw_into)
+              (into_target_repeat
+                (into_target
+                  (referenced_element
+                    (identifier))))))
+          (newline)
+          (exit_statement
+            (kw_exit)
+            (kw_when)
+            (expression
+              (referenced_element
+                (identifier))
+              (kw_notfound)))))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Legacy parenthesized WITH select statement
+==================
+
+CREATE OR REPLACE PROCEDURE p_demo IS
+  v_uuid VARCHAR2(100);
+BEGIN
+  WITH cfdi AS (
+    SELECT factura FROM cto_factura_digital
+  )
+  (SELECT uuid INTO v_uuid FROM cfdi);
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    (identifier)
+    (kw_is)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_varchar2)
+        (number)))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (legacy_parenthesized_with_select_statement
+          (with_clause
+            (kw_with)
+            (identifier)
+            (kw_as)
+            (newline)
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (referenced_element
+                    (identifier)))))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  (identifier))))
+            (newline))
+          (newline)
+          (kw_select)
+          (select_list
+            (select_list_element
+              (expression
+                (referenced_element
+                  (identifier)))))
+          (into_clause
+            (kw_into)
+            (into_target_repeat
+              (into_target
+                (referenced_element
+                  (identifier)))))
+          (kw_from)
+          (table_list
+            (table_list_element
+              (referenced_element
+                (identifier))))))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Oracle wrapped standalone function
+==================
+
+CREATE OR REPLACE EDITIONABLE FUNCTION "CORPO"."GETDATO" wrapped
+0
+abcd
+/
+
+---
+
+(source_file
+  (newline)
+  (create_function
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_function)
+    (identifier)
+    (identifier)
+    (kw_wrapped)
+    (newline)
+    (wrapped_body
+      (wrapped_body_line)
+      (newline)
+      (wrapped_body_line))
+    (newline))
+  (newline))
+
+==================
+Binary float numeric suffix
+==================
+
+SELECT NVL(NUM_TIT_ASIGNADOS,05D), 1F FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (ref_call
+              (referenced_element
+                (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (referenced_element
+                        (identifier)))))
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (oracle_binary_float_number))))))))
+        (select_list_element
+          (expression
+            (oracle_binary_float_number))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            (identifier))))))
+  (newline))
+
+==================
+Trailing dot numeric alias
+==================
+
+SELECT 0.as num_titulos_t4 FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (trailing_dot_number_alias
+            value: (number)
+            (kw_as)
+            alias: (identifier))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Oracle wrapped package units
+==================
+
+CREATE OR REPLACE EDITIONABLE PACKAGE "CORPO"."PKG_DATOS_CLTS" wrapped
+0
+abcd
+1PACKAGE:
+/
+
+CREATE OR REPLACE EDITIONABLE PACKAGE BODY "CORPO"."PKG_DATOS_CLTS" wrapped
+0
+abcd
+1PACKAGE:
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_package)
+    (referenced_element
+      (identifier)
+      (identifier))
+    (kw_wrapped)
+    (newline)
+    (wrapped_body
+      (wrapped_body_line)
+      (newline)
+      (wrapped_body_line)
+      (newline)
+      (wrapped_body_line))
+    (newline))
+  (newline)
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_package)
+    (kw_body)
+    (referenced_element
+      (identifier)
+      (identifier))
+    (kw_wrapped)
+    (newline)
+    (wrapped_body
+      (wrapped_body_line)
+      (newline)
+      (wrapped_body_line)
+      (newline)
+      (wrapped_body_line))
+    (newline))
+  (newline))
+
+==================
+Legacy repeated package name
+==================
+
+CREATE OR REPLACE EDITIONABLE PACKAGE "CORPO"."PKG_EDOCTA" pkg_edocta IS
+  TYPE t_array IS TABLE OF VARCHAR2(100);
+END pkg_edocta;
+
+CREATE OR REPLACE EDITIONABLE PACKAGE "CORPO"."PKG_FORM" PACKAGE PKG_FORM AS
+  ID_CAT_EDAD NUMBER(2) := 11;
+END PKG_FORM;
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_package)
+    (referenced_element
+      (identifier)
+      (identifier))
+    (legacy_package_name_repeat
+      (referenced_element
+        (identifier)))
+    (kw_is)
+    (newline)
+    (type_definition_collection
+      (kw_type)
+      (identifier)
+      (kw_is)
+      (type_definition_nested_table
+        (kw_table)
+        (kw_of)
+        (datatype
+          (kw_varchar2)
+          (number))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier))))
+  (newline)
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_package)
+    (referenced_element
+      (identifier)
+      (identifier))
+    (legacy_package_name_repeat
+      (kw_package)
+      (referenced_element
+        (identifier)))
+    (kw_as)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_number)
+        (number))
+      (default_expression
+        (expression
+          (number))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier))))
+  (newline))
+
+==================
+Qualified package end name
+==================
+
+CREATE OR REPLACE PACKAGE pkg IS
+  PROCEDURE p;
+END pkg.comision;
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (referenced_element
+      (identifier))
+    (kw_is)
+    (newline)
+    (procedure_declaration
+      (kw_procedure)
+      (identifier))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier)
+        (identifier))))
+  (newline))
+
+==================
+Associative array index by simple integer
+==================
+
+CREATE OR REPLACE PACKAGE pkg IS
+  TYPE t_values IS TABLE OF VARCHAR2(30) INDEX BY SIMPLE_INTEGER;
+END pkg;
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (referenced_element
+      (identifier))
+    (kw_is)
+    (newline)
+    (type_definition_collection
+      (kw_type)
+      (identifier)
+      (kw_is)
+      (type_definition_assoc_array
+        (kw_table)
+        (kw_of)
+        (datatype
+          (kw_varchar2)
+          (number))
+        (kw_index)
+        (kw_by)
+        (type_definition_assoc_array_datatypes
+          (kw_simple_integer))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier))))
+  (newline))
+
+==================
+SQLPlus substitution variable literal
+==================
+
+DECLARE
+  wn_diasmen INTEGER := &5;
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_declare)
+      (newline)
+      (item_declaration
+        (identifier)
+        (datatype
+          (kw_integer))
+        (default_expression
+          (expression
+            (sqlplus_substitution_variable))))
+      (newline)
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Oracle wrapped standalone procedure
+==================
+
+SET DEFINE OFF;
+
+CREATE OR REPLACE EDITIONABLE PROCEDURE "CORPO"."PCDR_LOGON" wrapped
+0
+abcd
+1PCDR_LOGON:
+/
+
+---
+
+(source_file
+  (newline)
+  (sqlplus_statement
+    (sqlplus_set_statement
+      (kw_set)
+      (kw_define)
+      (kw_off)))
+  (newline)
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_procedure)
+    (identifier)
+    (identifier)
+    (kw_wrapped)
+    (newline)
+    (wrapped_body
+      (wrapped_body_line)
+      (newline)
+      (wrapped_body_line)
+      (newline)
+      (wrapped_body_line))
+    (newline))
+  (newline))
+
+==================
+Standalone procedure with parallel enable
+==================
+
+CREATE OR REPLACE PROCEDURE p (x IN OUT VARCHAR2)
+PARALLEL_ENABLE
+DETERMINISTIC
+IS
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    (identifier)
+    (parameter_declaration
+      (parameter_declaration_element
+        (identifier)
+        (kw_in)
+        (kw_out)
+        (datatype
+          (kw_varchar2))))
+    (newline)
+    (parallel_enable_clause
+      (kw_parallel_enable))
+    (newline)
+    (kw_deterministic)
+    (newline)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+SQLPlus execute and database link privileges
+==================
+
+GRANT CREATE PUBLIC DATABASE LINK TO app_user;
+EXEC app_user.dale;
+REVOKE CREATE PUBLIC DATABASE LINK FROM app_user;
+SHOW ERROR
+
+---
+
+(source_file
+  (newline)
+  (grant_statement
+    (kw_grant)
+    (grant_privilege_list
+      (grant_privilege
+        (grant_create_system_privilege
+          (kw_create)
+          (kw_public)
+          (kw_database)
+          (kw_link))))
+    (kw_to)
+    (grant_recipient_list
+      (referenced_element
+        (identifier))))
+  (newline)
+  (sqlplus_statement
+    (sqlplus_execute_statement
+      (kw_exec)
+      (referenced_element
+        (identifier)
+        (identifier))))
+  (newline)
+  (revoke_statement
+    (kw_revoke)
+    (grant_privilege_list
+      (grant_privilege
+        (grant_create_system_privilege
+          (kw_create)
+          (kw_public)
+          (kw_database)
+          (kw_link))))
+    (kw_from)
+    (grant_recipient_list
+      (referenced_element
+        (identifier))))
+  (newline)
+  (sqlplus_statement
+    (sqlplus_show_errors_statement
+      (kw_show)
+      (kw_error)))
+  (newline))
+
+==================
+Legacy procedure name prefix export
+==================
+
+CREATE OR REPLACE PROCEDURE PROCEDURE pv_ajustares IS
+BEGIN
+  NULL;
+END;
+
+CREATE OR REPLACE procedure package mur_corrige_comis IS
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    (legacy_procedure_name_prefix
+      (kw_procedure))
+    (identifier)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline)
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    (legacy_procedure_name_prefix
+      (kw_package))
+    (identifier)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Legacy post-end exception block
+==================
+
+CREATE OR REPLACE PROCEDURE p IS
+BEGIN
+  NULL;
+END;
+EXCEPTION
+  WHEN OTHERS THEN
+    NULL;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    (identifier)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end)))
+    (newline)
+    (legacy_post_end_exception_block
+      (kw_exception)
+      (newline)
+      (exception_handler
+        (kw_when)
+        (kw_others)
+        (kw_then)
+        (newline)
+        (statement
+          (null_statement
+            (kw_null))))))
+  (newline))
+
+==================
+Legacy package spec with declare and body item
+==================
+
+CREATE OR REPLACE PACKAGE pkg IS
+DECLARE
+  x NUMBER;
+PROCEDURE p IS
+BEGIN
+  NULL;
+END;
+BEGIN
+  NULL;
+END pkg;
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (referenced_element
+      (identifier))
+    (kw_is)
+    (newline)
+    (kw_declare)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_number)))
+    (newline)
+    (procedure_definition
+      (kw_procedure)
+      (identifier)
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (null_statement
+            (kw_null)))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (package_initialization_block
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier))))
+  (newline))
+
+==================
+Nested outer join right side
+==================
+
+SELECT *
+FROM existe
+LEFT JOIN stg a
+  LEFT JOIN pi ON pi.id = a.id
+ON a.id = existe.id;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (join_clause
+            (referenced_element
+              ref_name: (identifier))
+            (newline)
+            (outer_join_type
+              (kw_left))
+            (kw_join)
+            (referenced_element
+              ref_name: (identifier))
+            alias: (identifier)
+            (newline)
+            (outer_join_type
+              (kw_left))
+            (kw_join)
+            (referenced_element
+              ref_name: (identifier))
+            (kw_on)
+            (expression
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier))
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier)))
+            (newline)
+            (kw_on)
+            (expression
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier))
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier))))))))
+  (newline))
+
+==================
+Sized integer declaration
+==================
+
+DECLARE
+  VlTotalRepart INTEGER(3);
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_declare)
+      (newline)
+      (item_declaration
+        (identifier)
+        (datatype
+          (kw_integer)
+          (number)))
+      (newline)
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+SQLPlus slash and legacy show errors
+==================
+
+/
+SHOW_ERRORS
+
+---
+
+(source_file
+  (newline)
+  (sqlplus_statement
+    (sqlplus_slash_statement))
+  (newline)
+  (sqlplus_statement
+    (sqlplus_show_errors_legacy_statement))
+  (newline))
+
+==================
+Grant with grant option
+==================
+
+GRANT EXECUTE ON RAP_PCK_UTIL TO USIGAH_APPS WITH GRANT OPTION;
+
+---
+
+(source_file
+  (newline)
+  (grant_statement
+    (kw_grant)
+    (grant_privilege_list
+      (grant_privilege
+        (kw_execute)))
+    (kw_on)
+    (referenced_element
+      ref_name: (identifier))
+    (kw_to)
+    (grant_recipient_list
+      (referenced_element
+        ref_name: (identifier)))
+    (kw_with)
+    (kw_grant)
+    (kw_option))
+  (newline))
+
+==================
+XMLForest implicit alias
+==================
+
+SELECT xmlforest(case when x = 1 then 'A' else 'B' end TITULO) FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (xml_function_call
+              (xmlforest_expression
+                (kw_xmlforest)
+                (xmlforest_element
+                  (expression
+                    (expression_base_case_search
+                      (kw_case)
+                      (kw_when)
+                      (expression
+                        (referenced_element
+                          ref_name: (identifier))
+                        (number))
+                      (kw_then)
+                      (expression
+                        (literal_string))
+                      (kw_else)
+                      (expression
+                        (literal_string))
+                      (kw_end)))
+                  (identifier)))))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+ANSI varchar byte semantics
+==================
+
+DECLARE
+  v_msg VARCHAR(4000 BYTE);
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_declare)
+      (newline)
+      (item_declaration
+        (identifier)
+        (datatype
+          (kw_varchar)
+          (number)
+          (byte_char
+            (kw_byte))))
+      (newline)
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Grant create system privileges
+==================
+
+GRANT CREATE TYPE TO CREAR_OBJETO;
+GRANT CREATE SESSION TO CREAR_OBJETO;
+
+---
+
+(source_file
+  (newline)
+  (grant_statement
+    (kw_grant)
+    (grant_privilege_list
+      (grant_privilege
+        (grant_create_system_privilege
+          (kw_create)
+          (kw_type))))
+    (kw_to)
+    (grant_recipient_list
+      (referenced_element
+        ref_name: (identifier))))
+  (newline)
+  (grant_statement
+    (kw_grant)
+    (grant_privilege_list
+      (grant_privilege
+        (grant_create_system_privilege
+          (kw_create)
+          (kw_session))))
+    (kw_to)
+    (grant_recipient_list
+      (referenced_element
+        ref_name: (identifier))))
+  (newline))
+
+==================
+Double-underscore not-equals comparison
+==================
+
+CREATE OR REPLACE PROCEDURE p IS
+BEGIN
+  IF ENV_FECMTO__ID_UNIDAD_PAGO<> 301 THEN
+    NULL;
+  END IF;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    prc_name: (identifier)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (number))
+          (kw_then)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Table collection subquery
+==================
+
+SELECT COLUMN_VALUE
+FROM TABLE (SELECT SPLIT(pImporte, '.') FROM dual);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (table_collection_expression
+            (kw_table)
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (ref_call
+                    (referenced_element
+                      ref_name: (identifier))
+                    (parameter
+                      (parameter_element
+                        (parameter_value
+                          (expression
+                            (referenced_element
+                              ref_name: (identifier)))))
+                      (parameter_element
+                        (parameter_value
+                          (expression
+                            (literal_string)))))))))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier)))))))))
+  (newline))
+
+==================
+Direct table function in from
+==================
+
+SELECT * FROM Split(VN_ARRAY_CVE_REGIMEN);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (table_function_reference
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier))))))))))))
+  (newline))
+
+==================
+Spaced bang not equal
+==================
+
+SELECT * FROM t WHERE STATUS_COBSERV! = 'M';
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name: (identifier))
+          (literal_string)))))
+  (newline))
+
+==================
+Update set parenthesized scalar column
+==================
+
+UPDATE ban_t_bach_bit sync
+SET (instruccion) = 'nada'
+WHERE EXISTS (SELECT 1 FROM dual);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_update
+      (kw_update)
+      (referenced_element
+        ref_name: (identifier))
+      alias: (identifier)
+      (newline)
+      (update_set_clause
+        (kw_set)
+        (update_set_clause_elements
+          (dml_column_list_repeat
+            (referenced_element
+              ref_name: (identifier)))
+          (literal_string)))
+      (newline)
+      (where_clause
+        (kw_where)
+        (expression
+          (exists_predicate
+            (kw_exists)
+            (scalar_subquery
+              (kw_select)
+              (select_list
+                (select_list_element
+                  (expression
+                    (number))))
+              (kw_from)
+              (table_list
+                (table_list_element
+                  (referenced_element
+                    ref_name: (identifier))))))))))
+  (newline))
+
+==================
+For loop with named end label
+==================
+
+BEGIN
+  <<LOOP1>>
+  FOR i IN 1..10 LOOP
+    NULL;
+  END LOOP LOOP1;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (label
+          (identifier))
+        (newline)
+        (for_loop_statement
+          (kw_for)
+          (iterator
+            (identifier)
+            (kw_in)
+            (expression
+              (number))
+            (expression
+              (number)))
+          (kw_loop)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (kw_end)
+          (kw_loop)
+          (loop_end_name
+            (identifier))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Create procedure with quoted schema
+==================
+
+CREATE OR REPLACE PROCEDURE "SEUS"."P_TEST" IS
+BEGIN
+  NULL;
+END P_TEST;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    schema_name: (identifier)
+    prc_name: (identifier)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end)
+        (referenced_element
+          ref_name: (identifier)))))
+  (newline))
+
+==================
+Create editionable function with quoted schema
+==================
+
+CREATE OR REPLACE EDITIONABLE FUNCTION "CORPO"."F_TEST" RETURN NUMBER IS
+BEGIN
+  RETURN 1;
+END F_TEST;
+
+---
+
+(source_file
+  (newline)
+  (create_function
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_function)
+    schema_name: (identifier)
+    fnc_name: (identifier)
+    (return_declaration
+      (kw_return)
+      (datatype
+        (kw_number)))
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (return_statement
+          (kw_return)
+          (expression
+            (number))))
+      (newline)
+      (end_obj_named
+        (kw_end)
+        (referenced_element
+          ref_name: (identifier)))))
+  (newline))
+
+==================
+Backslash quoted select aliases
+==================
+
+SELECT a.ID_PRODUCTO \PRODUCTO\, b.NOMBRE \NOMBRE\ FROM t a, u b;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))
+          (backslash_quoted_identifier))
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))
+          (backslash_quoted_identifier)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))
+          alias: (identifier))
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))
+          alias: (identifier)))))
+  (newline))
+
+==================
+Create Java call spec function
+==================
+
+CREATE OR REPLACE EDITIONABLE FUNCTION "CORPO"."F_TEST" RETURN VARCHAR2 AUTHID CURRENT_USER AS LANGUAGE JAVA NAME 'pkg.Clazz.method() return java.lang.String';
+/
+
+---
+
+(source_file
+  (newline)
+  (create_function
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_function)
+    schema_name: (identifier)
+    fnc_name: (identifier)
+    (return_declaration
+      (kw_return)
+      (datatype
+        (kw_varchar2)))
+    (invoker_rights_clause
+      (kw_authid)
+      (kw_current_user))
+    (kw_as)
+    (call_spec_ext
+      (java_declaration
+        (kw_language)
+        (kw_java)
+        (kw_name)
+        name: (literal_string)))
+    (newline))
+  (newline))
+
+==================
+Select into indexed record field
+==================
+
+SELECT a INTO recs(i).name FROM t;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (into_clause
+        (kw_into)
+        (into_target_repeat
+          (into_target
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier))))))
+              (referenced_element
+                ref_name: (identifier))))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Extract datetime expression
+==================
+
+SELECT EXTRACT(YEAR FROM ADD_MONTHS(d, 1)) FROM t;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (extract_expression
+              (kw_extract)
+              (extract_datetime_field
+                (kw_year))
+              (kw_from)
+              (expression
+                (ref_call
+                  (referenced_element
+                    ref_name: (identifier))
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (number)))))))))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+For loop range with bulk exception count
+==================
+
+BEGIN
+  FOR j IN 1..SQL%BULK_EXCEPTIONS.COUNT LOOP
+    NULL;
+  END LOOP;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (for_loop_statement
+          (kw_for)
+          (iterator
+            (identifier)
+            (kw_in)
+            (expression
+              (number))
+            (expression
+              (bulk_attribute_reference
+                (referenced_element
+                  ref_name: (identifier))
+                (kw_bulk_exceptions)
+                (referenced_element
+                  ref_name: (identifier)))))
+          (kw_loop)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (kw_end)
+          (kw_loop)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Bulk exception attribute with unary sign
+==================
+
+BEGIN
+  x := Sqlerrm(-sql%bulk_exceptions(j).error_code);
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (unary_expression
+                        (bulk_attribute_reference
+                          (referenced_element
+                            ref_name: (identifier))
+                          (kw_bulk_exceptions)
+                          (parameter
+                            (parameter_element
+                              (parameter_value
+                                (expression
+                                  (referenced_element
+                                    ref_name: (identifier))))))
+                          (referenced_element
+                            ref_name: (identifier))))))))))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Where clause with not exists predicate
+==================
+
+SELECT * FROM t WHERE NOT EXISTS (SELECT id FROM u WHERE u.id = t.id);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (where_clause
+        (kw_where)
+        (expression
+          (kw_not)
+          (exists_predicate
+            (kw_exists)
+            (scalar_subquery
+              (kw_select)
+              (select_list
+                (select_list_element
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))
+              (kw_from)
+              (table_list
+                (table_list_element
+                  (referenced_element
+                    ref_name: (identifier))))
+              (where_clause
+                (kw_where)
+                (expression
+                  (referenced_element
+                    ref_name_parent: (identifier)
+                    ref_name: (identifier))
+                  (referenced_element
+                    ref_name_parent: (identifier)
+                    ref_name: (identifier))))))))))
+  (newline))
+
+==================
+Escaped quote string concatenation
+==================
+
+BEGIN
+  x := '''' || p || '''';
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (literal_string)
+            (referenced_element
+              ref_name: (identifier))
+            (literal_string))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+SQLPlus show errors statement
+==================
+
+SHOW ERRORS;
+
+---
+
+(source_file
+  (newline)
+  (sqlplus_statement
+    (sqlplus_show_errors_statement
+      (kw_show)
+      (kw_errors)
+      (sqlplus_line_text)))
+  (newline))
+
+==================
+Where clause with parenthesized boolean chain
+==================
+
+SELECT * FROM t WHERE a = 1 AND (b = 2 OR c = 3);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name: (identifier))
+          (number)
+          (kw_and)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (number)
+            (kw_or)
+            (referenced_element
+              ref_name: (identifier))
+            (number))))))
+  (newline))
+
+==================
+If statement with parenthesized boolean chain
+==================
+
+BEGIN
+  IF a = 1 AND (b <> c OR d <> e OR f <> g) THEN
+    NULL;
+  END IF;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (number)
+            (kw_and)
+            (expression
+              (referenced_element
+                ref_name: (identifier))
+              (referenced_element
+                ref_name: (identifier))
+              (kw_or)
+              (referenced_element
+                ref_name: (identifier))
+              (referenced_element
+                ref_name: (identifier))
+              (kw_or)
+              (referenced_element
+                ref_name: (identifier))
+              (referenced_element
+                ref_name: (identifier))))
+          (kw_then)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Qualified asterisk select list
+==================
+
+SELECT p.* FROM person p;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (qualified_asterisk
+            (identifier)
+            (kw_asterisk))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))
+          alias: (identifier)))))
+  (newline))
+
+==================
+Open for dynamic SQL using expressions
+==================
+
+BEGIN
+  OPEN c FOR SELECT id FROM t WHERE x = y USING v_id, n + 1;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (open_for_statement
+          (kw_open)
+          (referenced_element
+            ref_name: (identifier))
+          (kw_for)
+          (sql_statement_select
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier))))
+            (where_clause
+              (kw_where)
+              (expression
+                (referenced_element
+                  ref_name: (identifier))
+                (referenced_element
+                  ref_name: (identifier)))))
+          (kw_using)
+          (expression
+            (referenced_element
+              ref_name: (identifier)))
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (number))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Analytic function over window frame
+==================
+
+SELECT COUNT(1) OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) total FROM t;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (analytic_function
+              (ref_call
+                (referenced_element
+                  ref_name: (identifier))
+                (parameter
+                  (parameter_element
+                    (parameter_value
+                      (expression
+                        (number))))))
+              (analytic_over_clause
+                (kw_over)
+                (analytic_partition_by_clause
+                  (kw_partition)
+                  (kw_by)
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier))))
+                (order_by_clause
+                  (kw_order)
+                  (kw_by)
+                  (order_by_clause_element
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier)))))
+                (analytic_windowing_clause
+                  (kw_rows)
+                  (kw_between)
+                  (analytic_window_bound
+                    (kw_unbounded)
+                    (kw_preceding))
+                  (kw_and)
+                  (analytic_window_bound
+                    (kw_current)
+                    (kw_row))))))
+          (identifier)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Cursor select for update skip locked
+==================
+
+CREATE PACKAGE BODY p IS
+  CURSOR c IS SELECT id FROM t FOR UPDATE SKIP LOCKED;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (cursor_definition
+      (kw_cursor)
+      (identifier)
+      (kw_is)
+      (sql_statement_select
+        (kw_select)
+        (select_list
+          (select_list_element
+            (expression
+              (referenced_element
+                ref_name: (identifier)))))
+        (kw_from)
+        (table_list
+          (table_list_element
+            (referenced_element
+              ref_name: (identifier))))
+        (for_update_clause
+          (kw_for)
+          (kw_update)
+          (for_update_clause_extension
+            (kw_skip)
+            (kw_locked)))))
+    (newline)
+    (end_obj_named
+      (kw_end)))
+  (newline))
+
+==================
+Separated percent type attributes
+==================
+
+PROCEDURE p (x IN t.c % TYPE) IS
+  y t % ROWTYPE;
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (standalone_procedure_definition
+    (kw_procedure)
+    prc_name: (identifier)
+    (parameter_declaration
+      (parameter_declaration_element
+        (identifier)
+        (kw_in)
+        (datatype
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (kw_datatype_type
+            (kw_type)))))
+    (kw_is)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (referenced_element
+          ref_name: (identifier))
+        (kw_datatype_rowtype
+          (kw_rowtype))))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Inline view and table collection in from clause
+==================
+
+SELECT a.x FROM (SELECT x FROM t) a, TABLE(CAST(f(1) AS tt)) b WHERE a.x = b.x;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (subquery_table_reference
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier)))))
+          alias: (identifier))
+        (table_list_element
+          (table_collection_expression
+            (kw_table)
+            (expression
+              (cast_expression
+                (kw_cast)
+                (expression
+                  (ref_call
+                    (referenced_element
+                      ref_name: (identifier))
+                    (parameter
+                      (parameter_element
+                        (parameter_value
+                          (expression
+                            (number)))))))
+                (kw_as)
+                (datatype
+                  (referenced_element
+                    ref_name: (identifier))))))
+          alias: (identifier)))
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Inline view with union all
+==================
+
+SELECT * FROM (SELECT a FROM t UNION ALL SELECT a FROM u) x;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (subquery_table_reference
+            (compound_subquery
+              (kw_select)
+              (select_list
+                (select_list_element
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))
+              (kw_from)
+              (table_list
+                (table_list_element
+                  (referenced_element
+                    ref_name: (identifier))))
+              (kw_union)
+              (kw_all)
+              (kw_select)
+              (select_list
+                (select_list_element
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))
+              (kw_from)
+              (table_list
+                (table_list_element
+                  (referenced_element
+                    ref_name: (identifier))))))
+          alias: (identifier)))))
+  (newline))
+
+==================
+Scalar subquery in expression
+==================
+
+SELECT * FROM t WHERE id = (SELECT MAX(id) FROM u);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name: (identifier))
+          (scalar_subquery
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (ref_call
+                    (referenced_element
+                      ref_name: (identifier))
+                    (parameter
+                      (parameter_element
+                        (parameter_value
+                          (expression
+                            (referenced_element
+                              ref_name: (identifier))))))))))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier)))))))))
+  (newline))
+
+==================
+JSON table expression in from clause
+==================
+
+SELECT jt.id FROM JSON_TABLE(p_data FORMAT JSON, '$.value[*]' COLUMNS (id NUMBER PATH '$.id', name VARCHAR2 PATH '$.name')) jt;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (json_table_expression
+            (kw_json_table)
+            (expression
+              (referenced_element
+                ref_name: (identifier)))
+            (kw_format)
+            (kw_json)
+            (literal_string)
+            (kw_columns)
+            (json_table_column
+              (identifier)
+              (datatype
+                (kw_number))
+              (kw_path)
+              (literal_string))
+            (json_table_column
+              (identifier)
+              (datatype
+                (kw_varchar2))
+              (kw_path)
+              (literal_string)))
+          alias: (identifier)))))
+  (newline))
+
+==================
+Analytic function over partition order
+==================
+
+SELECT COUNT(1) OVER (PARTITION BY nmpoliza ORDER BY nmpoliza) total FROM t;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (analytic_function
+              (ref_call
+                (referenced_element
+                  ref_name: (identifier))
+                (parameter
+                  (parameter_element
+                    (parameter_value
+                      (expression
+                        (number))))))
+              (analytic_over_clause
+                (kw_over)
+                (analytic_partition_by_clause
+                  (kw_partition)
+                  (kw_by)
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier))))
+                (order_by_clause
+                  (kw_order)
+                  (kw_by)
+                  (order_by_clause_element
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier))))))))
+          (identifier)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+With clause with multiple factoring clauses
+==================
+
+WITH a AS (SELECT 1 x FROM dual), b AS (SELECT 2 y FROM dual) SELECT * FROM a;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (with_clause
+        (kw_with)
+        query_name: (identifier)
+        (kw_as)
+        (kw_select)
+        (select_list
+          (select_list_element
+            (expression
+              (number))
+            (identifier)))
+        (kw_from)
+        (table_list
+          (table_list_element
+            (referenced_element
+              ref_name: (identifier))))
+        query_name: (identifier)
+        (kw_as)
+        (kw_select)
+        (select_list
+          (select_list_element
+            (expression
+              (number))
+            (identifier)))
+        (kw_from)
+        (table_list
+          (table_list_element
+            (referenced_element
+              ref_name: (identifier)))))
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Merge with aliases and qualified insert columns
+==================
+
+MERGE INTO target d USING (SELECT id FROM source) s ON (d.id = s.id) WHEN NOT MATCHED THEN INSERT (d.id, d.name) VALUES (s.id, s.name);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_merge
+      (kw_merge)
+      (kw_into)
+      (referenced_element
+        ref_name: (identifier))
+      alias: (identifier)
+      (kw_using)
+      (subquery_table_reference
+        (kw_select)
+        (select_list
+          (select_list_element
+            (expression
+              (referenced_element
+                ref_name: (identifier)))))
+        (kw_from)
+        (table_list
+          (table_list_element
+            (referenced_element
+              ref_name: (identifier)))))
+      alias: (identifier)
+      (kw_on)
+      (expression
+        (referenced_element
+          ref_name_parent: (identifier)
+          ref_name: (identifier))
+        (referenced_element
+          ref_name_parent: (identifier)
+          ref_name: (identifier)))
+      (merge_insert_clause
+        (kw_when)
+        (kw_not)
+        (kw_matched)
+        (kw_then)
+        (kw_insert)
+        (referenced_element_repeat
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier)))
+        (kw_values)
+        (expression
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier)))
+        (expression
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Goto statement and label declaration
+==================
+
+BEGIN
+  IF x = 1 THEN
+    GOTO done;
+  END IF;
+  <<done>>
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (number))
+          (kw_then)
+          (newline)
+          (statement
+            (goto_statement
+              (kw_goto)
+              (identifier)))
+          (newline)
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (statement
+        (label
+          (identifier))
+        (newline)
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Assignment to indexed record field
+==================
+
+BEGIN
+  items(i).amount := 0;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (assignment_statement
+          (ref_call
+            (referenced_element
+              ref_name: (identifier))
+            (parameter
+              (parameter_element
+                (parameter_value
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier))))))
+            (referenced_element
+              ref_name: (identifier)))
+          (expression
+            (number))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Parenthesized arithmetic operands
+==================
+
+SELECT (a - b) * c FROM t;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (expression
+              (referenced_element
+                ref_name: (identifier))
+              (referenced_element
+                ref_name: (identifier)))
+            (referenced_element
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Case condition with parenthesized arithmetic
+==================
+
+SELECT CASE WHEN (a / 100) < 1 THEN 1 ELSE 2 END FROM t;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (expression_base_case_search
+              (kw_case)
+              (kw_when)
+              (expression
+                (expression
+                  (referenced_element
+                    ref_name: (identifier))
+                  (number))
+                (number))
+              (kw_then)
+              (expression
+                (number))
+              (kw_else)
+              (expression
+                (number))
+              (kw_end)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Standalone function recovery with type attribute
+==================
+
+FUNCTION existe_poliza (
+  P_FOLIO IN AP_BITACORA_NOTIFICACIONES.ID_PROCESO%TYPE
+) RETURN NUMBER IS
+  VL_EXISTE NUMBER;
+BEGIN
+  RETURN VL_EXISTE;
+END;
+
+---
+
+(source_file
+  (newline)
+  (standalone_function_definition
+    (kw_function)
+    fnc_name: (identifier)
+    (parameter_declaration
+      (newline)
+      (parameter_declaration_element
+        (identifier)
+        (kw_in)
+        (datatype
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (kw_datatype_type
+            (kw_type))))
+      (newline))
+    (return_declaration
+      (kw_return)
+      (datatype
+        (kw_number)))
+    (kw_is)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_number)))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (return_statement
+          (kw_return)
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Standalone procedure recovery with type attribute
+==================
+
+PROCEDURE registra_evento (
+  P_ID IN BITACORA_EVENTOS.ID_EVENTO%TYPE
+) IS
+  V_TOTAL NUMBER;
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (standalone_procedure_definition
+    (kw_procedure)
+    prc_name: (identifier)
+    (parameter_declaration
+      (newline)
+      (parameter_declaration_element
+        (identifier)
+        (kw_in)
+        (datatype
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (kw_datatype_type
+            (kw_type))))
+      (newline))
+    (kw_is)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_number)))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Cursor parameters with unconstrained varchar
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg IS
+FUNCTION f(x VARCHAR2) RETURN NUMBER IS
+  CURSOR c (a VARCHAR, b VARCHAR2) IS SELECT 1 FROM dual;
+BEGIN
+  RETURN 1;
+END;
+END;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (function_definition
+      (kw_function)
+      fnc_name: (identifier)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (datatype
+            (kw_varchar2))))
+      (return_declaration
+        (kw_return)
+        (datatype
+          (kw_number)))
+      (kw_is)
+      (newline)
+      (cursor_definition
+        (kw_cursor)
+        (identifier)
+        (cursor_declaration_parameters
+          (cursor_declaration_parameter
+            (identifier)
+            (kw_varchar))
+          (cursor_declaration_parameter
+            (identifier)
+            (datatype
+              (kw_varchar2))))
+        (kw_is)
+        (sql_statement_select
+          (kw_select)
+          (select_list
+            (select_list_element
+              (expression
+                (number))))
+          (kw_from)
+          (table_list
+            (table_list_element
+              (referenced_element
+                ref_name: (identifier))))))
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)
+            (expression
+              (number))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (end_obj_named
+      (kw_end))
+    (newline))
+  (newline))
+
+==================
+Keyword prefixes inside identifiers
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg AS
+  PROCEDURE p IS
+    v_cursor SYS_REFCURSOR;
+    v_count NUMBER;
+  BEGIN
+    SELECT COUNT(*) INTO v_count FROM CB_TRANSACCION WHERE ID = TO_NUMBER('1');
+    RAISE_APPLICATION_ERROR(-20001, 'x');
+  END;
+END;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_as)
+    (newline)
+    (procedure_definition
+      (kw_procedure)
+      prc_name: (identifier)
+      (kw_is)
+      (newline)
+      (item_declaration
+        (identifier)
+        (datatype
+          (referenced_element
+            ref_name: (identifier))))
+      (newline)
+      (item_declaration
+        (identifier)
+        (datatype
+          (kw_number)))
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (sql_statement_select
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (ref_call
+                    (referenced_element
+                      ref_name: (identifier))
+                    (parameter
+                      (parameter_element
+                        (parameter_value
+                          (kw_asterisk))))))))
+            (into_clause
+              (kw_into)
+              (into_target_repeat
+                (into_target
+                  (referenced_element
+                    ref_name: (identifier)))))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier))))
+            (where_clause
+              (kw_where)
+              (expression
+                (referenced_element
+                  ref_name: (identifier))
+                (ref_call
+                  (referenced_element
+                    ref_name: (identifier))
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (literal_string))))))))))
+        (newline)
+        (statement
+          (ref_call
+            (referenced_element
+              ref_name: (identifier))
+            (parameter
+              (parameter_element
+                (parameter_value
+                  (expression
+                    (number))))
+              (parameter_element
+                (parameter_value
+                  (expression
+                    (literal_string)))))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (end_obj_named
+      (kw_end))
+    (newline))
+  (newline))
+
+==================
+Keyword prefix procedure call stays identifier
+==================
+
+BEGIN
+  LOCK_LOTE (p_lote,'I',v_msg_err);
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (ref_call
+          (referenced_element
+            ref_name: (identifier))
+          (parameter
+            (parameter_element
+              (parameter_value
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))))
+            (parameter_element
+              (parameter_value
+                (expression
+                  (literal_string))))
+            (parameter_element
+              (parameter_value
+                (expression
+                  (referenced_element
+                    ref_name: (identifier))))))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Keyword underscore-prefixed declarations
+==================
+
+CREATE OR REPLACE PROCEDURE p IS
+  select_priv char(1):='N';
+  insert_priv char(1):='N';
+  delete_priv char(1):='N';
+  update_priv char(1):='N';
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    prc_name: (identifier)
+    (kw_is)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_char)
+        (number))
+      (default_expression
+        (expression
+          (literal_string))))
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_char)
+        (number))
+      (default_expression
+        (expression
+          (literal_string))))
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_char)
+        (number))
+      (default_expression
+        (expression
+          (literal_string))))
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_char)
+        (number))
+      (default_expression
+        (expression
+          (literal_string))))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Oracle legacy outer join marker
+==================
+
+SELECT A.ID FROM T1 A, T2 B WHERE A.ID = B.ID(+);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))
+          alias: (identifier))
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))
+          alias: (identifier)))
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (oracle_outer_join_reference
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier))
+            (old_outer_join_marker))))))
+  (newline))
+
+==================
+FORALL bulk DML with record values
+==================
+
+BEGIN
+  FORALL i IN 1..items.COUNT
+    INSERT INTO t VALUES items(i);
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (forall_statement
+          (kw_forall)
+          iterator: (identifier)
+          (kw_in)
+          (forall_bounds
+            (expression
+              (number))
+            (expression
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier))))
+          (newline)
+          (sql_statement_insert
+            (kw_insert)
+            (single_table_insert
+              (kw_into)
+              (referenced_element
+                ref_name: (identifier))
+              (values_clause
+                (kw_values)
+                (record_values_element
+                  (expression
+                    (ref_call
+                      (referenced_element
+                        ref_name: (identifier))
+                      (parameter
+                        (parameter_element
+                          (parameter_value
+                            (expression
+                              (referenced_element
+                                ref_name: (identifier))))))))))))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Pragma statement inside package body
+==================
+
+CREATE OR REPLACE PACKAGE BODY demo_pkg IS
+  FUNCTION f RETURN NUMBER IS
+  BEGIN
+    RETURN 1;
+    PRAGMA RESTRICT_REFERENCES(f, WNDS);
+  END;
+END;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (function_definition
+      (kw_function)
+      fnc_name: (identifier)
+      (return_declaration
+        (kw_return)
+        (datatype
+          (kw_number)))
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)
+            (expression
+              (number))))
+        (newline)
+        (statement
+          (pragma_statement
+            (kw_pragma)
+            (identifier)
+            (parameter
+              (parameter_element
+                (parameter_value
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))
+              (parameter_element
+                (parameter_value
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier))))))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (end_obj_named
+      (kw_end))
+    (newline))
+  (newline))
+
+==================
+Cursor for loop with ordered subquery
+==================
+
+BEGIN
+  FOR c IN (SELECT id FROM t ORDER BY id DESC) LOOP
+    NULL;
+  END LOOP;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (for_loop_statement
+          (kw_for)
+          (iterator
+            (identifier)
+            (kw_in)
+            (expression
+              (scalar_subquery
+                (kw_select)
+                (select_list
+                  (select_list_element
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier)))))
+                (kw_from)
+                (table_list
+                  (table_list_element
+                    (referenced_element
+                      ref_name: (identifier))))
+                (order_by_clause
+                  (kw_order)
+                  (kw_by)
+                  (order_by_clause_element
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier)))
+                    (kw_desc))))))
+          (kw_loop)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (kw_end)
+          (kw_loop)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+THE collection expression in from clause
+==================
+
+OPEN rc FOR SELECT * FROM THE(SELECT CAST(items AS item_array) FROM dual);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (open_for_statement
+      (kw_open)
+      (referenced_element
+        ref_name: (identifier))
+      (kw_for)
+      (sql_statement_select
+        (kw_select)
+        (select_list
+          (select_list_element
+            (kw_asterisk)))
+        (kw_from)
+        (table_list
+          (table_list_element
+            (the_collection_expression
+              (kw_the)
+              (kw_select)
+              (select_list
+                (select_list_element
+                  (expression
+                    (cast_expression
+                      (kw_cast)
+                      (expression
+                        (referenced_element
+                          ref_name: (identifier)))
+                      (kw_as)
+                      (datatype
+                        (referenced_element
+                          ref_name: (identifier)))))))
+              (kw_from)
+              (table_list
+                (table_list_element
+                  (referenced_element
+                    ref_name: (identifier))))))))))
+  (newline))
+
+==================
+Pipe row with expression
+==================
+
+BEGIN
+  PIPE ROW(i + 1);
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (pipe_row_statement
+          (kw_pipe)
+          (kw_row)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (number))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Arithmetic expression before between
+==================
+
+SELECT id FROM t WHERE NVL(d, d) + 1 BETWEEN TRUNC(a) AND TRUNC(b);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (where_clause
+        (kw_where)
+        (expression
+          (ref_call
+            (referenced_element
+              ref_name: (identifier))
+            (parameter
+              (parameter_element
+                (parameter_value
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))
+              (parameter_element
+                (parameter_value
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))))
+          (number)
+          (kw_between)
+          (expression
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier))))))))
+          (kw_and)
+          (expression
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier))))))))))))
+  (newline))
+
+==================
+Arithmetic expression before comparison
+==================
+
+BEGIN
+  IF l_conta+6 > l_tam_pag THEN
+    NULL;
+  END IF;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (number)
+            (referenced_element
+              ref_name: (identifier)))
+          (kw_then)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Division expression before comparison
+==================
+
+BEGIN
+  IF rrecibo.prima_neta < ABS(prima_netaaju)/meses1 THEN
+    NULL;
+  END IF;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier))
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier)))))))
+            (referenced_element
+              ref_name: (identifier)))
+          (kw_then)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Standalone function return varchar without size
+==================
+
+FUNCTION f_desc(p_id T.COL%TYPE) RETURN VARCHAR IS
+  v_text VARCHAR2(10);
+BEGIN
+  RETURN v_text;
+END;
+
+---
+
+(source_file
+  (newline)
+  (standalone_function_definition
+    (kw_function)
+    fnc_name: (identifier)
+    (parameter_declaration
+      (parameter_declaration_element
+        (identifier)
+        (datatype
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (kw_datatype_type
+            (kw_type)))))
+    (return_declaration
+      (kw_return)
+      (kw_varchar))
+    (kw_is)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_varchar2)
+        (number)))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (return_statement
+          (kw_return)
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Open cursor for dynamic expression
+==================
+
+BEGIN
+  OPEN c FOR v_query;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (open_for_statement
+          (kw_open)
+          (referenced_element
+            ref_name: (identifier))
+          (kw_for)
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+In predicate with expression list
+==================
+
+SELECT id FROM t WHERE status NOT IN (TAR, DXN);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name: (identifier))
+          (kw_not)
+          (kw_in)
+          (in_expression_list
+            (expression
+              (referenced_element
+                ref_name: (identifier)))
+            (expression
+              (referenced_element
+                ref_name: (identifier))))))))
+  (newline))
+
+==================
+Sys package datatype
+==================
+
+PROCEDURE p(f IN OUT SYS.UTL_FILE.FILE_TYPE) IS
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (standalone_procedure_definition
+    (kw_procedure)
+    prc_name: (identifier)
+    (parameter_declaration
+      (parameter_declaration_element
+        (identifier)
+        (kw_in)
+        (kw_out)
+        (datatype
+          (sys_datatype
+            (kw_sys)
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier))))))
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Where current of cursor
+==================
+
+BEGIN
+  UPDATE t SET x = x - 1 WHERE CURRENT OF curPosicionCapa;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (sql_statement_update
+          (kw_update)
+          (referenced_element
+            ref_name: (identifier))
+          (update_set_clause
+            (kw_set)
+            (update_set_clause_elements
+              (referenced_element
+                ref_name: (identifier))
+              (expression
+                (referenced_element
+                  ref_name: (identifier))
+                (number))))
+          (where_clause
+            (where_current_of_clause
+              (kw_where)
+              (kw_current)
+              (kw_of)
+              (referenced_element
+                ref_name: (identifier))))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Exists predicate with parenthesized union
+==================
+
+SELECT id FROM t WHERE EXISTS ((SELECT id FROM a) UNION (SELECT id FROM b));
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (where_clause
+        (kw_where)
+        (expression
+          (exists_predicate
+            (kw_exists)
+            (scalar_subquery
+              (compound_subquery
+                (kw_select)
+                (select_list
+                  (select_list_element
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier)))))
+                (kw_from)
+                (table_list
+                  (table_list_element
+                    (referenced_element
+                      ref_name: (identifier))))
+                (kw_union)
+                (kw_select)
+                (select_list
+                  (select_list_element
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier)))))
+                (kw_from)
+                (table_list
+                  (table_list_element
+                    (referenced_element
+                      ref_name: (identifier)))))))))))
+  (newline))
+
+==================
+Trim expression forms and infix mod
+==================
+
+BEGIN
+  x := TRIM(BOTH FROM y) || TRIM(both ' ' FROM z) || TRIM(SUBSTR(txt, 1, 2));
+  meses := ((12 - mesAseg) + mesEmision) MOD 12;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (trim_expression
+              (kw_trim)
+              (trim_from_expression
+                (trim_spec
+                  (kw_both))
+                (kw_from)
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))))
+            (trim_expression
+              (kw_trim)
+              (trim_from_expression
+                (trim_spec
+                  (kw_both))
+                (expression
+                  (literal_string))
+                (kw_from)
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))))
+            (trim_expression
+              (kw_trim)
+              (expression
+                (ref_call
+                  (referenced_element
+                    ref_name: (identifier))
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (number))))
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (number)))))))))))
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (expression
+              (expression
+                (number)
+                (referenced_element
+                  ref_name: (identifier)))
+              (referenced_element
+                ref_name: (identifier)))
+            (kw_mod)
+            (number))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Case expression operands like parens and named block end
+==================
+
+BEGIN
+  CASE TRIM(SUBSTR(txt, 1, 2))
+    WHEN '1' THEN x := 'a';
+    ELSE x := x;
+  END CASE;
+  y := CASE WHEN NVL(a, 0) > 0 THEN '1' ELSE '0' END || token;
+  IF name LIKE ('%AUDITORIAS%') THEN NULL; END IF;
+  <<fetch_reserve>>
+  BEGIN
+    NULL;
+  END fetch_reserve;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (case_statement
+          (kw_case)
+          (expression
+            (trim_expression
+              (kw_trim)
+              (expression
+                (ref_call
+                  (referenced_element
+                    ref_name: (identifier))
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (number))))
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (number)))))))))
+          (newline)
+          (kw_when)
+          (expression
+            (literal_string))
+          (kw_then)
+          (statement
+            (assignment_statement
+              (referenced_element
+                ref_name: (identifier))
+              (expression
+                (literal_string))))
+          (newline)
+          (kw_else)
+          (statement
+            (assignment_statement
+              (referenced_element
+                ref_name: (identifier))
+              (expression
+                (referenced_element
+                  ref_name: (identifier)))))
+          (newline)
+          (kw_end)
+          (kw_case)))
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (expression_base_case_search
+              (kw_case)
+              (kw_when)
+              (expression
+                (ref_call
+                  (referenced_element
+                    ref_name: (identifier))
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (number))))))
+                (number))
+              (kw_then)
+              (expression
+                (literal_string))
+              (kw_else)
+              (expression
+                (literal_string))
+              (kw_end))
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (kw_like)
+            (expression
+              (expression
+                (literal_string))))
+          (kw_then)
+          (statement
+            (null_statement
+              (kw_null)))
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (statement
+        (label
+          (identifier))
+        (newline)
+        (plsql_block
+          (kw_begin)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (end_obj
+            (kw_end)
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Tuple in predicate and at time zone
+==================
+
+SELECT id FROM t WHERE (cveserv, motivoserv) IN ((CN_ZERO, CN_ZERO), (N_2208, N_631));
+
+BEGIN
+  x := SYSTIMESTAMP AT TIME ZONE 'UTC';
+END;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (where_clause
+        (kw_where)
+        (expression
+          (row_value_expression
+            (expression
+              (referenced_element
+                ref_name: (identifier)))
+            (expression
+              (referenced_element
+                ref_name: (identifier))))
+          (kw_in)
+          (in_expression_list
+            (expression
+              (row_value_expression
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))))
+            (expression
+              (row_value_expression
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))
+                (expression
+                  (referenced_element
+                    ref_name: (identifier))))))))))
+  (newline)
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (at_time_zone_expression
+              (referenced_element
+                ref_name: (identifier))
+              (kw_at)
+              (kw_time)
+              (kw_zone)
+              (literal_string)))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Package body initialization block
+==================
+
+CREATE OR REPLACE EDITIONABLE PACKAGE BODY "CORPO"."PKG_DEMO" AS
+  v NUMBER;
+BEGIN
+  v := 1;
+EXCEPTION
+  WHEN OTHERS THEN
+    NULL;
+END PKG_DEMO;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name_parent: (identifier)
+      ref_name: (identifier))
+    (kw_as)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_number)))
+    (newline)
+    (package_initialization_block
+      (kw_begin)
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (number))))
+      (newline)
+      (exception_block
+        (kw_exception)
+        (newline)
+        (exception_handler
+          (kw_when)
+          (kw_others)
+          (kw_then)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null))))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        ref_name: (identifier)))
+    (newline))
+  (newline))
+
+==================
+Lock table mode without wait option
+==================
+
+BEGIN
+  LOCK TABLE co_tipo_guia IN ROW EXCLUSIVE MODE;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (sql_statement_lock_table
+          (kw_lock)
+          (kw_table)
+          (referenced_element
+            ref_name: (identifier))
+          (kw_in)
+          (identifier)
+          (identifier)
+          (kw_mode)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+XMLTable table expression
+==================
+
+SELECT x.SessionODI
+FROM XMLTable(xmlnamespaces('http://schemas.xmlsoap.org/soap/envelope/' AS "S", 'xmlns.oracle.com/odi/OdiInvoke/' AS "ns2"),
+              'S:Envelope/S:Body/ns2:OdiStartScenResponse'
+       PASSING XMLTYPE(res_envelop)
+       COLUMNS SessionODI NUMBER PATH './Session') x;
+
+SELECT *
+FROM XMLTABLE('/items/item' PASSING XMLTYPE(pi_MovimientosXML)
+       COLUMNS CVE_ENTIDAD VARCHAR2(5) PATH 'CVE_ENTIDAD', IMPORTE NUMBER PATH 'IMPORTE');
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (xml_table_expression
+            (kw_xmltable)
+            (xmlnamespaces_clause
+              (kw_xmlnamespaces)
+              (xmlnamespace_element
+                (literal_string)
+                (kw_as)
+                (identifier))
+              (xmlnamespace_element
+                (literal_string)
+                (kw_as)
+                (identifier)))
+            (newline)
+            (expression
+              (literal_string))
+            (newline)
+            (kw_passing)
+            (expression
+              (xml_function_call
+                (xmltype_call
+                  (kw_xmltype)
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))))))
+            (newline)
+            (kw_columns)
+            (xml_table_column
+              (identifier)
+              (datatype
+                (kw_number))
+              (kw_path)
+              (literal_string)))
+          alias: (identifier)))))
+  (newline)
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (xml_table_expression
+            (kw_xmltable)
+            (expression
+              (literal_string))
+            (kw_passing)
+            (expression
+              (xml_function_call
+                (xmltype_call
+                  (kw_xmltype)
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))))))
+            (newline)
+            (kw_columns)
+            (xml_table_column
+              (identifier)
+              (datatype
+                (kw_varchar2)
+                (number))
+              (kw_path)
+              (literal_string))
+            (xml_table_column
+              (identifier)
+              (datatype
+                (kw_number))
+              (kw_path)
+              (literal_string)))))))
+  (newline))
+
+==================
+Function parameter with distinct
+==================
+
+SELECT COUNT(DISTINCT promotoria) FROM vagentes;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (distinct_parameter_value
+                      (kw_distinct)
+                      (expression
+                        (referenced_element
+                          ref_name: (identifier)))))))))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+XMLForest aliased elements
+==================
+
+SELECT xmlforest(vTabRefBancos(i).BANCO AS BANCO, nvl(x,'----') AS CONVENIO) FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (xml_function_call
+              (xmlforest_expression
+                (kw_xmlforest)
+                (xmlforest_element
+                  (expression
+                    (ref_call
+                      (referenced_element
+                        ref_name: (identifier))
+                      (parameter
+                        (parameter_element
+                          (parameter_value
+                            (expression
+                              (referenced_element
+                                ref_name: (identifier))))))
+                      (referenced_element
+                        ref_name: (identifier))))
+                  (kw_as)
+                  (identifier))
+                (xmlforest_element
+                  (expression
+                    (ref_call
+                      (referenced_element
+                        ref_name: (identifier))
+                      (parameter
+                        (parameter_element
+                          (parameter_value
+                            (expression
+                              (referenced_element
+                                ref_name: (identifier)))))
+                        (parameter_element
+                          (parameter_value
+                            (expression
+                              (literal_string)))))))
+                  (kw_as)
+                  (identifier)))))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+XMLTable path expression and XMLType call
+==================
+
+SELECT * FROM XMLTABLE(vl_path PASSING XMLTYPE(registros_compras) COLUMNS OPERACION CHAR(1) PATH 'OPERACION', PRECIO NUMBER(24,11) PATH 'PRECIO') x;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (xml_table_expression
+            (kw_xmltable)
+            (expression
+              (referenced_element
+                ref_name: (identifier)))
+            (kw_passing)
+            (expression
+              (xml_function_call
+                (xmltype_call
+                  (kw_xmltype)
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))))))
+            (kw_columns)
+            (xml_table_column
+              (identifier)
+              (datatype
+                (kw_char)
+                (number))
+              (kw_path)
+              (literal_string))
+            (xml_table_column
+              (identifier)
+              (datatype
+                (kw_number)
+                (number)
+                (number))
+              (kw_path)
+              (literal_string)))
+          alias: (identifier)))))
+  (newline))
+
+==================
+Update set qualified column tuple
+==================
+
+UPDATE env_cba_deudores a SET (a.stat_envio, a.forma_pago) = (SELECT b.stat_envio, b.formapago FROM t b);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_update
+      (kw_update)
+      (referenced_element
+        ref_name: (identifier))
+      alias: (identifier)
+      (update_set_clause
+        (kw_set)
+        (update_set_clause_elements
+          (dml_column_list_repeat
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier))
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))
+          (sql_statement_select
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (referenced_element
+                    ref_name_parent: (identifier)
+                    ref_name: (identifier))))
+              (select_list_element
+                (expression
+                  (referenced_element
+                    ref_name_parent: (identifier)
+                    ref_name: (identifier)))))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier))
+                alias: (identifier))))))))
+  (newline))
+
+==================
+Unpivot include nulls clause
+==================
+
+SELECT * FROM t UNPIVOT INCLUDE NULLS (otvalor FOR cdatribu IN (nmnumsin AS 8, ottempot AS 10));
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))
+          (unpivot_clause
+            (kw_unpivot)
+            (kw_include)
+            (kw_nulls)
+            (unpivot_measure_list
+              (referenced_element
+                ref_name: (identifier)))
+            (kw_for)
+            (identifier)
+            (kw_in)
+            (unpivot_in_element
+              (referenced_element
+                ref_name: (identifier))
+              (kw_as)
+              (number))
+            (unpivot_in_element
+              (referenced_element
+                ref_name: (identifier))
+              (kw_as)
+              (number)))))))
+  (newline))
+
+==================
+Boolean cursor attribute operand
+==================
+
+BEGIN IF v_st=0 OR c_puntocob%NOTFOUND THEN NULL; END IF; END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (number)
+            (kw_or)
+            (referenced_element
+              ref_name: (identifier))
+            (kw_notfound))
+          (kw_then)
+          (statement
+            (null_statement
+              (kw_null)))
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Pivot clause with literal aliases
+==================
+
+SELECT * FROM (SELECT rn, cve_contable FROM co_def_columnas) PIVOT(MAX(cve_contable) FOR rn IN (1 AS div1, 2 AS div2));
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (subquery_table_reference
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (referenced_element
+                    ref_name: (identifier))))
+              (select_list_element
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier)))))
+          (pivot_clause
+            (kw_pivot)
+            (pivot_aggregate_expression
+              (expression
+                (ref_call
+                  (referenced_element
+                    ref_name: (identifier))
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))))))
+            (kw_for)
+            (referenced_element
+              ref_name: (identifier))
+            (kw_in)
+            (pivot_in_element
+              (expression
+                (number))
+              (kw_as)
+              (identifier))
+            (pivot_in_element
+              (expression
+                (number))
+              (kw_as)
+              (identifier)))))))
+  (newline))
+
+==================
+Database link with dotted name
+==================
+
+SELECT a.aaqq FROM ap_ctlcarga_hist@MODIFY_METHP_METHPP.WORLD a;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier)
+            remote_name: (dblink_name))
+          alias: (identifier)))))
+  (newline))
+
+==================
+XMLType static call chained method
+==================
+
+SELECT (XMLTYPE.createxml(vlClobSalida)).extract('ROWSET/*') INTO vXML FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (parenthesized_method_call
+              (expression
+                (xml_function_call
+                  (xmltype_call
+                    (kw_xmltype)
+                    (referenced_element
+                      ref_name: (identifier))
+                    (parameter
+                      (parameter_element
+                        (parameter_value
+                          (expression
+                            (referenced_element
+                              ref_name: (identifier)))))))))
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (literal_string)))))))))
+      (into_clause
+        (kw_into)
+        (into_target_repeat
+          (into_target
+            (referenced_element
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Case keyword predicate column
+==================
+
+DELETE prov_inconsistencias_root WHERE task = 'PRO229' AND Case IN ('2L','2F');
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_delete
+      (kw_delete)
+      (referenced_element
+        ref_name: (identifier))
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name: (identifier))
+          (literal_string)
+          (kw_and)
+          (case_keyword_predicate
+            (identifier)
+            (kw_in)
+            (in_expression_list
+              (expression
+                (literal_string))
+              (expression
+                (literal_string))))))))
+  (newline))
+
+==================
+Listagg within group
+==================
+
+SELECT LISTAGG(UNIQUE(cve_rol_partic), ',') WITHIN GROUP (ORDER BY cve_rol_partic) INTO v FROM t;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (within_group_function
+              (ref_call
+                (referenced_element
+                  ref_name: (identifier))
+                (parameter
+                  (parameter_element
+                    (parameter_value
+                      (distinct_parameter_value
+                        (kw_unique)
+                        (expression
+                          (expression
+                            (referenced_element
+                              ref_name: (identifier)))))))
+                  (parameter_element
+                    (parameter_value
+                      (expression
+                        (literal_string))))))
+              (kw_within)
+              (kw_group)
+              (order_by_clause
+                (kw_order)
+                (kw_by)
+                (order_by_clause_element
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))))))
+      (into_clause
+        (kw_into)
+        (into_target_repeat
+          (into_target
+            (referenced_element
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Aggregate keep dense rank
+==================
+
+SELECT MAX(mxcol.id_solicitud) KEEP(DENSE_RANK FIRST ORDER BY mxcol.f_operacion DESC) id_solicitud FROM t;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (keep_dense_rank_function
+              (ref_call
+                (referenced_element
+                  ref_name: (identifier))
+                (parameter
+                  (parameter_element
+                    (parameter_value
+                      (expression
+                        (referenced_element
+                          ref_name_parent: (identifier)
+                          ref_name: (identifier)))))))
+              (kw_keep)
+              (kw_dense_rank)
+              (kw_first)
+              (order_by_clause
+                (kw_order)
+                (kw_by)
+                (order_by_clause_element
+                  (expression
+                    (referenced_element
+                      ref_name_parent: (identifier)
+                      ref_name: (identifier)))
+                  (kw_desc)))))
+          (identifier)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Cursor expression in select list
+==================
+
+SELECT cursor(SELECT tr.id_transaccion AS id_transaccion FROM cb_transaccion tr) FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (cursor_expression
+              (kw_cursor)
+              (sql_statement_select
+                (kw_select)
+                (select_list
+                  (select_list_element
+                    (expression
+                      (referenced_element
+                        ref_name_parent: (identifier)
+                        ref_name: (identifier)))
+                    (kw_as)
+                    (identifier)))
+                (kw_from)
+                (table_list
+                  (table_list_element
+                    (referenced_element
+                      ref_name: (identifier))
+                    alias: (identifier))))))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+PLSQL compile unit constant
+==================
+
+BEGIN log_pkg.write(peNomProceso => $$PLSQL_UNIT); END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (statement
+        (ref_call
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (parameter
+            (parameter_element
+              (parameter_name
+                (identifier))
+              (parameter_value
+                (expression
+                  (plsql_compile_constant)))))))
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+SQLPlus slash show errors
+==================
+
+/ SHOW ERRORS;
+
+---
+
+(source_file
+  (newline)
+  (sqlplus_statement
+    (sqlplus_slash_show_errors_statement))
+  (newline))
+
+==================
+Deep object attribute reference
+==================
+
+BEGIN apex_json.write('calle', PEJSONPLTYPE.TRAMA1.datos_emisor.domicilio.calle); END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (statement
+        (ref_call
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (parameter
+            (parameter_element
+              (parameter_value
+                (expression
+                  (literal_string))))
+            (parameter_element
+              (parameter_value
+                (expression
+                  (referenced_element
+                    ref_name_parent: (identifier)
+                    ref_name: (identifier)
+                    ref_name_sub: (identifier)
+                    ref_name_sub: (identifier)
+                    ref_name_sub: (identifier))))))))
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Having before group by legacy order
+==================
+
+SELECT a FROM t HAVING COUNT(*) > 0 GROUP BY a;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (group_having_clauses
+        (having_clause
+          (kw_having)
+          (expression
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (kw_asterisk)))))
+            (number)))
+        (group_by_clause
+          (kw_group)
+          (kw_by)
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))))
+  (newline))
+
+==================
+Unpivot for parenthesized column
+==================
+
+SELECT * FROM paises UNPIVOT EXCLUDE NULLS (val FOR (source) IN (cve_pais AS 'CVE_PAIS', nacionalidad AS 'NACIONALIDAD'));
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (kw_asterisk)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))
+          (unpivot_clause
+            (kw_unpivot)
+            (kw_exclude)
+            (kw_nulls)
+            (unpivot_measure_list
+              (referenced_element
+                ref_name: (identifier)))
+            (kw_for)
+            (identifier_list_repeat
+              (identifier))
+            (kw_in)
+            (unpivot_in_element
+              (referenced_element
+                ref_name: (identifier))
+              (kw_as)
+              (literal_string))
+            (unpivot_in_element
+              (referenced_element
+                ref_name: (identifier))
+              (kw_as)
+              (literal_string)))))))
+  (newline))
+
+==================
+Analytic row number with empty parameters
+==================
+
+SELECT ROW_NUMBER() OVER(PARTITION BY nmpoliza ORDER BY cdgarant) rnum FROM t;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (analytic_function
+              (ref_call
+                (referenced_element
+                  ref_name: (identifier))
+                (parameter))
+              (analytic_over_clause
+                (kw_over)
+                (analytic_partition_by_clause
+                  (kw_partition)
+                  (kw_by)
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier))))
+                (order_by_clause
+                  (kw_order)
+                  (kw_by)
+                  (order_by_clause_element
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier))))))))
+          (identifier)))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Cast expression at time zone
+==================
+
+BEGIN v := TO_CHAR(CAST(SYSDATE AS TIMESTAMP) AT TIME ZONE 'UTC'); END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (at_time_zone_expression
+                        (cast_expression
+                          (kw_cast)
+                          (expression
+                            (referenced_element
+                              ref_name: (identifier)))
+                          (kw_as)
+                          (datatype
+                            (kw_timestamp)))
+                        (kw_at)
+                        (kw_time)
+                        (kw_zone)
+                        (literal_string))))))))))
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+XMLType direct method call
+==================
+
+SELECT xmltype('<a/>').extract('/*') FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (xml_function_method_call
+              (xml_function_call
+                (xmltype_call
+                  (kw_xmltype)
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (literal_string)))))))
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (literal_string)))))))))
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+New JSON object constructors
+==================
+
+BEGIN po_encabezado := new JSON_OBJECT_T; po_detalle_array := new JSON_ARRAY_T; END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (new_object_expression
+              (kw_new)
+              (kw_json_object_t)))))
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (new_object_expression
+              (kw_new)
+              (kw_json_array_t)))))
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Forall save exceptions
+==================
+
+BEGIN FORALL i IN tab_ap_ctlpago.FIRST..tab_ap_ctlpago.LAST SAVE EXCEPTIONS INSERT INTO ctlsob (nmpoliza) VALUES(tab_ap_ctlpago(i).nmpoliza); END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (statement
+        (forall_statement
+          (kw_forall)
+          iterator: (identifier)
+          (kw_in)
+          (forall_bounds
+            (expression
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier)))
+            (expression
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier))))
+          (save_exceptions_clause
+            (kw_save)
+            (kw_exceptions))
+          (sql_statement_insert
+            (kw_insert)
+            (single_table_insert
+              (kw_into)
+              (referenced_element
+                ref_name: (identifier))
+              (dml_column_list_repeat
+                (referenced_element
+                  ref_name: (identifier)))
+              (values_clause
+                (kw_values)
+                (record_values_element
+                  (expression
+                    (expression
+                      (ref_call
+                        (referenced_element
+                          ref_name: (identifier))
+                        (parameter
+                          (parameter_element
+                            (parameter_value
+                              (expression
+                                (referenced_element
+                                  ref_name: (identifier))))))
+                        (referenced_element
+                          ref_name: (identifier)))))))))))
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Oracle q quote string
+==================
+
+BEGIN v := q'[ SELECT a FROM t WHERE x = 'PF' ]'; END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (literal_string
+              (q_quote_string)))))
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Latin identifier characters
+==================
+
+BEGIN pi_año := corpo.MX_CONFIGURACION_TASK.AÑO; END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)
+              (identifier)))))
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Escaped unicode identifier segments
+==================
+
+CREATE OR REPLACE FUNCTION f_unicode RETURN NUMBER IS
+  a\u00f1o NUMBER;
+BEGIN
+  a\u00f1o := 2024;
+  RETURN a\u00f1o;
+END;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_function
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_function)
+    fnc_name: (identifier)
+    (return_declaration
+      (kw_return)
+      (datatype
+        (kw_number)))
+    (kw_is)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_number)))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (number))))
+      (newline)
+      (statement
+        (return_statement
+          (kw_return)
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (end_obj_named
+        (kw_end)))
+    (newline))
+  (newline))
+
+==================
+Mojibake markers between statements
+==================
+
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('x');¿¿/* debug */
+  NULL;¿
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (ref_call
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (parameter
+            (parameter_element
+              (parameter_value
+                (expression
+                  (literal_string)))))))
+      (comment_ml)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Ref cursor type in declaration section
+==================
+
+CREATE OR REPLACE FUNCTION f_ref RETURN NUMBER IS
+  TYPE rc IS REF CURSOR;
+  c rc;
+BEGIN
+  RETURN 1;
+END;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_function
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_function)
+    fnc_name: (identifier)
+    (return_declaration
+      (kw_return)
+      (datatype
+        (kw_number)))
+    (kw_is)
+    (newline)
+    (type_definition_ref_cursor
+      (kw_type)
+      ref_cursor_name: (identifier)
+      (kw_is)
+      (kw_ref)
+      (kw_cursor))
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (referenced_element
+          ref_name: (identifier))))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (return_statement
+          (kw_return)
+          (expression
+            (number))))
+      (newline)
+      (end_obj_named
+        (kw_end)))
+    (newline))
+  (newline))
+
+==================
+Package spec cursor definition with with clause
+==================
+
+CREATE OR REPLACE PACKAGE pkg IS
+  CURSOR c (p_id IN tab.col%TYPE) IS
+    WITH q AS (
+      SELECT p_id n FROM dual
+    )
+    SELECT n FROM q;
+END;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (cursor_definition
+      (kw_cursor)
+      (identifier)
+      (cursor_declaration_parameters
+        (cursor_declaration_parameter
+          (identifier)
+          (kw_in)
+          (datatype
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier))
+            (kw_datatype_type
+              (kw_type)))))
+      (kw_is)
+      (newline)
+      (sql_statement_select
+        (with_clause
+          (kw_with)
+          query_name: (identifier)
+          (kw_as)
+          (newline)
+          (kw_select)
+          (select_list
+            (select_list_element
+              (expression
+                (referenced_element
+                  ref_name: (identifier)))
+              (identifier)))
+          (kw_from)
+          (table_list
+            (table_list_element
+              (referenced_element
+                ref_name: (identifier))))
+          (newline))
+        (newline)
+        (kw_select)
+        (select_list
+          (select_list_element
+            (expression
+              (referenced_element
+                ref_name: (identifier)))))
+        (kw_from)
+        (table_list
+          (table_list_element
+            (referenced_element
+              ref_name: (identifier))))))
+    (newline)
+    (end_obj_named
+      (kw_end))
+    (newline))
+  (newline))
+
+==================
+Create procedure with declare after is
+==================
+
+CREATE OR REPLACE PROCEDURE p IS
+DECLARE
+  x NUMBER;
+BEGIN
+  NULL;
+END;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    prc_name: (identifier)
+    (kw_is)
+    (newline)
+    (kw_declare)
+    (newline)
+    (item_declaration
+      (identifier)
+      (datatype
+        (kw_number)))
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end)))
+    (newline))
+  (newline))
+
+==================
+Spaced comparison operator
+==================
+
+BEGIN
+  IF a < = b THEN
+    NULL;
+  END IF;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (referenced_element
+              ref_name: (identifier)))
+          (kw_then)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Empty declare block
+==================
+
+DECLARE
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_declare)
+      (newline)
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Parenthesized unpivot table reference
+==================
+
+SELECT value
+FROM ((SELECT v_poliza2 p1 FROM dual)
+      UNPIVOT (value FOR value_type IN (p1)));
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (subquery_table_reference
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))
+                (identifier)))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier)))))
+          (newline)
+          (unpivot_clause
+            (kw_unpivot)
+            (unpivot_measure_list
+              (referenced_element
+                ref_name: (identifier)))
+            (kw_for)
+            (identifier)
+            (kw_in)
+            (unpivot_in_element
+              (referenced_element
+                ref_name: (identifier))))))))
+  (newline))
+
+==================
+Boolean null operand
+==================
+
+BEGIN
+  IF flag AND NULL THEN
+    NULL;
+  END IF;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (kw_and)
+            (kw_null))
+          (kw_then)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+XMLTable without columns
+==================
+
+SELECT x.csv_values
+FROM XMLTABLE(('''' || REPLACE(v, '|', ''',''') || '''')) x;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (xml_table_expression
+            (kw_xmltable)
+            (expression
+              (expression
+                (literal_string)
+                (ref_call
+                  (referenced_element
+                    ref_name: (identifier))
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (literal_string))))
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (literal_string))))))
+                (literal_string))))
+          alias: (identifier)))))
+  (newline))
+
+==================
+JSONTable alias with as
+==================
+
+SELECT jt.name
+FROM JSON_TABLE(payload, '$[*]' COLUMNS (name VARCHAR2(20) PATH '$.name')) AS jt;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (json_table_expression
+            (kw_json_table)
+            (expression
+              (referenced_element
+                ref_name: (identifier)))
+            (literal_string)
+            (kw_columns)
+            (json_table_column
+              (identifier)
+              (datatype
+                (kw_varchar2)
+                (number))
+              (kw_path)
+              (literal_string)))
+          (kw_as)
+          alias: (identifier)))))
+  (newline))
+
+==================
+JSONTable columns without datatype
+==================
+
+SELECT jt.periodo
+FROM JSON_TABLE(payload, '$[*]' COLUMNS (periodo PATH '$.periodo', ruta PATH '$.ruta')) jt;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (json_table_expression
+            (kw_json_table)
+            (expression
+              (referenced_element
+                ref_name: (identifier)))
+            (literal_string)
+            (kw_columns)
+            (json_table_column
+              (identifier)
+              (kw_path)
+              (literal_string))
+            (json_table_column
+              (identifier)
+              (kw_path)
+              (literal_string)))
+          alias: (identifier)))))
+  (newline))
+
+==================
+JSON object value pairs returning CLOB
+==================
+
+SELECT JSON_ARRAYAGG(JSON_OBJECT('ruta' VALUE ruta, 'nombre' VALUE nombre) RETURNING CLOB) AS json_doc
+FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (json_function_call
+              (json_arrayagg_expression
+                (kw_json_arrayagg)
+                (expression
+                  (json_function_call
+                    (json_object_expression
+                      (kw_json_object)
+                      (json_object_entry
+                        (expression
+                          (literal_string))
+                        (kw_value)
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier))))
+                      (json_object_entry
+                        (expression
+                          (literal_string))
+                        (kw_value)
+                        (expression
+                          (referenced_element
+                            ref_name: (identifier)))))))
+                (json_returning_clause
+                  (kw_returning)
+                  (datatype
+                    (kw_clob))))))
+          (kw_as)
+          (identifier)))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Nested collection index call
+==================
+
+BEGIN
+  valor := arregloFinal(i)(j);
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier))))))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (referenced_element
+                        ref_name: (identifier))))))))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Cursor keyword as predicate column
+==================
+
+SELECT 1
+FROM dual
+WHERE CURSOR = peCursor
+  AND SIT_CONF = 'AC';
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (number))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (newline)
+      (where_clause
+        (kw_where)
+        (expression
+          (cursor_keyword_predicate
+            (identifier)
+            (referenced_element
+              ref_name: (identifier)))
+          (newline)
+          (kw_and)
+          (referenced_element
+            ref_name: (identifier))
+          (literal_string)))))
+  (newline))
+
+==================
+Consecutive package Java call specs
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg IS
+PROCEDURE get_lista_directorio
+    ( p_ruta in varchar2 )
+    as language java
+    name 'ListadorArchivos.getLista( java.lang.String )';
+
+PROCEDURE borra_dir
+    ( p_ruta in varchar2 )
+    as language java
+    name 'BorraArchivos.borraContenidoDir( java.lang.String )';
+END pkg;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (procedure_definition
+      (kw_procedure)
+      prc_name: (identifier)
+      (newline)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (kw_varchar2))))
+      (newline)
+      (kw_as)
+      (call_spec_ext
+        (java_declaration
+          (kw_language)
+          (kw_java)
+          (newline)
+          (kw_name)
+          name: (literal_string))))
+    (newline)
+    (newline)
+    (procedure_definition
+      (kw_procedure)
+      prc_name: (identifier)
+      (newline)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (kw_varchar2))))
+      (newline)
+      (kw_as)
+      (call_spec_ext
+        (java_declaration
+          (kw_language)
+          (kw_java)
+          (newline)
+          (kw_name)
+          name: (literal_string))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        ref_name: (identifier)))
+    (newline))
+  (newline))
+
+==================
+Merge insert values without column list
+==================
+
+MERGE INTO destino d
+USING (SELECT id, valor FROM origen) s
+ON (d.id = s.id)
+WHEN MATCHED THEN UPDATE SET d.valor = s.valor
+WHEN NOT MATCHED THEN INSERT VALUES (s.id, s.valor);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_merge
+      (kw_merge)
+      (kw_into)
+      (referenced_element
+        ref_name: (identifier))
+      alias: (identifier)
+      (newline)
+      (kw_using)
+      (subquery_table_reference
+        (kw_select)
+        (select_list
+          (select_list_element
+            (expression
+              (referenced_element
+                ref_name: (identifier))))
+          (select_list_element
+            (expression
+              (referenced_element
+                ref_name: (identifier)))))
+        (kw_from)
+        (table_list
+          (table_list_element
+            (referenced_element
+              ref_name: (identifier)))))
+      alias: (identifier)
+      (newline)
+      (kw_on)
+      (expression
+        (referenced_element
+          ref_name_parent: (identifier)
+          ref_name: (identifier))
+        (referenced_element
+          ref_name_parent: (identifier)
+          ref_name: (identifier)))
+      (newline)
+      (merge_update_clause
+        (kw_when)
+        (kw_matched)
+        (kw_then)
+        (kw_update)
+        (update_set_clause
+          (kw_set)
+          (update_set_clause_elements
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier))
+            (expression
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier))))))
+      (newline)
+      (merge_insert_clause
+        (kw_when)
+        (kw_not)
+        (kw_matched)
+        (kw_then)
+        (kw_insert)
+        (kw_values)
+        (expression
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier)))
+        (expression
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Legacy exact DML missing comma column
+==================
+
+BEGIN
+  INSERT INTO t (id_pago--solicitud
+                 SIT_ENVIO_API)
+  VALUES (x);
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (sql_statement_insert
+          (kw_insert)
+          (single_table_insert
+            (kw_into)
+            (referenced_element
+              ref_name: (identifier))
+            (dml_column_list_repeat
+              (referenced_element
+                ref_name: (identifier))
+              (comment_sl)
+              (newline)
+              (legacy_dml_missing_comma_column))
+            (newline)
+            (values_clause
+              (kw_values)
+              (record_values_element
+                (expression
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Adjacent DML column without legacy token stays erroneous
+==================
+
+BEGIN
+  INSERT INTO t (id_pago OTRA_COLUMNA) VALUES (x);
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (sql_statement_insert
+          (kw_insert)
+          (single_table_insert
+            (kw_into)
+            (referenced_element
+              ref_name: (identifier))
+            (dml_column_list_repeat
+              (referenced_element
+                ref_name: (identifier)))
+            (ERROR)
+            (values_clause
+              (kw_values)
+              (record_values_element
+                (expression
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Legacy embedded non PLSQL package block
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg IS
+PROCEDURE ok IS BEGIN NULL; END;
+-- separator
+procedure patito
+    error VARCHAR2 = "error fatal";
+    P_CBA_autoriza_pagos(1,2,3,4,5,error);
+    printf( error )
+-- separator
+error = "Error no fatal"
+
+-- separator
+class PatitoDaoImpl
+    Strring error  = "error fatal";
+    PCbAAutorizaPagos(1,2,3,4,5,error);
+    printf( error )
+-- separator
+error = "Error no fatal"
+-- separator
+PROCEDURE next_p IS
+  p_error = "Error no fatal"
+  x NUMBER;
+BEGIN
+  NULL;
+END;
+END pkg;
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (procedure_definition
+      (kw_procedure)
+      prc_name: (identifier)
+      (kw_is)
+      (body
+        (kw_begin)
+        (statement
+          (null_statement
+            (kw_null)))
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (comment_sl)
+    (newline)
+    (legacy_embedded_non_plsql_block
+      (newline)
+      (newline)
+      (newline)
+      (newline)
+      (comment_sl)
+      (newline)
+      (newline)
+      (newline)
+      (comment_sl)
+      (newline)
+      (newline)
+      (newline)
+      (newline)
+      (newline)
+      (comment_sl)
+      (newline))
+    (newline)
+    (comment_sl)
+    (newline)
+    (procedure_definition
+      (kw_procedure)
+      prc_name: (identifier)
+      (kw_is)
+      (newline)
+      (legacy_java_style_assignment_declaration)
+      (newline)
+      (item_declaration
+        (identifier)
+        (datatype
+          (kw_number)))
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (null_statement
+            (kw_null)))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        ref_name: (identifier))))
+  (newline))
+
+==================
+Procedure patito declaration stays generic
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg IS
+PROCEDURE patito;
+END pkg;
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (procedure_declaration
+      (kw_procedure)
+      prc_name: (identifier))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        ref_name: (identifier))))
+  (newline))
+
+==================
+Package functions with raw signatures
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg IS
+FUNCTION encrypt(p_text IN VARCHAR2) RETURN RAW IS
+  l_encrypted RAW(32767);
+BEGIN
+  RETURN l_encrypted;
+END;
+FUNCTION decrypt(p_raw IN RAW) RETURN VARCHAR2 IS
+BEGIN
+  RETURN NULL;
+END;
+END pkg;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (function_definition
+      (kw_function)
+      fnc_name: (identifier)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (kw_varchar2))))
+      (return_declaration
+        (kw_return)
+        (datatype
+          (kw_raw)))
+      (kw_is)
+      (newline)
+      (item_declaration
+        (identifier)
+        (datatype
+          (kw_raw)
+          (number)))
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)
+            (expression
+              (referenced_element
+                ref_name: (identifier)))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (function_definition
+      (kw_function)
+      fnc_name: (identifier)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (kw_raw))))
+      (return_declaration
+        (kw_return)
+        (datatype
+          (kw_varchar2)))
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)
+            (expression
+              (kw_null))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        ref_name: (identifier)))
+    (newline))
+  (newline))
+
+==================
+Caret q quote string
+==================
+
+BEGIN
+  html := q'^
+<section>
+  <p class="info">Hola</p>
+</section>^';
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            ref_name: (identifier))
+          (expression
+            (literal_string
+              (q_quote_string)))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Connect by prior expression
+==================
+
+SELECT RowN
+FROM (SELECT ROWNUM RowN FROM dual)
+WHERE CONNECT_BY_ISLEAF = 1
+CONNECT BY PRIOR RowN = RowN - 1
+START WITH RowN = 1;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (subquery_table_reference
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))
+                (identifier)))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier)))))))
+      (newline)
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name: (identifier))
+          (number)))
+      (newline)
+      (hierachical_query_clause
+        (kw_connect)
+        (kw_by)
+        (expression
+          (unary_expression
+            (kw_prior)
+            (referenced_element
+              ref_name: (identifier)))
+          (referenced_element
+            ref_name: (identifier))
+          (number))
+        (newline)
+        (kw_start)
+        (kw_with)
+        (expression
+          (referenced_element
+            ref_name: (identifier))
+          (number)))))
+  (newline))
+
+==================
+Parenthesized join group
+==================
+
+SELECT p.id
+FROM (postura p INNER JOIN hora t ON p.entidad = t.entidad)
+LEFT JOIN evento e ON p.id = e.id;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (join_clause
+            (join_clause
+              (referenced_element
+                ref_name: (identifier))
+              alias: (identifier)
+              (kw_inner)
+              (kw_join)
+              (referenced_element
+                ref_name: (identifier))
+              alias: (identifier)
+              (kw_on)
+              (expression
+                (referenced_element
+                  ref_name_parent: (identifier)
+                  ref_name: (identifier))
+                (referenced_element
+                  ref_name_parent: (identifier)
+                  ref_name: (identifier))))
+            (newline)
+            (outer_join_type
+              (kw_left))
+            (kw_join)
+            (referenced_element
+              ref_name: (identifier))
+            alias: (identifier)
+            (kw_on)
+            (expression
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier))
+              (referenced_element
+                ref_name_parent: (identifier)
+                ref_name: (identifier))))))))
+  (newline))
+
+==================
+Negative scalar subquery parameter
+==================
+
+SELECT NVL(- (SELECT SUM(monto) FROM movimientos), 0) total
+FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (ref_call
+              (referenced_element
+                ref_name: (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (unary_expression
+                        (scalar_subquery
+                          (kw_select)
+                          (select_list
+                            (select_list_element
+                              (expression
+                                (ref_call
+                                  (referenced_element
+                                    ref_name: (identifier))
+                                  (parameter
+                                    (parameter_element
+                                      (parameter_value
+                                        (expression
+                                          (referenced_element
+                                            ref_name: (identifier))))))))))
+                          (kw_from)
+                          (table_list
+                            (table_list_element
+                              (referenced_element
+                                ref_name: (identifier)))))))))
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (number)))))))
+          (identifier)))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Member of predicate
+==================
+
+BEGIN
+  IF persona_id MEMBER OF idsProcesados THEN
+    NULL;
+  END IF;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (if_statement
+          (kw_if)
+          (expression
+            (referenced_element
+              ref_name: (identifier))
+            (kw_member)
+            (kw_of)
+            (expression
+              (referenced_element
+                ref_name: (identifier))))
+          (kw_then)
+          (newline)
+          (statement
+            (null_statement
+              (kw_null)))
+          (newline)
+          (end_if
+            (kw_end)
+            (kw_if))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Package procedure deterministic property
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg IS
+PROCEDURE procesa(valor NUMBER) DETERMINISTIC IS
+BEGIN
+  NULL;
+END;
+END pkg;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (procedure_definition
+      (kw_procedure)
+      prc_name: (identifier)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (datatype
+            (kw_number))))
+      (kw_deterministic)
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (null_statement
+            (kw_null)))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        ref_name: (identifier)))
+    (newline))
+  (newline))
+
+==================
+Quantified any subquery comparison
+==================
+
+SELECT flag
+FROM serv
+WHERE numservicio = ANY (SELECT numservicio FROM mservicios WHERE nmpoliza = p_poliza);
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))
+      (newline)
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name: (identifier))
+          (quantified_comparison_operand
+            (kw_any)
+            (scalar_subquery
+              (kw_select)
+              (select_list
+                (select_list_element
+                  (expression
+                    (referenced_element
+                      ref_name: (identifier)))))
+              (kw_from)
+              (table_list
+                (table_list_element
+                  (referenced_element
+                    ref_name: (identifier))))
+              (where_clause
+                (kw_where)
+                (expression
+                  (referenced_element
+                    ref_name: (identifier))
+                  (referenced_element
+                    ref_name: (identifier))))))))))
+  (newline))
+
+==================
+Case keyword as select column
+==================
+
+SELECT poliza nmpolant, CASE C_CASE, type usaidenom
+FROM prov_inconsistencias_root;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))
+          (identifier))
+        (select_list_element
+          (case_keyword_select_list_element
+            (identifier)
+            (identifier)))
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name: (identifier)))
+          (identifier)))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Nullable item declaration
+==================
+
+DECLARE
+  v_nombre varchar2(20) null;
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_declare)
+      (newline)
+      (item_declaration
+        (identifier)
+        (datatype
+          (kw_varchar2)
+          (number))
+        (kw_null))
+      (newline)
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+XMLAttributes expression
+==================
+
+SELECT XMLELEMENT("correo",
+         XMLAttributes(ban.cve_entidad AS "entidad",
+                       'CONFIRMACION' AS "tipo"),
+         XMLELEMENT("folio", ban.id_instruccion))
+FROM dual;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (xml_function_call
+              (xmlelement_expression
+                (kw_xmlelement)
+                (identifier)
+                (newline)
+                (expression
+                  (xml_function_call
+                    (xmlattributes_expression
+                      (kw_xmlattributes)
+                      (xmlattribute_element
+                        (expression
+                          (referenced_element
+                            ref_name_parent: (identifier)
+                            ref_name: (identifier)))
+                        (kw_as)
+                        (identifier))
+                      (newline)
+                      (xmlattribute_element
+                        (expression
+                          (literal_string))
+                        (kw_as)
+                        (identifier)))))
+                (newline)
+                (expression
+                  (xml_function_call
+                    (xmlelement_expression
+                      (kw_xmlelement)
+                      (identifier)
+                      (expression
+                        (referenced_element
+                          ref_name_parent: (identifier)
+                          ref_name: (identifier)))))))))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (referenced_element
+            ref_name: (identifier))))))
+  (newline))
+
+==================
+Parenthesized subquery table alias
+==================
+
+SELECT per.id_persona
+FROM ((SELECT id_persona FROM cred_per_asig)) per
+WHERE per.id_persona = 1;
+
+---
+
+(source_file
+  (newline)
+  (statement
+    (sql_statement_select
+      (kw_select)
+      (select_list
+        (select_list_element
+          (expression
+            (referenced_element
+              ref_name_parent: (identifier)
+              ref_name: (identifier)))))
+      (newline)
+      (kw_from)
+      (table_list
+        (table_list_element
+          (subquery_table_reference
+            (kw_select)
+            (select_list
+              (select_list_element
+                (expression
+                  (referenced_element
+                    ref_name: (identifier)))))
+            (kw_from)
+            (table_list
+              (table_list_element
+                (referenced_element
+                  ref_name: (identifier)))))
+          alias: (identifier)))
+      (newline)
+      (where_clause
+        (kw_where)
+        (expression
+          (referenced_element
+            ref_name_parent: (identifier)
+            ref_name: (identifier))
+          (number)))))
+  (newline))
+
+==================
+Legacy truncated package body file
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg_demo IS
+  PROCEDURE p_open(p_id IN NUMBER) AS
+  BEGIN
+
+---
+
+(source_file
+  (newline)
+  (legacy_truncated_package_body_file
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    (referenced_element
+      (identifier))
+    (kw_is)
+    (newline)
+    (kw_procedure)
+    (identifier)
+    (parameter_declaration
+      (parameter_declaration_element
+        (identifier)
+        (kw_in)
+        (datatype
+          (kw_number))))
+    (kw_as)
+    (newline)
+    (kw_begin))
+  (newline))
+
+==================
+Complete package body avoids truncated recovery
+==================
+
+CREATE OR REPLACE PACKAGE BODY pkg_demo IS
+  PROCEDURE p_open IS
+  BEGIN
+    NULL;
+  END p_open;
+END pkg_demo;
+
+---
+
+(source_file
+  (newline)
+  (create_package_body
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (kw_body)
+    (referenced_element
+      (identifier))
+    (kw_is)
+    (newline)
+    (procedure_definition
+      (kw_procedure)
+      (identifier)
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (null_statement
+            (kw_null)))
+        (newline)
+        (end_obj_named
+          (kw_end)
+          (referenced_element
+            (identifier)))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier))))
+  (newline))
+
+==================
+Legacy truncated package spec file
+==================
+
+CREATE OR REPLACE PACKAGE pkg_demo AS
+  PROCEDURE p_ok(p_id IN NUMBER);
+  PROCEDURE GEST_PERSONA_REFER(
+    pIdCredito IN CRED_CREDITO.ID_CREDITO%TYPE,
+    pIdPersonaRefer IN CORP_PERSONA.ID_PERSONA%TYPE,
+
+---
+
+(source_file
+  (newline)
+  (legacy_truncated_package_spec_file
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (referenced_element
+      (identifier))
+    (kw_as)
+    (newline)
+    (procedure_declaration
+      (kw_procedure)
+      (identifier)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (kw_number)))))
+    (newline)
+    (newline)
+    (newline))
+  (newline))
+
+==================
+Complete package spec avoids truncated recovery
+==================
+
+CREATE OR REPLACE PACKAGE pkg_demo AS
+  PROCEDURE p_ok(p_id IN NUMBER);
+END pkg_demo;
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (referenced_element
+      (identifier))
+    (kw_as)
+    (newline)
+    (procedure_declaration
+      (kw_procedure)
+      (identifier)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (kw_number)))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier))))
+  (newline))

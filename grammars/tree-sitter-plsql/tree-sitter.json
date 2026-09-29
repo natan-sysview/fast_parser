@@ -1,0 +1,38 @@
+{
+  "grammars": [
+    {
+      "name": "plsql",
+      "camelcase": "Plsql",
+      "scope": "source.plsql",
+      "path": ".",
+      "file-types": [
+        "sql",
+        "pks",
+        "pkb",
+        "prc",
+        "fnc",
+        "pls",
+        "plsql"
+      ]
+    }
+  ],
+  "metadata": {
+    "version": "0.0.1",
+    "license": "MIT",
+    "description": "Experimental Oracle PL/SQL grammar for tree-sitter",
+    "authors": [
+      {
+        "name": "Andreas Maier",
+        "email": "andreas.maier.de@gmail.com"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/AndreasMaierDe/tree-sitter-plsql"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "node": true,
+    "rust": true
+  }
+}

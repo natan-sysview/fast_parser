@@ -1,17 +1,44 @@
 # FastParse PL/SQL Extension
 
-FastParse language extension for the public `tree-sitter-plsql` grammar.
+This extension registers the promoted `tree-sitter-plsql` grammar as the FastParse language `plsql`.
 
-The canonical FastParse language name is `plsql`. The native descriptor exports
-`tree_sitter_plsql` and is built as `libfastparse_language_plsql`.
+The extension follows the FastParse language-extension standard:
 
-Configure a local grammar checkout when generating the build:
+- Native descriptor: `fastparse_language_extension_descriptor`
+- Tree-sitter symbol: `tree_sitter_plsql`
+- Canonical language: `plsql`
+- Package names: `fastparse-language-plsql`, `FastParser.Language.Plsql`
+
+## Build
+
+From the repository root:
 
 ```sh
-cmake -S . -B build-plsql-extension \
-  -DFASTPARSE_PLSQL_GRAMMAR_DIR=/path/to/tree-sitter-plsql
-cmake --build build-plsql-extension --target fastparse_language_plsql
+python3 scripts/package_language_extension.py --language plsql --version 0.1.3
 ```
 
-The current grammar covers pure Oracle PL/SQL, SQL, and DDL. Converted Oracle
-Forms exports remain outside its declared scope.
+The promoted grammar is expected at:
+
+```text
+grammars/tree-sitter-plsql
+```
+
+The local extension library is emitted to:
+
+```text
+bin/libfastparse_language_plsql.dylib
+```
+
+On Linux the extension suffix is `.so`; on Windows it is `.dll`.
+
+## Package
+
+NuGet packaging uses the native archives produced per platform:
+
+```sh
+python3 scripts/package_nuget_language_extension.py \
+  --language plsql \
+  --version 0.1.3 \
+  --core-version 0.1.3 \
+  --archive dist/languages/fastparse-language-plsql-0.1.3-macos-arm64.tar.gz
+```

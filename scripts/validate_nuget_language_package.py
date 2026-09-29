@@ -355,6 +355,51 @@ Console.WriteLine(parser.Version);
 Console.WriteLine(parser.LibraryPath);
 '''
 
+PLSQL_PROGRAM = r'''using FastParse;
+
+using var parser = new FastParseClient();
+
+var load = parser.LoadBundledLanguage("plsql");
+if (load.Language != "plsql" || !parser.LanguageAvailable("plsql"))
+{
+    throw new InvalidOperationException("FastParser.Language.Plsql load smoke failed");
+}
+
+var source = "CREATE TABLE demo_table (id NUMBER PRIMARY KEY, name VARCHAR2(40));";
+var json = parser.ParseText(
+    source,
+    new ParseOptions
+    {
+        Language = "plsql",
+        Format = FastParseFormat.Json,
+        IncludeRules = "create_table",
+        Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+    });
+
+if (json.NodeCount != 1 || !json.Text.Contains("create_table", StringComparison.Ordinal))
+{
+    throw new InvalidOperationException("FastParser.Language.Plsql JSON smoke failed");
+}
+
+var diagnostics = parser.ParseText(
+    "CREATE TABLE broken_table (id NUMBER",
+    new ParseOptions
+    {
+        Language = "plsql",
+        Format = FastParseFormat.Diagnostics
+    });
+
+using var diagnosticsDocument = diagnostics.JsonDocument();
+if (!diagnosticsDocument.RootElement.GetProperty("hasErrors").GetBoolean())
+{
+    throw new InvalidOperationException("FastParser.Language.Plsql diagnostics smoke failed");
+}
+
+Console.WriteLine("FastParser language NuGet smoke OK");
+Console.WriteLine(parser.Version);
+Console.WriteLine(parser.LibraryPath);
+'''
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a FastParser.Language.* package from local nupkgs.")
@@ -513,6 +558,8 @@ def main() -> int:
             program = JAVASWING_PROGRAM
         elif args.language == "cobol":
             program = COBOL_PROGRAM
+        elif args.language == "plsql":
+            program = PLSQL_PROGRAM
         else:
             program = PYTHON_PROGRAM
         (project_dir / "Program.cs").write_text(program, encoding="utf-8")

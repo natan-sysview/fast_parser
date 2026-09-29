@@ -359,6 +359,51 @@ Console.WriteLine(parser.Version);
 Console.WriteLine(parser.LibraryPath);
 '''
 
+PLSQL_PROGRAM = r'''using FastParse;
+
+using var parser = new FastParseClient();
+
+var load = parser.LoadBundledLanguage("plsql");
+if (load.Language != "plsql" || !parser.LanguageAvailable("plsql"))
+{
+    throw new InvalidOperationException("published PL/SQL language NuGet load smoke failed");
+}
+
+var source = "CREATE TABLE demo_table (id NUMBER PRIMARY KEY, name VARCHAR2(40));";
+var json = parser.ParseText(
+    source,
+    new ParseOptions
+    {
+        Language = "plsql",
+        Format = FastParseFormat.Json,
+        IncludeRules = "create_table",
+        Fields = FastParseField.Rule | FastParseField.Text | FastParseField.ByteRange
+    });
+
+if (json.NodeCount != 1 || !json.Text.Contains("create_table", StringComparison.Ordinal))
+{
+    throw new InvalidOperationException("published PL/SQL language NuGet JSON smoke failed");
+}
+
+var diagnostics = parser.ParseText(
+    "CREATE TABLE broken_table (id NUMBER",
+    new ParseOptions
+    {
+        Language = "plsql",
+        Format = FastParseFormat.Diagnostics
+    });
+
+using var diagnosticsDocument = diagnostics.JsonDocument();
+if (!diagnosticsDocument.RootElement.GetProperty("hasErrors").GetBoolean())
+{
+    throw new InvalidOperationException("published PL/SQL language NuGet diagnostics smoke failed");
+}
+
+Console.WriteLine("FastParser published language NuGet smoke OK");
+Console.WriteLine(parser.Version);
+Console.WriteLine(parser.LibraryPath);
+'''
+
 
 def run_command(command: list[str], *, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
     completed = subprocess.run(
@@ -421,6 +466,8 @@ def smoke_program(language: str) -> str:
         return JAVASWING_PROGRAM
     if language == "cobol":
         return COBOL_PROGRAM
+    if language == "plsql":
+        return PLSQL_PROGRAM
     return PYTHON_PROGRAM
 
 
