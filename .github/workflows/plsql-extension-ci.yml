@@ -1,0 +1,97 @@
+name: PL/SQL Extension CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/plsql-extension-ci.yml"
+      - "bindings/python/**"
+      - "extensions/plsql/**"
+      - "grammars/tree-sitter-plsql/**"
+      - "include/**"
+      - "scripts/package_language_extension.py"
+      - "scripts/validate_language_extension_smoke.py"
+      - "src/**"
+      - "vendor/tree-sitter/**"
+      - "CMakeLists.txt"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/plsql-extension-ci.yml"
+      - "bindings/python/**"
+      - "extensions/plsql/**"
+      - "grammars/tree-sitter-plsql/**"
+      - "include/**"
+      - "scripts/package_language_extension.py"
+      - "scripts/validate_language_extension_smoke.py"
+      - "src/**"
+      - "vendor/tree-sitter/**"
+      - "CMakeLists.txt"
+
+permissions:
+  contents: read
+
+jobs:
+  build-smoke:
+    name: ${{ matrix.os_name }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os_name: Linux
+            runner: ubuntu-latest
+            platform: linux
+            arch: x64
+            archive_glob: dist/languages/*.tar.gz
+          - os_name: macOS
+            runner: macos-14
+            platform: macos
+            arch: arm64
+            archive_glob: dist/languages/*.tar.gz
+          - os_name: Windows
+            runner: windows-latest
+            platform: windows
+            arch: x64
+            archive_glob: dist/languages/*.zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Linux build tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+
+      - name: Configure native build
+        run: cmake -S . -B build-plsql-extension -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build FastParse core
+        run: cmake --build build-plsql-extension --config Release --target tsmp
+
+      - name: Build and package PL/SQL extension
+        run: >
+          python scripts/package_language_extension.py
+          --language plsql
+          --version 0.1.5-ci.${{ github.run_number }}
+          --platform ${{ matrix.platform }}
+          --arch ${{ matrix.arch }}
+          --build-dir build-plsql-extension
+
+      - name: Validate FastParse can load PL/SQL extension
+        run: python scripts/validate_language_extension_smoke.py --language plsql
+
+      - name: Upload PL/SQL extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-plsql-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ${{ matrix.archive_glob }}

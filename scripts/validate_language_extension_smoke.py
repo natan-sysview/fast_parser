@@ -38,6 +38,21 @@ class DemoBean {
 """.strip()
 
 
+PLSQL_SOURCE = """
+CREATE OR REPLACE PACKAGE BODY demo_pkg AS
+  PROCEDURE parent_proc IS
+    FUNCTION child_func RETURN NUMBER IS
+    BEGIN
+      RETURN 1;
+    END child_func;
+  BEGIN
+    INSERT INTO demo_table(id, name) VALUES (child_func(), 'OK');
+  END parent_proc;
+END demo_pkg;
+/
+""".strip()
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a local FastParse language extension.")
     parser.add_argument("--language", required=True)
@@ -121,6 +136,44 @@ def validate_java_frameworks(parser: FastParse, query_path: Path) -> None:
     )
 
 
+def validate_plsql(parser: FastParse) -> None:
+    json_result = parser.parse_text(
+        PLSQL_SOURCE,
+        ParseOptions(
+            language="plsql",
+            output_format=OutputFormat.JSON,
+            fields=["rule", "text", "byte_range"],
+        ),
+    )
+    document = json_result.json()
+    rules = {node["rule"] for node in document.get("nodes", []) if "rule" in node}
+    required_rules = {"create_package_body", "procedure_definition", "nested_function_definition"}
+    missing_rules = sorted(required_rules - rules)
+    if missing_rules:
+        raise AssertionError(f"missing expected plsql rules: {missing_rules}")
+
+    diagnostics = parser.parse_text(
+        PLSQL_SOURCE,
+        language="plsql",
+        output_format=OutputFormat.DIAGNOSTICS,
+    ).json()
+    if diagnostics.get("hasErrors") is True:
+        raise AssertionError(f"plsql smoke unexpectedly has parse errors: {diagnostics}")
+
+    broken = parser.parse_text(
+        "CREATE TABLE broken_table (id NUMBER",
+        language="plsql",
+        output_format=OutputFormat.DIAGNOSTICS,
+    ).json()
+    if broken.get("hasErrors") is not True:
+        raise AssertionError(f"plsql diagnostics did not report broken source: {broken}")
+
+    print(
+        "FastParse plsql extension smoke OK "
+        f"({platform.system()} {platform.machine()}, nodes={json_result.node_count})"
+    )
+
+
 def validate_generic(parser: FastParse, language: str) -> None:
     result = parser.parse_text(
         "class Demo { void run() {} }",
@@ -153,6 +206,8 @@ def main() -> int:
         if not query.is_file():
             raise FileNotFoundError(f"java-frameworks query not found: {query}")
         validate_java_frameworks(parser, query)
+    elif language == "plsql":
+        validate_plsql(parser)
     else:
         validate_generic(parser, language)
 
