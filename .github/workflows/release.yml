@@ -7,12 +7,30 @@ on:
         description: Release version
         required: true
         default: 0.1.0-preview.36
+      release_target:
+        description: Release target to run
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - plsql-nuget
+      core_version:
+        description: Published FastParser core version for language-only releases
+        required: false
+        default: 0.1.4
+      publish_plsql:
+        description: Publish FastParser.Language.Plsql after validation
+        required: true
+        default: false
+        type: boolean
   push:
     tags:
       - "v*"
 
 jobs:
   package:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Package ${{ matrix.platform }}-${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
 
@@ -117,6 +135,7 @@ jobs:
           path: ${{ matrix.archive_glob }}
 
   nuget-package:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: NuGet Package
     needs: package
     runs-on: ubuntu-latest
@@ -198,6 +217,7 @@ jobs:
             dist/nuget/*.snupkg
 
   npm-package:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: npm Package
     needs: package
     runs-on: ubuntu-latest
@@ -260,6 +280,7 @@ jobs:
 
 
   java-jni:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Java JNI ${{ matrix.platform }}-${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
 
@@ -322,6 +343,7 @@ jobs:
           path: ${{ matrix.archive_glob }}
 
   maven-package:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Maven Package
     needs:
       - package
@@ -450,9 +472,9 @@ jobs:
             dist/maven/*.zip
 
   published-maven-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.MAVEN_PUBLISH == 'true') }}
     name: Published Maven Smoke ${{ matrix.platform }}-${{ matrix.arch }}
     needs: maven-package
-    if: startsWith(github.ref, 'refs/tags/') && vars.MAVEN_PUBLISH == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -491,6 +513,7 @@ jobs:
         run: python scripts/validate_published_maven.py --version "${{ steps.version.outputs.value }}"
 
   python-wheel:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Python Wheel ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
 
@@ -583,6 +606,7 @@ jobs:
           path: dist/python/*.whl
 
   language-extension:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Language Extension python ${{ matrix.platform }}-${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
 
@@ -640,6 +664,7 @@ jobs:
           path: ${{ matrix.archive_glob }}
 
   java-frameworks-language-extension:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Language Extension java-frameworks ${{ matrix.platform }}-${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
 
@@ -697,6 +722,7 @@ jobs:
           path: ${{ matrix.archive_glob }}
 
   javaswing-language-extension:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Language Extension javaswing ${{ matrix.platform }}-${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
 
@@ -755,6 +781,7 @@ jobs:
 
 
   cobol-language-extension:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Language Extension cobol ${{ matrix.platform }}-${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
 
@@ -812,6 +839,7 @@ jobs:
           path: ${{ matrix.archive_glob }}
 
   plsql-language-extension:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' || inputs.release_target == 'plsql-nuget' }}
     name: Language Extension plsql ${{ matrix.platform }}-${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
 
@@ -869,6 +897,7 @@ jobs:
           path: ${{ matrix.archive_glob }}
 
   python-language-wheel:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Python Language Wheel python ${{ matrix.platform }}
     needs: python-wheel
     runs-on: ${{ matrix.runner }}
@@ -973,6 +1002,7 @@ jobs:
           path: dist/python-languages/*.whl
 
   java-frameworks-language-wheel:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: Python Language Wheel java-frameworks ${{ matrix.platform }}
     needs: python-wheel
     runs-on: ${{ matrix.runner }}
@@ -1078,6 +1108,7 @@ jobs:
           path: dist/python-languages/*.whl
 
   nuget-language-package:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: NuGet Language Package Python
     needs:
       - language-extension
@@ -1170,6 +1201,7 @@ jobs:
           path: dist/nuget-languages/*.nupkg
 
   nuget-language-java-frameworks-package:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: NuGet Language Package Java Frameworks
     needs:
       - java-frameworks-language-extension
@@ -1263,6 +1295,7 @@ jobs:
           path: dist/nuget-languages/*.nupkg
 
   nuget-language-javaswing-package:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: NuGet Language Package JavaSwing
     needs:
       - javaswing-language-extension
@@ -1357,6 +1390,7 @@ jobs:
 
 
   nuget-language-cobol-package:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: NuGet Language Package COBOL
     needs:
       - cobol-language-extension
@@ -1451,6 +1485,7 @@ jobs:
           path: dist/nuget-languages/*.nupkg
 
   nuget-language-plsql-package:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.release_target == 'all' }}
     name: NuGet Language Package PL/SQL
     needs:
       - plsql-language-extension
@@ -1544,11 +1579,150 @@ jobs:
           name: fastparse-language-plsql-${{ steps.version.outputs.value }}-nuget
           path: dist/nuget-languages/*.nupkg
 
+  nuget-language-plsql-package-only:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.release_target == 'plsql-nuget' }}
+    name: NuGet Language Package PL/SQL Only
+    needs:
+      - plsql-language-extension
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Download PL/SQL language extension archives
+        uses: actions/download-artifact@v4
+        with:
+          path: language-artifacts
+          pattern: fastparse-language-plsql-${{ inputs.version }}-*
+          merge-multiple: true
+
+      - name: Build NuGet PL/SQL language package
+        shell: bash
+        run: |
+          archives=()
+          while IFS= read -r -d '' archive; do
+            archives+=(--archive "$archive")
+          done < <(find language-artifacts -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' \) -print0)
+          python scripts/package_nuget_language_extension.py \
+            --language plsql \
+            --version "${{ inputs.version }}" \
+            --core-version "${{ inputs.core_version }}" \
+            --require-all-rids \
+            "${archives[@]}"
+
+      - name: Download published FastParser core package
+        shell: bash
+        run: |
+          mkdir -p nuget-artifacts
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request
+
+          version = "${{ inputs.core_version }}".lower()
+          url = f"https://api.nuget.org/v3-flatcontainer/fastparser/{version}/fastparser.{version}.nupkg"
+          out = Path("nuget-artifacts") / f"FastParser.${{ inputs.core_version }}.nupkg"
+          with urllib.request.urlopen(url, timeout=60) as response:
+              out.write_bytes(response.read())
+          print(out)
+          PY
+
+      - name: Validate NuGet PL/SQL language package
+        shell: bash
+        run: |
+          core_package="$(find nuget-artifacts -maxdepth 1 -name 'FastParser.*.nupkg' ! -name '*.snupkg' | head -n 1)"
+          language_package="dist/nuget-languages/FastParser.Language.Plsql.${{ inputs.version }}.nupkg"
+          python scripts/validate_nuget_language_package.py \
+            --core-package "$core_package" \
+            --language-package "$language_package" \
+            --version "${{ inputs.version }}" \
+            --core-version "${{ inputs.core_version }}" \
+            --language plsql \
+            --require-all-rids
+
+      - name: NuGet login
+        id: nuget_login
+        uses: NuGet/login@v1
+        with:
+          user: NATANBARRON
+        if: ${{ inputs.publish_plsql }}
+
+      - name: Publish NuGet PL/SQL language package
+        shell: bash
+        run: |
+          set +e
+          dotnet nuget push \
+            "dist/nuget-languages/FastParser.Language.Plsql.${{ inputs.version }}.nupkg" \
+            --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate \
+            --force-english-output 2>&1 | tee nuget-language-plsql-push.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            python -c 'from pathlib import Path; message = Path("nuget-language-plsql-push.log").read_text(encoding="utf-8", errors="replace")[-3000:]; message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A"); print(f"::error title=NuGet PL/SQL language publish failed::{message}")'
+            exit "$status"
+          fi
+        if: ${{ inputs.publish_plsql }}
+
+      - name: Upload NuGet PL/SQL language package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastparse-language-plsql-${{ inputs.version }}-nuget
+          path: dist/nuget-languages/*.nupkg
+
+  published-nuget-language-plsql-smoke-only:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.release_target == 'plsql-nuget' && inputs.publish_plsql }}
+    name: Published NuGet Language PL/SQL Only Smoke ${{ matrix.platform }}-${{ matrix.arch }}
+    needs:
+      - nuget-language-plsql-package-only
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+            arch: x64
+          - runner: windows-latest
+            platform: windows
+            arch: x64
+          - runner: macos-14
+            platform: macos
+            arch: arm64
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Validate published NuGet PL/SQL language package
+        run: >
+          python scripts/validate_published_nuget_language.py
+          --version "${{ inputs.version }}"
+          --core-version "${{ inputs.core_version }}"
+          --language plsql
+
   publish-pypi-language-python:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_PYTHON_PUBLISH == 'true') }}
     name: Publish PyPI Language Python
     needs: python-language-wheel
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_PYTHON_PUBLISH == 'true'
     permissions:
       contents: read
       id-token: write
@@ -1567,9 +1741,9 @@ jobs:
           packages-dir: python-language-dist
 
   published-pypi-language-python-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_PYTHON_PUBLISH == 'true') }}
     name: Published PyPI Language Python Smoke ${{ matrix.platform }}
     needs: publish-pypi-language-python
-    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_PYTHON_PUBLISH == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -1603,10 +1777,10 @@ jobs:
         run: python scripts/validate_published_pypi_language.py --version "${{ steps.version.outputs.value }}"
 
   publish-pypi-language-java-frameworks:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true') }}
     name: Publish PyPI Language Java Frameworks
     needs: java-frameworks-language-wheel
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true'
     permissions:
       contents: read
       id-token: write
@@ -1625,9 +1799,9 @@ jobs:
           packages-dir: python-language-dist
 
   published-pypi-language-java-frameworks-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true') }}
     name: Published PyPI Language Java Frameworks Smoke ${{ matrix.platform }}
     needs: publish-pypi-language-java-frameworks
-    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -1661,10 +1835,10 @@ jobs:
         run: python scripts/validate_published_pypi_language.py --version "${{ steps.version.outputs.value }}" --language java-frameworks
 
   publish-pypi:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.PYPI_PUBLISH == 'true') }}
     name: Publish PyPI
     needs: python-wheel
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_PUBLISH == 'true'
     permissions:
       contents: read
       id-token: write
@@ -1688,9 +1862,9 @@ jobs:
           packages-dir: python-dist
 
   published-pypi-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.PYPI_PUBLISH == 'true') }}
     name: Published PyPI Smoke ${{ matrix.platform }}
     needs: publish-pypi
-    if: startsWith(github.ref, 'refs/tags/') && vars.PYPI_PUBLISH == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -1724,9 +1898,9 @@ jobs:
         run: python scripts/validate_published_pypi.py --version "${{ steps.version.outputs.value }}"
 
   published-nuget-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/')) }}
     name: Published NuGet Smoke ${{ matrix.platform }}-${{ matrix.arch }}
     needs: nuget-package
-    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -1764,9 +1938,9 @@ jobs:
         run: python scripts/validate_published_nuget.py --version "${{ steps.version.outputs.value }}"
 
   published-nuget-language-python-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_PYTHON_PUBLISH == 'true') }}
     name: Published NuGet Language Python Smoke ${{ matrix.platform }}-${{ matrix.arch }}
     needs: nuget-language-package
-    if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_PYTHON_PUBLISH == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -1804,9 +1978,9 @@ jobs:
         run: python scripts/validate_published_nuget_language.py --version "${{ steps.version.outputs.value }}"
 
   published-nuget-language-java-frameworks-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true') }}
     name: Published NuGet Language Java Frameworks Smoke ${{ matrix.platform }}-${{ matrix.arch }}
     needs: nuget-language-java-frameworks-package
-    if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVA_FRAMEWORKS_PUBLISH == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -1844,9 +2018,9 @@ jobs:
         run: python scripts/validate_published_nuget_language.py --version "${{ steps.version.outputs.value }}" --language java-frameworks
 
   published-nuget-language-javaswing-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVASWING_PUBLISH == 'true') }}
     name: Published NuGet Language JavaSwing Smoke ${{ matrix.platform }}-${{ matrix.arch }}
     needs: nuget-language-javaswing-package
-    if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_JAVASWING_PUBLISH == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -1885,9 +2059,9 @@ jobs:
 
 
   published-nuget-language-cobol-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_COBOL_PUBLISH == 'true') }}
     name: Published NuGet Language COBOL Smoke ${{ matrix.platform }}-${{ matrix.arch }}
     needs: nuget-language-cobol-package
-    if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_COBOL_PUBLISH == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -1925,9 +2099,9 @@ jobs:
         run: python scripts/validate_published_nuget_language.py --version "${{ steps.version.outputs.value }}" --language cobol
 
   published-nuget-language-plsql-smoke:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_PLSQL_PUBLISH == 'true') }}
     name: Published NuGet Language PL/SQL Smoke ${{ matrix.platform }}-${{ matrix.arch }}
     needs: nuget-language-plsql-package
-    if: startsWith(github.ref, 'refs/tags/') && vars.NUGET_LANGUAGE_PLSQL_PUBLISH == 'true'
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -1965,6 +2139,7 @@ jobs:
         run: python scripts/validate_published_nuget_language.py --version "${{ steps.version.outputs.value }}" --language plsql
 
   github-release:
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.release_target == 'all') && (startsWith(github.ref, 'refs/tags/')) }}
     name: Attach To GitHub Release
     needs:
       - package
@@ -1985,7 +2160,6 @@ jobs:
       - nuget-language-plsql-package
       - published-nuget-smoke
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
 
