@@ -183,6 +183,29 @@ def validate_plsql(parser: FastParse) -> None:
     ):
         raise AssertionError(f"plsql cursor structure was lost: {cursor_document}")
 
+    type_source = (
+        'CREATE TYPE "demo"."item_t" AS OBJECT (id NUMBER) NOT FINAL NOT INSTANTIABLE; '
+        'CREATE TYPE item_list_t AS TABLE OF item_t; '
+        'CREATE TYPE BODY item_t IS '
+        'CONSTRUCTOR FUNCTION item_t RETURN SELF AS RESULT IS '
+        'BEGIN RETURN; END; END;'
+    )
+    type_document = parser.parse_text(
+        type_source,
+        language="plsql",
+        output_format=OutputFormat.BINARY,
+        include_rules=["create_type", "create_type_body", "type_constructor_definition"],
+        fields=["rule", "range", "diagnostics"],
+    ).binary_document()
+    type_counts = {rule: sum(node.rule == rule for node in type_document.nodes) for rule in
+                   ("create_type", "create_type_body", "type_constructor_definition")}
+    if type_document.has_errors or type_counts != {
+        "create_type": 2,
+        "create_type_body": 1,
+        "type_constructor_definition": 1,
+    }:
+        raise AssertionError(f"plsql Oracle type structure was lost: {type_counts}, {type_document}")
+
     broken = parser.parse_text(
         "CREATE TABLE broken_table (id NUMBER",
         language="plsql",

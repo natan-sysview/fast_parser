@@ -3466,8 +3466,8 @@
           ]
         },
         {
-          "type": "SYMBOL",
-          "name": "end_obj_named"
+          "type": "PATTERN",
+          "value": ";[ \\t\\f]*"
         },
         {
           "type": "CHOICE",
@@ -3547,39 +3547,21 @@
           "name": "_is_as"
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_subprog_decl_in_type"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "element_spec_map_order_function_spec"
-            }
-          ]
-        },
-        {
-          "type": "REPEAT",
+          "type": "REPEAT1",
           "content": {
-            "type": "SEQ",
+            "type": "CHOICE",
             "members": [
               {
-                "type": "STRING",
-                "value": ","
+                "type": "SYMBOL",
+                "name": "type_constructor_definition"
               },
               {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "_subprog_decl_in_type"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "element_spec_map_order_function_spec"
-                  }
-                ]
+                "type": "SYMBOL",
+                "name": "type_member_function_definition"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "type_member_procedure_definition"
               }
             ]
           }
@@ -3599,6 +3581,188 @@
               "type": "BLANK"
             }
           ]
+        }
+      ]
+    },
+    "type_constructor_definition": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "kw_constructor"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "kw_function"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "parameter_declaration"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "kw_return"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "kw_self"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "kw_as"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "kw_result"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_is_as"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_subprogram_body_with_declarations"
+        }
+      ]
+    },
+    "type_member_function_definition": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "kw_map"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "kw_order"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "kw_member"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "kw_static"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "kw_function"
+        },
+        {
+          "type": "FIELD",
+          "name": "fnc_name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "parameter_declaration"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "return_declaration"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_is_as"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_subprogram_body_with_declarations"
+        }
+      ]
+    },
+    "type_member_procedure_definition": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "kw_member"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "kw_static"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "kw_procedure"
+        },
+        {
+          "type": "FIELD",
+          "name": "prc_name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "parameter_declaration"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_is_as"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_subprogram_body_with_declarations"
         }
       ]
     },
@@ -4387,7 +4551,7 @@
     },
     "legacy_truncated_package_spec_file": {
       "type": "PREC_RIGHT",
-      "value": 1,
+      "value": 0,
       "content": {
         "type": "SEQ",
         "members": [
@@ -7990,16 +8154,11 @@
           ]
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "inheritance_clause"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "inheritance_clause"
+          }
         }
       ]
     },
@@ -8023,16 +8182,11 @@
           ]
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "inheritance_clause"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "inheritance_clause"
+          }
         }
       ]
     },
@@ -9306,13 +9460,34 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_legacy_truncated_gest_persona_refer_header"
+          "name": "kw_procedure"
+        },
+        {
+          "type": "FIELD",
+          "name": "prc_name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "("
         },
         {
           "type": "REPEAT1",
           "content": {
-            "type": "SYMBOL",
-            "name": "_legacy_truncated_gest_persona_refer_parameter_line"
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "parameter_declaration_element"
+              },
+              {
+                "type": "STRING",
+                "value": ","
+              }
+            ]
           }
         }
       ]
@@ -9412,28 +9587,6 @@
           "value": ";[ \\t\\f]*"
         }
       ]
-    },
-    "_legacy_truncated_gest_persona_refer_header": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": 3,
-        "content": {
-          "type": "PATTERN",
-          "value": "[Pp][Rr][Oo][Cc][Ee][Dd][Uu][Rr][Ee][ \\t]+GEST_PERSONA_REFER[ \\t]*\\("
-        }
-      }
-    },
-    "_legacy_truncated_gest_persona_refer_parameter_line": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": 3,
-        "content": {
-          "type": "PATTERN",
-          "value": "p(?:IdCredito|IdPersonaRefer|NomRazonSocial|NomPersona|ApellidoPaterno|ApellidoMaterno|Sexo|RfcSiglas|RfcFecha)[ \\t]+[Ii][Nn][ \\t]+[A-Za-z_][A-Za-z0-9_$#]*(?:\\.[A-Za-z_][A-Za-z0-9_$#]*)*(?:%[A-Za-z_][A-Za-z0-9_$#]*)?(?:[ \\t]*,[ \\t]*)?"
-        }
-      }
     },
     "_procedure_properties": {
       "type": "CHOICE",
@@ -27729,6 +27882,10 @@
   "conflicts": [
     [
       "_query_table_expression_ref_element"
+    ],
+    [
+      "_legacy_truncated_procedure_declaration_tail",
+      "parameter_declaration"
     ]
   ],
   "precedences": [],

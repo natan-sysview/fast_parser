@@ -3550,10 +3550,6 @@
           "named": true
         },
         {
-          "type": "end_obj_named",
-          "named": true
-        },
-        {
           "type": "inheritance_clause",
           "named": true
         },
@@ -3658,19 +3654,7 @@
           "named": true
         },
         {
-          "type": "element_spec_constructor_spec",
-          "named": true
-        },
-        {
-          "type": "element_spec_map_order_function_spec",
-          "named": true
-        },
-        {
           "type": "end_obj_named",
-          "named": true
-        },
-        {
-          "type": "func_decl_in_type",
           "named": true
         },
         {
@@ -3698,11 +3682,19 @@
           "named": true
         },
         {
-          "type": "proc_decl_in_type",
+          "type": "sharing_clause",
           "named": true
         },
         {
-          "type": "sharing_clause",
+          "type": "type_constructor_definition",
+          "named": true
+        },
+        {
+          "type": "type_member_function_definition",
+          "named": true
+        },
+        {
+          "type": "type_member_procedure_definition",
           "named": true
         }
       ]
@@ -6114,144 +6106,6 @@
     }
   },
   {
-    "type": "func_decl_in_type",
-    "named": true,
-    "fields": {
-      "fnc_name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "accessible_by_clause",
-          "named": true
-        },
-        {
-          "type": "body",
-          "named": true
-        },
-        {
-          "type": "call_spec_ext",
-          "named": true
-        },
-        {
-          "type": "cursor_declaration",
-          "named": true
-        },
-        {
-          "type": "cursor_definition",
-          "named": true
-        },
-        {
-          "type": "exception_declaration",
-          "named": true
-        },
-        {
-          "type": "function_declaration",
-          "named": true
-        },
-        {
-          "type": "function_definition",
-          "named": true
-        },
-        {
-          "type": "invoker_rights_clause",
-          "named": true
-        },
-        {
-          "type": "item_declaration",
-          "named": true
-        },
-        {
-          "type": "kw_as",
-          "named": true
-        },
-        {
-          "type": "kw_deterministic",
-          "named": true
-        },
-        {
-          "type": "kw_function",
-          "named": true
-        },
-        {
-          "type": "kw_is",
-          "named": true
-        },
-        {
-          "type": "kw_pipelined",
-          "named": true
-        },
-        {
-          "type": "legacy_cursor_definition_blob",
-          "named": true
-        },
-        {
-          "type": "legacy_embedded_non_plsql_block",
-          "named": true
-        },
-        {
-          "type": "legacy_java_style_assignment_declaration",
-          "named": true
-        },
-        {
-          "type": "parallel_enable_clause",
-          "named": true
-        },
-        {
-          "type": "parameter_declaration",
-          "named": true
-        },
-        {
-          "type": "pragma_declaration",
-          "named": true
-        },
-        {
-          "type": "procedure_declaration",
-          "named": true
-        },
-        {
-          "type": "procedure_definition",
-          "named": true
-        },
-        {
-          "type": "result_cache_clause",
-          "named": true
-        },
-        {
-          "type": "return_declaration",
-          "named": true
-        },
-        {
-          "type": "type_definition_collection",
-          "named": true
-        },
-        {
-          "type": "type_definition_record",
-          "named": true
-        },
-        {
-          "type": "type_definition_ref_cursor",
-          "named": true
-        },
-        {
-          "type": "type_definition_sub",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "function_declaration",
     "named": true,
     "fields": {
@@ -8294,6 +8148,16 @@
             "named": true
           }
         ]
+      },
+      "prc_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
@@ -8365,7 +8229,15 @@
           "named": true
         },
         {
+          "type": "kw_procedure",
+          "named": true
+        },
+        {
           "type": "legacy_package_name_repeat",
+          "named": true
+        },
+        {
+          "type": "parameter_declaration_element",
           "named": true
         },
         {
@@ -9675,116 +9547,6 @@
     }
   },
   {
-    "type": "proc_decl_in_type",
-    "named": true,
-    "fields": {
-      "prc_name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "body",
-          "named": true
-        },
-        {
-          "type": "call_spec_ext",
-          "named": true
-        },
-        {
-          "type": "cursor_declaration",
-          "named": true
-        },
-        {
-          "type": "cursor_definition",
-          "named": true
-        },
-        {
-          "type": "exception_declaration",
-          "named": true
-        },
-        {
-          "type": "function_declaration",
-          "named": true
-        },
-        {
-          "type": "function_definition",
-          "named": true
-        },
-        {
-          "type": "item_declaration",
-          "named": true
-        },
-        {
-          "type": "kw_as",
-          "named": true
-        },
-        {
-          "type": "kw_is",
-          "named": true
-        },
-        {
-          "type": "kw_procedure",
-          "named": true
-        },
-        {
-          "type": "legacy_cursor_definition_blob",
-          "named": true
-        },
-        {
-          "type": "legacy_embedded_non_plsql_block",
-          "named": true
-        },
-        {
-          "type": "legacy_java_style_assignment_declaration",
-          "named": true
-        },
-        {
-          "type": "parameter_declaration",
-          "named": true
-        },
-        {
-          "type": "pragma_declaration",
-          "named": true
-        },
-        {
-          "type": "procedure_declaration",
-          "named": true
-        },
-        {
-          "type": "procedure_definition",
-          "named": true
-        },
-        {
-          "type": "type_definition_collection",
-          "named": true
-        },
-        {
-          "type": "type_definition_record",
-          "named": true
-        },
-        {
-          "type": "type_definition_ref_cursor",
-          "named": true
-        },
-        {
-          "type": "type_definition_sub",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "procedure_declaration",
     "named": true,
     "fields": {
@@ -10241,29 +10003,6 @@
       "types": [
         {
           "type": "referenced_element",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "result_cache_clause",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "identifier_list_repeat",
-          "named": true
-        },
-        {
-          "type": "kw_relies_on",
-          "named": true
-        },
-        {
-          "type": "kw_result_cache",
           "named": true
         }
       ]
@@ -14088,6 +13827,132 @@
     }
   },
   {
+    "type": "type_constructor_definition",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "body",
+          "named": true
+        },
+        {
+          "type": "cursor_declaration",
+          "named": true
+        },
+        {
+          "type": "cursor_definition",
+          "named": true
+        },
+        {
+          "type": "exception_declaration",
+          "named": true
+        },
+        {
+          "type": "function_declaration",
+          "named": true
+        },
+        {
+          "type": "item_declaration",
+          "named": true
+        },
+        {
+          "type": "kw_as",
+          "named": true
+        },
+        {
+          "type": "kw_constructor",
+          "named": true
+        },
+        {
+          "type": "kw_declare",
+          "named": true
+        },
+        {
+          "type": "kw_function",
+          "named": true
+        },
+        {
+          "type": "kw_is",
+          "named": true
+        },
+        {
+          "type": "kw_result",
+          "named": true
+        },
+        {
+          "type": "kw_return",
+          "named": true
+        },
+        {
+          "type": "kw_self",
+          "named": true
+        },
+        {
+          "type": "legacy_embedded_non_plsql_block",
+          "named": true
+        },
+        {
+          "type": "legacy_java_style_assignment_declaration",
+          "named": true
+        },
+        {
+          "type": "legacy_post_end_exception_block",
+          "named": true
+        },
+        {
+          "type": "nested_function_definition",
+          "named": true
+        },
+        {
+          "type": "nested_procedure_definition",
+          "named": true
+        },
+        {
+          "type": "parameter_declaration",
+          "named": true
+        },
+        {
+          "type": "pragma_declaration",
+          "named": true
+        },
+        {
+          "type": "procedure_declaration",
+          "named": true
+        },
+        {
+          "type": "type_definition_collection",
+          "named": true
+        },
+        {
+          "type": "type_definition_record",
+          "named": true
+        },
+        {
+          "type": "type_definition_ref_cursor",
+          "named": true
+        },
+        {
+          "type": "type_definition_sub",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "type_definition_assoc_array",
     "named": true,
     "fields": {},
@@ -14513,6 +14378,254 @@
         },
         {
           "type": "oracle_binary_float_number",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_member_function_definition",
+    "named": true,
+    "fields": {
+      "fnc_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "body",
+          "named": true
+        },
+        {
+          "type": "cursor_declaration",
+          "named": true
+        },
+        {
+          "type": "cursor_definition",
+          "named": true
+        },
+        {
+          "type": "exception_declaration",
+          "named": true
+        },
+        {
+          "type": "function_declaration",
+          "named": true
+        },
+        {
+          "type": "item_declaration",
+          "named": true
+        },
+        {
+          "type": "kw_as",
+          "named": true
+        },
+        {
+          "type": "kw_declare",
+          "named": true
+        },
+        {
+          "type": "kw_function",
+          "named": true
+        },
+        {
+          "type": "kw_is",
+          "named": true
+        },
+        {
+          "type": "kw_map",
+          "named": true
+        },
+        {
+          "type": "kw_member",
+          "named": true
+        },
+        {
+          "type": "kw_order",
+          "named": true
+        },
+        {
+          "type": "kw_static",
+          "named": true
+        },
+        {
+          "type": "legacy_embedded_non_plsql_block",
+          "named": true
+        },
+        {
+          "type": "legacy_java_style_assignment_declaration",
+          "named": true
+        },
+        {
+          "type": "legacy_post_end_exception_block",
+          "named": true
+        },
+        {
+          "type": "nested_function_definition",
+          "named": true
+        },
+        {
+          "type": "nested_procedure_definition",
+          "named": true
+        },
+        {
+          "type": "parameter_declaration",
+          "named": true
+        },
+        {
+          "type": "pragma_declaration",
+          "named": true
+        },
+        {
+          "type": "procedure_declaration",
+          "named": true
+        },
+        {
+          "type": "return_declaration",
+          "named": true
+        },
+        {
+          "type": "type_definition_collection",
+          "named": true
+        },
+        {
+          "type": "type_definition_record",
+          "named": true
+        },
+        {
+          "type": "type_definition_ref_cursor",
+          "named": true
+        },
+        {
+          "type": "type_definition_sub",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_member_procedure_definition",
+    "named": true,
+    "fields": {
+      "prc_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "body",
+          "named": true
+        },
+        {
+          "type": "cursor_declaration",
+          "named": true
+        },
+        {
+          "type": "cursor_definition",
+          "named": true
+        },
+        {
+          "type": "exception_declaration",
+          "named": true
+        },
+        {
+          "type": "function_declaration",
+          "named": true
+        },
+        {
+          "type": "item_declaration",
+          "named": true
+        },
+        {
+          "type": "kw_as",
+          "named": true
+        },
+        {
+          "type": "kw_declare",
+          "named": true
+        },
+        {
+          "type": "kw_is",
+          "named": true
+        },
+        {
+          "type": "kw_member",
+          "named": true
+        },
+        {
+          "type": "kw_procedure",
+          "named": true
+        },
+        {
+          "type": "kw_static",
+          "named": true
+        },
+        {
+          "type": "legacy_embedded_non_plsql_block",
+          "named": true
+        },
+        {
+          "type": "legacy_java_style_assignment_declaration",
+          "named": true
+        },
+        {
+          "type": "legacy_post_end_exception_block",
+          "named": true
+        },
+        {
+          "type": "nested_function_definition",
+          "named": true
+        },
+        {
+          "type": "nested_procedure_definition",
+          "named": true
+        },
+        {
+          "type": "parameter_declaration",
+          "named": true
+        },
+        {
+          "type": "pragma_declaration",
+          "named": true
+        },
+        {
+          "type": "procedure_declaration",
+          "named": true
+        },
+        {
+          "type": "type_definition_collection",
+          "named": true
+        },
+        {
+          "type": "type_definition_record",
+          "named": true
+        },
+        {
+          "type": "type_definition_ref_cursor",
+          "named": true
+        },
+        {
+          "type": "type_definition_sub",
           "named": true
         }
       ]
@@ -17066,10 +17179,6 @@
   },
   {
     "type": "kw_reject",
-    "named": true
-  },
-  {
-    "type": "kw_relies_on",
     "named": true
   },
   {

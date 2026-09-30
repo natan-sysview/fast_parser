@@ -68,6 +68,7 @@ module.exports = grammar({
     name: 'plsql',
     conflicts: $ => [
         [$._query_table_expression_ref_element],
+        [$._legacy_truncated_procedure_declaration_tail, $.parameter_declaration],
     ],
     extras: $ => [
     $.comment_sl,
@@ -663,7 +664,7 @@ module.exports = grammar({
                 $._object_base_type_def,
                 $._object_subtype_def,
             ),
-            $.end_obj_named,
+            SEMICOLON,
             optional(DIVISON),
         ),
         create_type_body: $ => seq(
@@ -675,10 +676,43 @@ module.exports = grammar({
             field("type_name", $.identifier),
             optional($.sharing_clause),
             $._is_as,
-            choice($._subprog_decl_in_type, $.element_spec_map_order_function_spec),
-            repeat(seq(COMMA,choice($._subprog_decl_in_type, $.element_spec_map_order_function_spec))),
+            repeat1(choice(
+                $.type_constructor_definition,
+                $.type_member_function_definition,
+                $.type_member_procedure_definition,
+            )),
             $.end_obj_named,
             optional(DIVISON),
+        ),
+        type_constructor_definition: $ => seq(
+            $.kw_constructor,
+            $.kw_function,
+            field("name", $.identifier),
+            optional($.parameter_declaration),
+            $.kw_return,
+            $.kw_self,
+            $.kw_as,
+            $.kw_result,
+            $._is_as,
+            $._subprogram_body_with_declarations,
+        ),
+        type_member_function_definition: $ => seq(
+            optional(choice($.kw_map, $.kw_order)),
+            choice($.kw_member, $.kw_static),
+            $.kw_function,
+            field("fnc_name", $.identifier),
+            optional($.parameter_declaration),
+            $.return_declaration,
+            $._is_as,
+            $._subprogram_body_with_declarations,
+        ),
+        type_member_procedure_definition: $ => seq(
+            choice($.kw_member, $.kw_static),
+            $.kw_procedure,
+            field("prc_name", $.identifier),
+            optional($.parameter_declaration),
+            $._is_as,
+            $._subprogram_body_with_declarations,
         ),
         create_function: $ => seq(
             $.create_obj,
@@ -811,7 +845,7 @@ module.exports = grammar({
             repeat($._declare_section_element),
             $._legacy_truncated_procedure_definition_tail,
         )),
-        legacy_truncated_package_spec_file: $ => prec.right(1, seq(
+        legacy_truncated_package_spec_file: $ => prec.right(0, seq(
             $.create_obj,
             optional($._editionable_noneditionable),
             $.kw_package,
@@ -1503,13 +1537,13 @@ module.exports = grammar({
             $.kw_under,
             $.referenced_element,
             optional($.type_attribute_datatype_element_spec),
-            optional($.inheritance_clause),
+            repeat($.inheritance_clause),
 
         ),
         _object_type_def: $ => seq(
             $.kw_object,
             optional($.type_attribute_datatype_element_spec),
-            optional($.inheritance_clause),
+            repeat($.inheritance_clause),
 
         ),
         result_cache_clause: $ => seq(
@@ -1757,8 +1791,10 @@ module.exports = grammar({
             )),
         ),
         _legacy_truncated_procedure_declaration_tail: $ => seq(
-            $._legacy_truncated_gest_persona_refer_header,
-            repeat1($._legacy_truncated_gest_persona_refer_parameter_line),
+            $.kw_procedure,
+            field("prc_name", $.identifier),
+            BRACKET_LEFT,
+            repeat1(seq($.parameter_declaration_element, COMMA)),
         ),
         standalone_procedure_definition: $ => seq(
             $.kw_procedure,
@@ -1776,8 +1812,6 @@ module.exports = grammar({
             repeat($._procedure_properties),
             SEMICOLON,
         ),
-        _legacy_truncated_gest_persona_refer_header: _ => token(prec(3, /[Pp][Rr][Oo][Cc][Ee][Dd][Uu][Rr][Ee][ \t]+GEST_PERSONA_REFER[ \t]*\(/)),
-        _legacy_truncated_gest_persona_refer_parameter_line: _ => token(prec(3, /p(?:IdCredito|IdPersonaRefer|NomRazonSocial|NomPersona|ApellidoPaterno|ApellidoMaterno|Sexo|RfcSiglas|RfcFecha)[ \t]+[Ii][Nn][ \t]+[A-Za-z_][A-Za-z0-9_$#]*(?:\.[A-Za-z_][A-Za-z0-9_$#]*)*(?:%[A-Za-z_][A-Za-z0-9_$#]*)?(?:[ \t]*,[ \t]*)?/)),
         _procedure_properties: $ => choice(
             $.kw_deterministic,
             $.parallel_enable_clause,

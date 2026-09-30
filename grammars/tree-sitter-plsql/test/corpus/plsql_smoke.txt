@@ -7944,8 +7944,28 @@ CREATE OR REPLACE PACKAGE pkg_demo AS
           (datatype
             (kw_number)))))
     (newline)
+    (kw_procedure)
+    (identifier)
     (newline)
-    (newline))
+    (parameter_declaration_element
+      (identifier)
+      (kw_in)
+      (datatype
+        (referenced_element
+          (identifier)
+          (identifier))
+        (kw_datatype_type
+          (kw_type))))
+    (newline)
+    (parameter_declaration_element
+      (identifier)
+      (kw_in)
+      (datatype
+        (referenced_element
+          (identifier)
+          (identifier))
+        (kw_datatype_type
+          (kw_type)))))
   (newline))
 
 ==================

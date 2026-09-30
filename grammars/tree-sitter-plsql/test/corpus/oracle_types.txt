@@ -1,0 +1,403 @@
+==================
+Oracle object type with two inheritance modifiers
+==================
+
+CREATE OR REPLACE EDITIONABLE TYPE "CORPO"."PERSONA_T" AS OBJECT (
+  ID NUMBER(10,0),
+  NOMBRE VARCHAR2(80 CHAR)
+) NOT FINAL NOT INSTANTIABLE;
+
+---
+
+(source_file
+  (newline)
+  (create_type
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_editionable)
+    (kw_type)
+    (identifier)
+    (identifier)
+    (kw_as)
+    (kw_object)
+    (type_attribute_datatype_element_spec
+      (newline)
+      (identifier)
+      (datatype
+        (kw_number)
+        (number)
+        (number))
+      (newline)
+      (identifier)
+      (datatype
+        (kw_varchar2)
+        (number)
+        (byte_char
+          (kw_char)))
+      (newline))
+    (inheritance_clause
+      (kw_not)
+      (kw_final))
+    (inheritance_clause
+      (kw_not)
+      (kw_instantiable)))
+  (newline))
+
+==================
+Oracle collection and subtype constructors
+==================
+
+CREATE TYPE persona_tab AS TABLE OF corpo.persona_t;
+CREATE TYPE persona_child UNDER persona_t (
+  CODIGO NUMBER,
+  CONSTRUCTOR FUNCTION persona_child(CODIGO IN NUMBER DEFAULT NULL)
+    RETURN SELF AS RESULT
+);
+
+---
+
+(source_file
+  (newline)
+  (create_type
+    (create_obj
+      (kw_create))
+    (kw_type)
+    (identifier)
+    (kw_as)
+    (type_definition_nested_table
+      (kw_table)
+      (kw_of)
+      (datatype
+        (referenced_element
+          (identifier)
+          (identifier)))))
+  (newline)
+  (create_type
+    (create_obj
+      (kw_create))
+    (kw_type)
+    (identifier)
+    (kw_under)
+    (referenced_element
+      (identifier))
+    (type_attribute_datatype_element_spec
+      (newline)
+      (identifier)
+      (datatype
+        (kw_number))
+      (newline)
+      (element_spec
+        (element_spec_constructor_spec
+          (kw_constructor)
+          (kw_function)
+          (identifier)
+          (parameter_declaration_element
+            (identifier)
+            (kw_in)
+            (datatype
+              (kw_number))
+            (default_expression
+              (kw_default)
+              (expression
+                (kw_null))))
+          (newline)
+          (kw_return)
+          (kw_self)
+          (kw_as)
+          (kw_result)))
+      (newline)))
+  (newline))
+
+==================
+Oracle type body with two constructors
+==================
+
+CREATE TYPE BODY persona_child AS
+  CONSTRUCTOR FUNCTION persona_child(CODIGO IN NUMBER)
+    RETURN SELF AS RESULT IS
+  BEGIN
+    SELF.CODIGO := CODIGO;
+    RETURN;
+  END;
+  CONSTRUCTOR FUNCTION persona_child RETURN SELF AS RESULT IS
+  BEGIN
+    RETURN;
+  END;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_type_body
+    (create_obj
+      (kw_create))
+    (kw_type)
+    (kw_body)
+    (identifier)
+    (kw_as)
+    (newline)
+    (type_constructor_definition
+      (kw_constructor)
+      (kw_function)
+      (identifier)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (kw_number))))
+      (newline)
+      (kw_return)
+      (kw_self)
+      (kw_as)
+      (kw_result)
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (assignment_statement
+            (referenced_element
+              (identifier)
+              (identifier))
+            (expression
+              (referenced_element
+                (identifier)))))
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (type_constructor_definition
+      (kw_constructor)
+      (kw_function)
+      (identifier)
+      (kw_return)
+      (kw_self)
+      (kw_as)
+      (kw_result)
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (end_obj_named
+      (kw_end)))
+  (newline))
+
+==================
+Oracle type body member routines
+==================
+
+CREATE TYPE BODY persona_t IS
+  MEMBER FUNCTION get_id RETURN NUMBER IS
+  BEGIN
+    RETURN SELF.ID;
+  END;
+  MEMBER PROCEDURE set_id(p_id IN NUMBER) IS
+  BEGIN
+    SELF.ID := p_id;
+  END;
+END;
+
+---
+
+(source_file
+  (newline)
+  (create_type_body
+    (create_obj
+      (kw_create))
+    (kw_type)
+    (kw_body)
+    (identifier)
+    (kw_is)
+    (newline)
+    (type_member_function_definition
+      (kw_member)
+      (kw_function)
+      (identifier)
+      (return_declaration
+        (kw_return)
+        (datatype
+          (kw_number)))
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (return_statement
+            (kw_return)
+            (expression
+              (referenced_element
+                (identifier)
+                (identifier)))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (type_member_procedure_definition
+      (kw_member)
+      (kw_procedure)
+      (identifier)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (kw_number))))
+      (kw_is)
+      (newline)
+      (body
+        (kw_begin)
+        (newline)
+        (statement
+          (assignment_statement
+            (referenced_element
+              (identifier)
+              (identifier))
+            (expression
+              (referenced_element
+                (identifier)))))
+        (newline)
+        (end_obj_named
+          (kw_end))))
+    (newline)
+    (end_obj_named
+      (kw_end)))
+  (newline))
+
+==================
+Complete package following truncated export pattern
+==================
+
+CREATE OR REPLACE PACKAGE pkg_demo AS
+  PROCEDURE PROCESS_PERSON(
+    p_id IN demo_account.id%TYPE,
+    p_person IN demo_person.id%TYPE,
+    p_date IN demo_person.created_on%TYPE,
+    p_status IN demo_person.status%TYPE,
+    pExtra OUT NUMBER
+  );
+  PROCEDURE ALTA_SOLICITUD(pIdCredito OUT NUMBER);
+END pkg_demo;
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (referenced_element
+      (identifier))
+    (kw_as)
+    (newline)
+    (procedure_declaration
+      (kw_procedure)
+      (identifier)
+      (parameter_declaration
+        (newline)
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (referenced_element
+              (identifier)
+              (identifier))
+            (kw_datatype_type
+              (kw_type))))
+        (newline)
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (referenced_element
+              (identifier)
+              (identifier))
+            (kw_datatype_type
+              (kw_type))))
+        (newline)
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (referenced_element
+              (identifier)
+              (identifier))
+            (kw_datatype_type
+              (kw_type))))
+        (newline)
+        (parameter_declaration_element
+          (identifier)
+          (kw_in)
+          (datatype
+            (referenced_element
+              (identifier)
+              (identifier))
+            (kw_datatype_type
+              (kw_type))))
+        (newline)
+        (parameter_declaration_element
+          (identifier)
+          (kw_out)
+          (datatype
+            (kw_number)))
+        (newline)))
+    (newline)
+    (procedure_declaration
+      (kw_procedure)
+      (identifier)
+      (parameter_declaration
+        (parameter_declaration_element
+          (identifier)
+          (kw_out)
+          (datatype
+            (kw_number)))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier))))
+  (newline))
+
+==================
+Oracle object type does not use package END
+==================
+
+CREATE TYPE malformed_t AS OBJECT (ID NUMBER) END;
+
+---
+
+(source_file
+  (newline)
+  (create_type
+    (create_obj
+      (kw_create))
+    (kw_type)
+    (identifier)
+    (kw_as)
+    (kw_object)
+    (type_attribute_datatype_element_spec
+      (identifier)
+      (datatype
+        (kw_number)))
+    (ERROR))
+  (newline))
