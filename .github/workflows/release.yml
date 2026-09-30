@@ -1564,7 +1564,6 @@ jobs:
             "dist/nuget-languages/FastParser.Language.Plsql.${{ steps.version.outputs.value }}.nupkg" \
             --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json \
-            --skip-duplicate \
             --force-english-output 2>&1 | tee nuget-language-plsql-push.log
           status=${PIPESTATUS[0]}
           if [ "$status" -ne 0 ]; then
@@ -1663,7 +1662,6 @@ jobs:
             "dist/nuget-languages/FastParser.Language.Plsql.${{ inputs.version }}.nupkg" \
             --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json \
-            --skip-duplicate \
             --force-english-output 2>&1 | tee nuget-language-plsql-push.log
           status=${PIPESTATUS[0]}
           if [ "$status" -ne 0 ]; then

@@ -2097,7 +2097,7 @@
           "named": true
         },
         {
-          "type": "label",
+          "type": "label_reference",
           "named": true
         }
       ]
@@ -5334,7 +5334,7 @@
           "named": true
         },
         {
-          "type": "label",
+          "type": "label_reference",
           "named": true
         }
       ]
@@ -7850,6 +7850,21 @@
   },
   {
     "type": "label",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "label_reference",
     "named": true,
     "fields": {},
     "children": {

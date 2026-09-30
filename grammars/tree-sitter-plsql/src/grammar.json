@@ -10177,6 +10177,10 @@
         }
       ]
     },
+    "label_reference": {
+      "type": "SYMBOL",
+      "name": "identifier"
+    },
     "basic_loop_statement": {
       "type": "SEQ",
       "members": [
@@ -10437,7 +10441,7 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "label"
+              "name": "label_reference"
             },
             {
               "type": "BLANK"
@@ -10509,7 +10513,7 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "label"
+              "name": "label_reference"
             },
             {
               "type": "BLANK"

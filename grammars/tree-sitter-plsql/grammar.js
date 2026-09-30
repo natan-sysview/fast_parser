@@ -1930,6 +1930,7 @@ module.exports = grammar({
             $.identifier,
             LABEL_END
         ),
+        label_reference: $ => $.identifier,
         basic_loop_statement: $ => seq(
             $.kw_loop,
             repeat1($.statement),
@@ -1976,7 +1977,7 @@ module.exports = grammar({
         ),
         continue_statement: $ => seq(
             $.kw_continue,
-            optional($.label),
+            optional($.label_reference),
             optional(seq($.kw_when,$.expression)),
         ),
         fetch_statement: $ => seq(
@@ -1990,7 +1991,7 @@ module.exports = grammar({
         ),
         exit_statement: $ => seq(
             $.kw_exit,
-            optional($.label),
+            optional($.label_reference),
             optional(seq($.kw_when,$.expression)),
         ),
         return_statement: $ => seq(

@@ -395,6 +395,55 @@ if (!diagnosticsDocument.RootElement.GetProperty("hasErrors").GetBoolean())
     throw new InvalidOperationException("FastParser.Language.Plsql diagnostics smoke failed");
 }
 
+static void AssertPlSqlClean(FastParseClient parser, string name, string source)
+{
+    var result = parser.ParseText(
+        source,
+        new ParseOptions
+        {
+            Language = "plsql",
+            Format = FastParseFormat.Diagnostics
+        });
+    using var document = result.JsonDocument();
+    var root = document.RootElement;
+    if (root.GetProperty("hasErrors").GetBoolean() ||
+        root.GetProperty("errorNodeCount").GetInt32() != 0 ||
+        root.GetProperty("missingNodeCount").GetInt32() != 0)
+    {
+        throw new InvalidOperationException($"FastParser.Language.Plsql regression failed for {name}: {root}");
+    }
+}
+
+static void AssertPlSqlDirty(FastParseClient parser, string name, string source)
+{
+    var result = parser.ParseText(
+        source,
+        new ParseOptions
+        {
+            Language = "plsql",
+            Format = FastParseFormat.Diagnostics
+        });
+    using var document = result.JsonDocument();
+    var root = document.RootElement;
+    if (!root.GetProperty("hasErrors").GetBoolean() ||
+        root.GetProperty("errorNodeCount").GetInt32() == 0)
+    {
+        throw new InvalidOperationException($"FastParser.Language.Plsql expected diagnostics for {name}: {root}");
+    }
+}
+
+AssertPlSqlClean(parser, "bare reraises", "BEGIN NULL; EXCEPTION WHEN OTHERS THEN RAISE; END; /");
+AssertPlSqlClean(parser, "labelled EXIT", "BEGIN <<outer_loop>> LOOP LOOP EXIT outer_loop WHEN x=1; END LOOP; END LOOP outer_loop; END; /");
+AssertPlSqlClean(parser, "labelled CONTINUE", "BEGIN <<outer_loop>> LOOP LOOP CONTINUE outer_loop; END LOOP; END LOOP outer_loop; END; /");
+AssertPlSqlClean(parser, "export quote wrapped package", """
+"
+CREATE OR REPLACE PACKAGE "SAR"."PKG_TEST" IS
+  PROCEDURE p;
+END PKG_TEST;
+ "
+""");
+AssertPlSqlDirty(parser, "malformed grant quote", "GRANT SELECT ON CORPO.SIM_CONFIGURACION_KYC TO REPORTES';\nGRANT SELECT ON CORPO.SIM_CONFIGURACION_KYC TO APP;");
+
 Console.WriteLine("FastParser language NuGet smoke OK");
 Console.WriteLine(parser.Version);
 Console.WriteLine(parser.LibraryPath);

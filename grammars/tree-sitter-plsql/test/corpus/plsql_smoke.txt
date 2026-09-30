@@ -7869,3 +7869,65 @@ END;
       (end_obj
         (kw_end))))
   (newline))
+
+==================
+Labelled exit and continue references
+==================
+
+BEGIN
+  <<outer_loop>>
+  LOOP
+    LOOP
+      EXIT outer_loop WHEN x = 1;
+      CONTINUE outer_loop;
+    END LOOP;
+  END LOOP outer_loop;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (label
+          (identifier))
+        (newline)
+        (basic_loop_statement
+          (kw_loop)
+          (newline)
+          (statement
+            (basic_loop_statement
+              (kw_loop)
+              (newline)
+              (statement
+                (exit_statement
+                  (kw_exit)
+                  (label_reference
+                    (identifier))
+                  (kw_when)
+                  (expression
+                    (referenced_element
+                      (identifier))
+                    (number))))
+              (newline)
+              (statement
+                (continue_statement
+                  (kw_continue)
+                  (label_reference
+                    (identifier))))
+              (newline)
+              (kw_end)
+              (kw_loop)))
+          (newline)
+          (kw_end)
+          (kw_loop)
+          (loop_end_name
+            (identifier))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
