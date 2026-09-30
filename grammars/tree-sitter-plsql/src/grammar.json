@@ -4190,10 +4190,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "legacy_package_spec_cursor_definition_blob"
-        },
-        {
-          "type": "SYMBOL",
           "name": "cursor_definition"
         }
       ]
@@ -12254,79 +12250,6 @@
         "content": {
           "type": "PATTERN",
           "value": "[^;]*[Oo][Rr][Dd][Ee][Rr][ \\t\\r\\n]+[Bb][Yy][^;]*"
-        }
-      }
-    },
-    "legacy_package_spec_cursor_definition_blob": {
-      "type": "PREC",
-      "value": 1,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "kw_cursor"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "identifier"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "cursor_declaration_parameters"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "kw_return"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "_cursor_declaration_return_datatype"
-                  }
-                ]
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
-            "type": "SYMBOL",
-            "name": "kw_is"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "legacy_package_spec_cursor_select_blob"
-          },
-          {
-            "type": "PATTERN",
-            "value": ";[ \\t\\f]*"
-          }
-        ]
-      }
-    },
-    "legacy_package_spec_cursor_select_blob": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": 1,
-        "content": {
-          "type": "PATTERN",
-          "value": "(?:--[^\\r\\n]*(?:\\r?\\n)?|\\/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*\\/|'(?:''|[^'])*'|[^;])*[Oo][Rr][Dd][Ee][Rr][ \\t\\r\\n]+[Bb][Yy](?:--[^\\r\\n]*(?:\\r?\\n)?|\\/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*\\/|'(?:''|[^'])*'|[^;])*"
         }
       }
     },

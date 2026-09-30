@@ -160,6 +160,29 @@ def validate_plsql(parser: FastParse) -> None:
     if diagnostics.get("hasErrors") is True:
         raise AssertionError(f"plsql smoke unexpectedly has parse errors: {diagnostics}")
 
+    cursor_source = (
+        "CREATE PACKAGE p IS "
+        "CURSOR c IS WITH d AS (SELECT app.workday(1) d FROM dual ORDER BY d), "
+        "m AS (SELECT app.next_workday(2) d FROM dual) SELECT d FROM d; "
+        "CURSOR c2 IS SELECT x FROM t; END; /"
+    )
+    cursor_document = parser.parse_text(
+        cursor_source,
+        language="plsql",
+        output_format=OutputFormat.BINARY,
+        include_rules=["cursor_definition", "ref_call", "legacy_package_spec_cursor_definition_blob"],
+        fields=["rule", "text", "range", "diagnostics"],
+    ).binary_document()
+    cursor_rules = [node.rule for node in cursor_document.nodes]
+    call_texts = {node.text for node in cursor_document.nodes if node.rule == "ref_call"}
+    if (
+        cursor_document.has_errors
+        or cursor_rules.count("cursor_definition") != 2
+        or "legacy_package_spec_cursor_definition_blob" in cursor_rules
+        or not {b"app.workday(1)", b"app.next_workday(2)"} <= call_texts
+    ):
+        raise AssertionError(f"plsql cursor structure was lost: {cursor_document}")
+
     broken = parser.parse_text(
         "CREATE TABLE broken_table (id NUMBER",
         language="plsql",

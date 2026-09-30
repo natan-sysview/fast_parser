@@ -2465,10 +2465,6 @@
           "named": true
         },
         {
-          "type": "legacy_package_spec_cursor_definition_blob",
-          "named": true
-        },
-        {
           "type": "package_initialization_block",
           "named": true
         },
@@ -7981,53 +7977,6 @@
     }
   },
   {
-    "type": "legacy_package_spec_cursor_definition_blob",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "cursor_declaration_parameters",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "kw_cursor",
-          "named": true
-        },
-        {
-          "type": "kw_datatype_rowtype",
-          "named": true
-        },
-        {
-          "type": "kw_datatype_type",
-          "named": true
-        },
-        {
-          "type": "kw_is",
-          "named": true
-        },
-        {
-          "type": "kw_return",
-          "named": true
-        },
-        {
-          "type": "legacy_package_spec_cursor_select_blob",
-          "named": true
-        },
-        {
-          "type": "referenced_element",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "legacy_parenthesized_with_select_statement",
     "named": true,
     "fields": {},
@@ -8417,10 +8366,6 @@
         },
         {
           "type": "legacy_package_name_repeat",
-          "named": true
-        },
-        {
-          "type": "legacy_package_spec_cursor_definition_blob",
           "named": true
         },
         {
@@ -17633,10 +17578,6 @@
   },
   {
     "type": "legacy_export_quote_marker",
-    "named": true
-  },
-  {
-    "type": "legacy_package_spec_cursor_select_blob",
     "named": true
   },
   {

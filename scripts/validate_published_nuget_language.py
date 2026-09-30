@@ -446,6 +446,29 @@ CREATE OR REPLACE PACKAGE "SAR"."PKG_TEST" IS
 END PKG_TEST;
  "
 """);
+var cursorSource = "CREATE PACKAGE p IS " +
+    "CURSOR c IS WITH d AS (SELECT app.workday(1) d FROM dual ORDER BY d), " +
+    "m AS (SELECT app.next_workday(2) d FROM dual) SELECT d FROM d; " +
+    "CURSOR c2 IS SELECT x FROM t; END; /";
+AssertPlSqlClean(parser, "package cursor CTE order by", cursorSource);
+var cursorResult = parser.ParseText(cursorSource, new ParseOptions
+{
+    Language = "plsql",
+    Format = FastParseFormat.Json,
+    IncludeRules = "cursor_definition|ref_call|legacy_package_spec_cursor_definition_blob",
+    Fields = FastParseField.Rule | FastParseField.Text | FastParseField.Range
+});
+using var cursorDocument = cursorResult.JsonDocument();
+var cursorNodes = cursorDocument.RootElement.GetProperty("nodes").EnumerateArray().ToArray();
+if (cursorNodes.Count(node => node.GetProperty("rule").GetString() == "cursor_definition") != 2 ||
+    cursorNodes.Any(node => node.GetProperty("rule").GetString() == "legacy_package_spec_cursor_definition_blob") ||
+    !cursorNodes.Any(node => node.GetProperty("rule").GetString() == "ref_call" &&
+        node.GetProperty("text").GetString() == "app.workday(1)") ||
+    !cursorNodes.Any(node => node.GetProperty("rule").GetString() == "ref_call" &&
+        node.GetProperty("text").GetString() == "app.next_workday(2)"))
+{
+    throw new InvalidOperationException("published PL/SQL cursor structure smoke failed");
+}
 AssertPlSqlDirty(parser, "malformed grant quote", "GRANT SELECT ON CORPO.SIM_CONFIGURACION_KYC TO REPORTES';\nGRANT SELECT ON CORPO.SIM_CONFIGURACION_KYC TO APP;");
 
 Console.WriteLine("FastParser published language NuGet smoke OK");

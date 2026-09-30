@@ -776,7 +776,6 @@ module.exports = grammar({
             $._item_list_1,
             $.function_definition,
             $.procedure_definition,
-            $.legacy_package_spec_cursor_definition_blob,
             $.cursor_definition,
         ),
         create_package_body: $ => seq(
@@ -2296,16 +2295,6 @@ module.exports = grammar({
             SEMICOLON,
         )),
         legacy_cursor_select_blob: _ => token(prec(1, /[^;]*[Oo][Rr][Dd][Ee][Rr][ \t\r\n]+[Bb][Yy][^;]*/)),
-        legacy_package_spec_cursor_definition_blob: $ => prec(1, seq(
-            $.kw_cursor,
-            $.identifier,
-            optional($.cursor_declaration_parameters),
-            optional(seq($.kw_return, $._cursor_declaration_return_datatype)),
-            $.kw_is,
-            $.legacy_package_spec_cursor_select_blob,
-            SEMICOLON,
-        )),
-        legacy_package_spec_cursor_select_blob: _ => token(prec(1, /(?:--[^\r\n]*(?:\r?\n)?|\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/|'(?:''|[^'])*'|[^;])*[Oo][Rr][Dd][Ee][Rr][ \t\r\n]+[Bb][Yy](?:--[^\r\n]*(?:\r?\n)?|\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/|'(?:''|[^'])*'|[^;])*/)),
         cursor_declaration: $ => seq(
             $.kw_cursor,
             $.identifier,

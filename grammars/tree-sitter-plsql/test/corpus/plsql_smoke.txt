@@ -3436,16 +3436,195 @@ END p;
       ref_name: (identifier))
     (kw_is)
     (newline)
-    (legacy_package_spec_cursor_definition_blob
+    (cursor_definition
       (kw_cursor)
       (identifier)
       (kw_is)
-      (legacy_package_spec_cursor_select_blob))
+      (newline)
+      (sql_statement_select
+        (with_clause
+          (kw_with)
+          query_name: (identifier)
+          (kw_as)
+          (newline)
+          (kw_select)
+          (select_list
+            (select_list_element
+              (expression
+                (referenced_element
+                  ref_name: (identifier)))))
+          (newline)
+          (kw_from)
+          (table_list
+            (table_list_element
+              (referenced_element
+                ref_name: (identifier))))
+          (newline)
+          (comment_sl)
+          (newline))
+        (newline)
+        (kw_select)
+        (select_list
+          (select_list_element
+            (expression
+              (referenced_element
+                ref_name: (identifier)))))
+        (newline)
+        (kw_from)
+        (table_list
+          (table_list_element
+            (referenced_element
+              ref_name: (identifier))))
+        (newline)
+        (order_by_clause
+          (kw_order)
+          (kw_by)
+          (order_by_clause_element
+            (expression
+              (referenced_element
+                ref_name: (identifier)))))))
     (newline)
     (end_obj_named
       (kw_end)
       (referenced_element
         ref_name: (identifier)))
+    (newline))
+  (newline))
+
+==================
+Package spec CTE order by keeps calls and following cursor
+==================
+
+CREATE OR REPLACE PACKAGE p IS
+  CURSOR c IS
+    WITH days AS (
+      SELECT app.workday(1) AS d FROM dual ORDER BY d
+    ), movements AS (
+      SELECT app.next_workday(2) AS d FROM dual
+    )
+    SELECT d FROM days ORDER BY d;
+  CURSOR later_cursor IS SELECT d FROM movements;
+END p;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (referenced_element
+      (identifier))
+    (kw_is)
+    (newline)
+    (cursor_definition
+      (kw_cursor)
+      (identifier)
+      (kw_is)
+      (newline)
+      (sql_statement_select
+        (with_clause
+          (kw_with)
+          (identifier)
+          (kw_as)
+          (newline)
+          (kw_select)
+          (select_list
+            (select_list_element
+              (expression
+                (ref_call
+                  (referenced_element
+                    (identifier)
+                    (identifier))
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (number)))))))
+              (kw_as)
+              (identifier)))
+          (kw_from)
+          (table_list
+            (table_list_element
+              (referenced_element
+                (identifier))))
+          (order_by_clause
+            (kw_order)
+            (kw_by)
+            (order_by_clause_element
+              (expression
+                (referenced_element
+                  (identifier)))))
+          (newline)
+          (identifier)
+          (kw_as)
+          (newline)
+          (kw_select)
+          (select_list
+            (select_list_element
+              (expression
+                (ref_call
+                  (referenced_element
+                    (identifier)
+                    (identifier))
+                  (parameter
+                    (parameter_element
+                      (parameter_value
+                        (expression
+                          (number)))))))
+              (kw_as)
+              (identifier)))
+          (kw_from)
+          (table_list
+            (table_list_element
+              (referenced_element
+                (identifier))))
+          (newline))
+        (newline)
+        (kw_select)
+        (select_list
+          (select_list_element
+            (expression
+              (referenced_element
+                (identifier)))))
+        (kw_from)
+        (table_list
+          (table_list_element
+            (referenced_element
+              (identifier))))
+        (order_by_clause
+          (kw_order)
+          (kw_by)
+          (order_by_clause_element
+            (expression
+              (referenced_element
+                (identifier)))))))
+    (newline)
+    (cursor_definition
+      (kw_cursor)
+      (identifier)
+      (kw_is)
+      (sql_statement_select
+        (kw_select)
+        (select_list
+          (select_list_element
+            (expression
+              (referenced_element
+                (identifier)))))
+        (kw_from)
+        (table_list
+          (table_list_element
+            (referenced_element
+              (identifier))))))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier)))
     (newline))
   (newline))
 
