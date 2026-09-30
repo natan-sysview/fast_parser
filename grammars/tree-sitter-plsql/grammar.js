@@ -45,7 +45,7 @@ const EXPONENT= '**'
 const LABEL_START= '<<'
 const LABEL_END= '>>'
 const RANGE= '..'
-const SEMICOLON = ';'
+const SEMICOLON = /;[ \t\f]*/
 const POINT = '.'
 const DOUBLE_POINT = ':'
 const COMMA = ','
@@ -85,6 +85,7 @@ module.exports = grammar({
             repeat($._element),
         ),
         _element: $ => choice(
+            $.legacy_export_quote_marker,
             $._ddl_statement,
             $.sqlplus_statement,
             $.anonymous_block,
@@ -92,6 +93,7 @@ module.exports = grammar({
             $.standalone_procedure_definition,
             $.statement,
         ),
+        legacy_export_quote_marker: _ => token(prec(2, /[ \t]*"[ \t\r]*/)),
         _ddl_statement: $ => choice(
              $._alter_statement,
              $._create_statement,
@@ -105,6 +107,7 @@ module.exports = grammar({
             $.drop_table,
             $.drop_synonym,
             $.drop_sequence,
+            $.drop_index,
             $.drop_function,
             $.drop_procedure,
             $.drop_package,
@@ -132,6 +135,13 @@ module.exports = grammar({
         drop_sequence: $ => seq(
             $.kw_drop,
             $.kw_sequence,
+            $.referenced_element,
+            optional(SEMICOLON),
+            optional(DIVISON),
+        ),
+        drop_index: $ => seq(
+            $.kw_drop,
+            $.kw_index,
             $.referenced_element,
             optional(SEMICOLON),
             optional(DIVISON),
@@ -433,6 +443,7 @@ module.exports = grammar({
         sqlplus_statement: $ => choice(
             $.sqlplus_prompt_statement,
             $.sqlplus_set_statement,
+            $.sqlplus_clear_statement,
             $.sqlplus_exit_statement,
             $.sqlplus_rem_statement,
             $.sqlplus_spool_statement,
@@ -460,12 +471,30 @@ module.exports = grammar({
             $.kw_prompt,
             optional($.sqlplus_line_text),
         ),
-        sqlplus_set_statement: $ => seq(
-            $.kw_set,
-            $.kw_define,
-            choice($.kw_on, $.kw_off),
-            SEMICOLON,
+        sqlplus_set_statement: $ => choice(
+            seq(
+                $.kw_set,
+                $.kw_define,
+                choice($.kw_on, $.kw_off),
+                optional(SEMICOLON),
+            ),
+            prec.right(1, seq(
+                $.kw_set,
+                repeat1($.sqlplus_set_argument),
+                optional(SEMICOLON),
+            )),
         ),
+        sqlplus_set_argument: $ => choice(
+            $.identifier,
+            $.kw_on,
+            $.kw_off,
+            $.kw_unlimited,
+            $._literal,
+        ),
+        sqlplus_clear_statement: $ => prec.right(1, seq(
+            $.kw_clear,
+            optional($.sqlplus_line_text),
+        )),
         sqlplus_exit_statement: $ => prec.right(1, seq(
             $.kw_exit,
             optional(SEMICOLON),
@@ -745,7 +774,10 @@ module.exports = grammar({
         ),
         _package_spec_item: $ => choice(
             $._item_list_1,
-            $._item_list_ext,
+            $.function_definition,
+            $.procedure_definition,
+            $.legacy_package_spec_cursor_definition_blob,
+            $.cursor_definition,
         ),
         create_package_body: $ => seq(
             $.create_obj,
@@ -1551,16 +1583,26 @@ module.exports = grammar({
             field("remote_name",$.dblink_name),
         ),
         dblink_name: _ => token(/[a-zA-Z][a-zA-Z0-9_$#]*(\.[a-zA-Z][a-zA-Z0-9_$#]*)*/),
-        referenced_element: $ => seq(
-            optional($._schema),
-            choice(
-                $._referenced_element_deep,
-                $._referenced_element_parent,
-                $._referenced_element_name,
-                $._referenced_element_multi,
+        referenced_element: $ => choice(
+            $._contextual_referenced_element,
+            seq(
+                optional($._schema),
+                choice(
+                    $._referenced_element_deep,
+                    $._referenced_element_parent,
+                    $._referenced_element_name,
+                    $._referenced_element_multi,
+                ),
+                optional($._remote),
             ),
-            optional($._remote),
         ),
+        _contextual_referenced_element: $ => prec.right(4, seq(
+            field("ref_name_parent", $._trigger_context_identifier),
+            POINT,
+            field("ref_name", $._contextual_identifier),
+            repeat(seq(POINT, field("ref_name_sub", $._contextual_identifier))),
+            optional($._remote),
+        )),
         _referenced_element_deep: $ => prec.right(6, choice(
             seq(
                 field("ref_name_parent", $.identifier), POINT,
@@ -1661,6 +1703,7 @@ module.exports = grammar({
         _item_list_ext: $ => choice(
             $.function_definition,
             $.procedure_definition,
+            $.legacy_cursor_definition_blob,
             $.cursor_definition,
         ),
         _nested_declare_section_element: $ => choice(
@@ -1956,7 +1999,7 @@ module.exports = grammar({
         ),
         raise_statement: $ => seq(
             $.kw_raise,
-            $.referenced_element,
+            optional($.referenced_element),
         ),
         pipe_row_statement: $ => seq(
             $.kw_pipe,
@@ -2086,7 +2129,7 @@ module.exports = grammar({
             $._iterator_ctl_seq,
         ),
         _iterand_decl: $ => seq(
-            $.identifier,
+            $._contextual_identifier,
             optional(choice($.kw_mutable,$.kw_immutable)),
         ),
         _iterator_ctl_seq: $ => seq(
@@ -2242,6 +2285,26 @@ module.exports = grammar({
             $.sql_statement_select,
             SEMICOLON
         ),
+        legacy_cursor_definition_blob: $ => prec(1, seq(
+            $.kw_cursor,
+            $.identifier,
+            optional($.cursor_declaration_parameters),
+            optional(seq($.kw_return, $._cursor_declaration_return_datatype)),
+            $.kw_is,
+            $.legacy_cursor_select_blob,
+            SEMICOLON,
+        )),
+        legacy_cursor_select_blob: _ => token(prec(1, /[^;]*[Oo][Rr][Dd][Ee][Rr][ \t\r\n]+[Bb][Yy][^;]*/)),
+        legacy_package_spec_cursor_definition_blob: $ => prec(1, seq(
+            $.kw_cursor,
+            $.identifier,
+            optional($.cursor_declaration_parameters),
+            optional(seq($.kw_return, $._cursor_declaration_return_datatype)),
+            $.kw_is,
+            $.legacy_package_spec_cursor_select_blob,
+            SEMICOLON,
+        )),
+        legacy_package_spec_cursor_select_blob: _ => token(prec(1, /(?:--[^\r\n]*(?:\r?\n)?|\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/|'(?:''|[^'])*'|[^;])*[Oo][Rr][Dd][Ee][Rr][ \t\r\n]+[Bb][Yy](?:--[^\r\n]*(?:\r?\n)?|\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/|'(?:''|[^'])*'|[^;])*/)),
         cursor_declaration: $ => seq(
             $.kw_cursor,
             $.identifier,
@@ -3320,10 +3383,19 @@ module.exports = grammar({
             $._unquoted_identifier,
             $._quoted_identifier
         ),
+        _contextual_identifier: $ => choice(
+            $.identifier,
+            $._trigger_context_identifier,
+        ),
+        _trigger_context_identifier: $ => choice(
+            alias($.kw_new, $.identifier),
+            alias($.kw_old, $.identifier),
+            alias($.kw_parent, $.identifier),
+        ),
         _keyword_prefixed_identifier: _ => token(prec(2, keywordPrefixIdentifierPattern())),
         _unquoted_identifier: $ => /[a-zA-Z\u00C0-\u00FF](?:[a-zA-Z0-9_$#\u00C0-\u00FF]|\\u[0-9A-Fa-f]{4})*/,
         _quoted_identifier: $ => choice(
-            seq('"', field("name", /(""|[^"])*/), '"'), // ANSI QUOTES
+            seq('"', field("name", /(""|[^"\r\n])*/), '"'), // ANSI QUOTES
         ),
         _referenced_element_list: $ => seq(
             BRACKET_LEFT,
@@ -4493,6 +4565,7 @@ module.exports = grammar({
         kw_collate: _ => reservedWord("collate"),
         kw_prompt: _ => reservedWord("prompt"),
         kw_define: _ => reservedWord("define"),
+        kw_clear: _ => reservedWord("clear"),
         kw_off: _ => reservedWord("off"),
         kw_logging: _ => reservedWord("logging"),
         kw_nologging: _ => reservedWord("nologging"),
@@ -4720,6 +4793,6 @@ module.exports = grammar({
         kw_link: _ => reservedWord("link"),
         kw_log: _ => reservedWord("log"),
         kw_wrapped: _ => reservedWord("wrapped"),
-        newline: $ => /\r?\n/,
+        newline: $ => /\r?\n[ \t\f]*/,
     },
 });

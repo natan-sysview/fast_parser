@@ -1778,6 +1778,137 @@ END;
   (newline))
 
 ==================
+Procedure with trailing semicolon padding
+==================
+
+CREATE OR REPLACE PROCEDURE p IS
+BEGIN
+  NULL;
+END; 
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    (identifier)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end))))
+  (newline))
+
+==================
+Procedure with SQLPlus slash and trailing indentation
+==================
+
+CREATE OR REPLACE PROCEDURE p IS
+BEGIN
+  NULL;
+END;
+/
+   
+
+---
+
+(source_file
+  (newline)
+  (create_procedure
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_procedure)
+    (identifier)
+    (kw_is)
+    (newline)
+    (body
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj_named
+        (kw_end)))
+    (newline))
+  (newline)
+  (newline))
+
+==================
+Contextual NEW cursor variable and object constructor
+==================
+
+BEGIN
+  FOR NEW IN c LOOP
+    v := new.poliza;
+  END LOOP;
+  v_obj := NEW tipo_objeto(1);
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (for_loop_statement
+          (kw_for)
+          (iterator
+            (identifier)
+            (kw_in)
+            (expression
+              (referenced_element
+                (identifier))))
+          (kw_loop)
+          (newline)
+          (statement
+            (assignment_statement
+              (referenced_element
+                (identifier))
+              (expression
+                (referenced_element
+                  (identifier)
+                  (identifier)))))
+          (newline)
+          (kw_end)
+          (kw_loop)))
+      (newline)
+      (statement
+        (assignment_statement
+          (referenced_element
+            (identifier))
+          (expression
+            (new_object_expression
+              (kw_new)
+              (referenced_element
+                (identifier))
+              (parameter
+                (parameter_element
+                  (parameter_value
+                    (expression
+                      (number)))))))))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
 Create procedure with quoted schema
 ==================
 
@@ -3237,6 +3368,84 @@ END;
     (newline)
     (end_obj_named
       (kw_end))
+    (newline))
+  (newline))
+
+==================
+Legacy cursor with unbalanced order by
+==================
+
+DECLARE
+  CURSOR c IS SELECT a FROM t WHERE (x = 1 ORDER BY a;
+BEGIN
+  NULL;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_declare)
+      (newline)
+      (legacy_cursor_definition_blob
+        (kw_cursor)
+        (identifier)
+        (kw_is)
+        (legacy_cursor_select_blob))
+      (newline)
+      (kw_begin)
+      (newline)
+      (statement
+        (null_statement
+          (kw_null)))
+      (newline)
+      (end_obj
+        (kw_end))))
+  (newline))
+
+==================
+Package spec cursor with commented order by semicolon
+==================
+
+CREATE OR REPLACE PACKAGE p IS
+  CURSOR c IS
+    WITH q AS (
+      SELECT a
+      FROM t
+      --ORDER BY a;
+    )
+      SELECT a
+      FROM q
+      ORDER BY a;
+END p;
+/
+
+---
+
+(source_file
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    package_name: (referenced_element
+      ref_name: (identifier))
+    (kw_is)
+    (newline)
+    (legacy_package_spec_cursor_definition_blob
+      (kw_cursor)
+      (identifier)
+      (kw_is)
+      (legacy_package_spec_cursor_select_blob))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        ref_name: (identifier)))
     (newline))
   (newline))
 
@@ -6656,8 +6865,8 @@ Legacy embedded non PLSQL package block
 CREATE OR REPLACE PACKAGE BODY pkg IS
 PROCEDURE ok IS BEGIN NULL; END;
 -- separator
-procedure patito
-    error VARCHAR2 = "error fatal";
+procedure patito 
+    error VARCHAR2 = "error fatal"; 
     P_CBA_autoriza_pagos(1,2,3,4,5,error);
     printf( error )
 -- separator
@@ -6665,7 +6874,7 @@ error = "Error no fatal"
 
 -- separator
 class PatitoDaoImpl
-    Strring error  = "error fatal";
+    Strring error  = "error fatal"; 
     PCbAAutorizaPagos(1,2,3,4,5,error);
     printf( error )
 -- separator
@@ -7596,4 +7805,67 @@ END pkg_demo;
       (kw_end)
       (referenced_element
         (identifier))))
+  (newline))
+
+==================
+Package spec with export quote wrapper
+==================
+
+"
+CREATE OR REPLACE PACKAGE "SAR"."PKG_TEST" IS
+  PROCEDURE p;
+END PKG_TEST;
+ "
+
+---
+
+(source_file
+  (newline)
+  (legacy_export_quote_marker)
+  (newline)
+  (create_package
+    (create_obj
+      (kw_create)
+      (kw_or)
+      (kw_replace))
+    (kw_package)
+    (referenced_element
+      (identifier)
+      (identifier))
+    (kw_is)
+    (newline)
+    (procedure_declaration
+      (kw_procedure)
+      (identifier))
+    (newline)
+    (end_obj_named
+      (kw_end)
+      (referenced_element
+        (identifier))))
+  (newline)
+  (legacy_export_quote_marker)
+  (newline))
+
+==================
+Bare raise statement
+==================
+
+BEGIN
+  RAISE;
+END;
+
+---
+
+(source_file
+  (newline)
+  (anonymous_block
+    (plsql_block
+      (kw_begin)
+      (newline)
+      (statement
+        (raise_statement
+          (kw_raise)))
+      (newline)
+      (end_obj
+        (kw_end))))
   (newline))

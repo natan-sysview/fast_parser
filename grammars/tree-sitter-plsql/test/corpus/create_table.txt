@@ -1138,6 +1138,23 @@ for SEUS.AGENTES_BASE;
   (newline))
 
 ==================
+Drop index statement
+==================
+
+DROP INDEX IDX_COMP_DET_REP_ID;
+
+---
+
+(source_file
+  (newline)
+  (drop_index
+    (kw_drop)
+    (kw_index)
+    (referenced_element
+      (identifier)))
+  (newline))
+
+==================
 Create table constraints
 ==================
 
