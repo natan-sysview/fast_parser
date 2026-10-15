@@ -40,6 +40,7 @@ class GrammarIntrospectionTests(unittest.TestCase):
             MODULE.write_descriptor(first, first_path)
             MODULE.write_descriptor(second, second_path)
             self.assertEqual(first_path.read_bytes(), second_path.read_bytes())
+            self.assertNotIn(b"\r\n", first_path.read_bytes())
             self.assertEqual(json.loads(first_path.read_text(encoding="utf-8")), first)
 
     def test_move_preserves_structure_and_case_policy_without_expansion(self) -> None:

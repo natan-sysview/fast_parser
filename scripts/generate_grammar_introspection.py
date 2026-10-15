@@ -184,10 +184,8 @@ def generate_descriptor(
 
 def write_descriptor(descriptor: dict[str, Any], output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(
-        json.dumps(descriptor, indent=2, sort_keys=True, ensure_ascii=True) + "\n",
-        encoding="utf-8",
-    )
+    with output.open("w", encoding="utf-8", newline="\n") as stream:
+        stream.write(json.dumps(descriptor, indent=2, sort_keys=True, ensure_ascii=True) + "\n")
 
 
 def main() -> int:

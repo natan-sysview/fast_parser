@@ -88,7 +88,13 @@ def read_introspection(language: str, version: str, path: Path) -> tuple[str, st
     grammar_sha = grammar.get("sha256")
     if not isinstance(grammar_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", grammar_sha):
         raise AssertionError(f"grammar introspection hash missing or invalid: {path}")
-    return hashlib.sha256(path.read_bytes()).hexdigest(), grammar_sha
+    canonical_descriptor = json.dumps(
+        descriptor,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+    ).encode("utf-8")
+    return hashlib.sha256(canonical_descriptor).hexdigest(), grammar_sha
 
 
 def stage_archive(language: str, archive: Path, staging: Path) -> tuple[str, str, str]:

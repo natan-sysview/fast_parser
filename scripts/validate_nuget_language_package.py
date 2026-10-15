@@ -551,7 +551,10 @@ def smoke_framework(env: dict[str, str]) -> str:
 
 
 def prepend_introspection_check(program: str, language: str) -> str:
-    return f'''var grammarIntrospectionPath = Path.Combine(
+    using_block, separator, body = program.partition("\n\n")
+    if not separator:
+        raise ValueError("smoke program must begin with a using-directive block")
+    check = f'''var grammarIntrospectionPath = Path.Combine(
     AppContext.BaseDirectory,
     "fastparse",
     "languages",
@@ -572,7 +575,8 @@ using (var grammarIntrospection = System.Text.Json.JsonDocument.Parse(File.ReadA
     }}
 }}
 
-''' + program
+'''
+    return using_block + separator + check + body
 
 
 def validate_package_layout(language_package: Path, language: str, require_all_rids: bool) -> None:
