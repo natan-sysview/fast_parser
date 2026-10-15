@@ -322,6 +322,52 @@ Rules:
 - `symbols.treeSitterLanguage` must match the descriptor.
 - `platforms` lists the platforms included by the package, not hoped-for platforms.
 
+## Optional Grammar Introspection Descriptor
+
+Status: `Preview`
+
+Every newly built official language package includes the optional sidecar:
+
+```text
+grammar/introspection.json
+```
+
+The descriptor is generated from that extension's vendored `src/grammar.json`; it
+is never edited by hand and is not loaded by the native parser. Old packages that
+do not contain it remain valid extensions.
+
+It is intended for tooling such as grammar explorers and AI agents that need the
+actual Tree-sitter production structure without reverse engineering a dynamic
+library. Schema version `1` preserves the grammar graph rather than expanding it:
+
+- `choice`, `seq`, `optional`, `repeat`, and `repeat1` remain structural nodes.
+- `symbol` nodes remain references, so recursive grammars cannot create an
+  infinite descriptor.
+- `field`, literal, and regex information is retained.
+- A regex gets `ascii-case-insensitive` only when that can be proven from an
+  explicit ASCII case-pair pattern such as `[mM][oO][vV][eE]`; otherwise its
+  case policy is `unknown`.
+- `grammar.sha256` is the SHA-256 of the exact generated `src/grammar.json`.
+
+The package manifest points to the sidecar and repeats the grammar hash:
+
+```json
+"grammarIntrospection": {
+  "path": "grammar/introspection.json",
+  "schemaVersion": 1,
+  "grammarSha256": "..."
+}
+```
+
+NuGet copies the descriptor to:
+
+```text
+<application-output>/fastparse/languages/<language>/grammar/introspection.json
+```
+
+The descriptor is an inspection contract, not a parser input and not a promise
+that every structural alternative is a recommended business-level command.
+
 ## Output Compatibility
 
 Status: `Stable`

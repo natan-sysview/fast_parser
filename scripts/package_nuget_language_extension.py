@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
+import json
 import re
 import shutil
 import tarfile
@@ -73,7 +75,23 @@ def extract_archive(archive: Path, destination: Path) -> Path:
     return roots[0]
 
 
-def stage_archive(language: str, archive: Path, staging: Path) -> str:
+def read_introspection(language: str, version: str, path: Path) -> tuple[str, str]:
+    descriptor = json.loads(path.read_text(encoding="utf-8"))
+    if descriptor.get("format") != "fastparse-grammar-introspection":
+        raise AssertionError(f"invalid grammar introspection format: {path}")
+    if descriptor.get("schemaVersion") != 1:
+        raise AssertionError(f"unsupported grammar introspection schema: {path}")
+    extension = descriptor.get("extension", {})
+    if extension.get("language") != language or extension.get("version") != version:
+        raise AssertionError(f"grammar introspection identity mismatch: {path}")
+    grammar = descriptor.get("grammar", {})
+    grammar_sha = grammar.get("sha256")
+    if not isinstance(grammar_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", grammar_sha):
+        raise AssertionError(f"grammar introspection hash missing or invalid: {path}")
+    return hashlib.sha256(path.read_bytes()).hexdigest(), grammar_sha
+
+
+def stage_archive(language: str, archive: Path, staging: Path) -> tuple[str, str, str]:
     match = ARCHIVE_RE.match(archive.name)
     if not match:
         raise AssertionError(f"unexpected language archive name: {archive.name}")
@@ -82,6 +100,7 @@ def stage_archive(language: str, archive: Path, staging: Path) -> str:
 
     platform_name = match.group("platform")
     arch = match.group("arch")
+    version = match.group("version")
     rid = rid_for(platform_name, arch)
     expected_native = native_name(language, platform_name)
 
@@ -100,6 +119,32 @@ def stage_archive(language: str, archive: Path, staging: Path) -> str:
             manifest_target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(manifest, manifest_target)
 
+        introspection = root / "grammar" / "introspection.json"
+        if not introspection.is_file():
+            raise AssertionError(f"missing grammar introspection descriptor: {introspection}")
+        descriptor_hash, grammar_hash = read_introspection(language, version, introspection)
+        manifest_data = json.loads(manifest.read_text(encoding="utf-8"))
+        manifest_introspection = manifest_data.get("grammarIntrospection", {})
+        if (
+            manifest_introspection.get("path") != "grammar/introspection.json"
+            or manifest_introspection.get("schemaVersion") != 1
+            or manifest_introspection.get("grammarSha256") != grammar_hash
+        ):
+            raise AssertionError(f"manifest grammar introspection metadata mismatch: {manifest}")
+        introspection_target = (
+            staging
+            / "contentFiles"
+            / "any"
+            / "any"
+            / "fastparse"
+            / "languages"
+            / language
+            / "grammar"
+            / "introspection.json"
+        )
+        introspection_target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(introspection, introspection_target)
+
         queries = root / "queries"
         if queries.is_dir():
             query_target = staging / "contentFiles" / "any" / "any" / "fastparse" / "languages" / language / "queries"
@@ -108,7 +153,7 @@ def stage_archive(language: str, archive: Path, staging: Path) -> str:
         readme = root / "README.md"
         if readme.is_file():
             shutil.copy2(readme, staging / "README.md")
-    return rid
+    return rid, descriptor_hash, grammar_hash
 
 
 def write_targets(language: str, staging: Path) -> None:
@@ -119,12 +164,17 @@ def write_targets(language: str, staging: Path) -> None:
   <Target Name="FastParserLanguage{target_name}CopyManifest" AfterTargets="Build">
     <ItemGroup>
       <FastParserLanguageManifest Include="$(MSBuildThisFileDirectory)..\\contentFiles\\any\\any\\fastparse\\languages\\{language}\\manifest.json" />
+      <FastParserLanguageGrammarIntrospection Include="$(MSBuildThisFileDirectory)..\\contentFiles\\any\\any\\fastparse\\languages\\{language}\\grammar\\introspection.json" />
       <FastParserLanguageQueries Include="$(MSBuildThisFileDirectory)..\\contentFiles\\any\\any\\fastparse\\languages\\{language}\\queries\\**\\*" />
     </ItemGroup>
     <Copy SourceFiles="@(FastParserLanguageManifest)"
           DestinationFolder="$(OutDir)fastparse\\languages\\{language}\\"
           SkipUnchangedFiles="true"
           Condition="Exists('%(FastParserLanguageManifest.Identity)')" />
+    <Copy SourceFiles="@(FastParserLanguageGrammarIntrospection)"
+          DestinationFolder="$(OutDir)fastparse\\languages\\{language}\\grammar\\"
+          SkipUnchangedFiles="true"
+          Condition="Exists('%(FastParserLanguageGrammarIntrospection.Identity)')" />
     <Copy SourceFiles="@(FastParserLanguageQueries)"
           DestinationFiles="@(FastParserLanguageQueries->'$(OutDir)fastparse\\languages\\{language}\\queries\\%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
@@ -168,6 +218,7 @@ def write_nuspec(language: str, version: str, core_version: str, staging: Path) 
     </dependencies>
     <contentFiles>
       <files include="any/any/fastparse/languages/{escape(language)}/manifest.json" buildAction="Content" copyToOutput="true" />
+      <files include="any/any/fastparse/languages/{escape(language)}/grammar/introspection.json" buildAction="Content" copyToOutput="true" />
       <files include="any/any/fastparse/languages/{escape(language)}/queries/**/*.scm" buildAction="Content" copyToOutput="true" />
     </contentFiles>
   </metadata>
@@ -260,7 +311,12 @@ def main() -> int:
         raise SystemExit("pass at least one --archive")
     with tempfile.TemporaryDirectory(prefix="fastparse-language-nuget-stage-") as temp:
         staging = Path(temp)
-        seen = {stage_archive(args.language, archive.resolve(), staging) for archive in args.archive}
+        staged = [stage_archive(args.language, archive.resolve(), staging) for archive in args.archive]
+        seen = {rid for rid, _descriptor_hash, _grammar_hash in staged}
+        descriptor_hashes = {descriptor_hash for _rid, descriptor_hash, _grammar_hash in staged}
+        grammar_hashes = {grammar_hash for _rid, _descriptor_hash, grammar_hash in staged}
+        if len(descriptor_hashes) != 1 or len(grammar_hashes) != 1:
+            raise AssertionError("language archives contain incompatible grammar introspection descriptors")
         required = {"linux-x64", "osx-arm64", "osx-x64", "win-x64"}
         missing = sorted(required - seen)
         if args.require_all_rids and missing:

@@ -106,6 +106,23 @@ def write_project(temp: Path, language: str, version: str, core_version: str, pl
     shutil.copy2(source_native, native_dir / source_native.name)
     manifest_path = package_dir / "manifest.json"
     shutil.copy2(ROOT / "extensions" / language / "manifest.json", manifest_path)
+    grammar_dir = package_dir / "grammar"
+    grammar_dir.mkdir()
+    (grammar_dir / "__init__.py").write_text("", encoding="utf-8")
+    subprocess.run(
+        [
+            sys.executable,
+            "scripts/generate_grammar_introspection.py",
+            "--language",
+            language,
+            "--extension-version",
+            version,
+            "--output",
+            str(grammar_dir / "introspection.json"),
+        ],
+        cwd=ROOT,
+        check=True,
+    )
     query_package = package_dir / "queries"
     query_package.mkdir()
     (query_package / "__init__.py").write_text("", encoding="utf-8")
@@ -114,8 +131,14 @@ def write_project(temp: Path, language: str, version: str, core_version: str, pl
         shutil.copytree(queries_source, query_package, dirs_exist_ok=True)
         (query_package / "__init__.py").write_text("", encoding="utf-8")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    descriptor = json.loads((grammar_dir / "introspection.json").read_text(encoding="utf-8"))
     manifest["version"] = version
     manifest["platforms"] = [platform_key()]
+    manifest["grammarIntrospection"] = {
+        "path": "grammar/introspection.json",
+        "schemaVersion": descriptor["schemaVersion"],
+        "grammarSha256": descriptor["grammar"]["sha256"],
+    }
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     (package_dir / "py.typed").write_text("", encoding="utf-8")
     (package_dir / "__init__.py").write_text(
@@ -158,6 +181,11 @@ def extension_path() -> Path:
     return Path(str(path))
 
 
+def introspection_path() -> Path:
+    path = resources.files(__package__) / "grammar" / "introspection.json"
+    return Path(str(path))
+
+
 def query_path(name: str = "frameworks") -> Path:
     if name == "frameworks":
         name = "{default_query_name(language)}"
@@ -193,8 +221,8 @@ setup(
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     install_requires=["fastparse=={pep440(core_version)}"],
-    packages=["{package_name}", "{package_name}.native", "{package_name}.queries"],
-    package_data={{{package_name!r}: ["manifest.json", "py.typed", "native/*/*", "queries/*.scm"]}},
+    packages=["{package_name}", "{package_name}.grammar", "{package_name}.native", "{package_name}.queries"],
+    package_data={{{package_name!r}: ["manifest.json", "py.typed", "grammar/introspection.json", "native/*/*", "queries/*.scm"]}},
     include_package_data=True,
     zip_safe=False,
     cmdclass={{"bdist_wheel": bdist_wheel}},

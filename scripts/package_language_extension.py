@@ -12,6 +12,8 @@ import tarfile
 import zipfile
 from pathlib import Path
 
+from generate_grammar_introspection import generate_descriptor, write_descriptor
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -130,6 +132,13 @@ def package_extension(args: argparse.Namespace) -> Path:
 
     grammar_meta = package_dir / "grammar"
     grammar_meta.mkdir()
+    descriptor = generate_descriptor(
+        language,
+        args.version,
+        grammar,
+        extension_dir / "manifest.json",
+    )
+    write_descriptor(descriptor, grammar_meta / "introspection.json")
     for name in ["LICENSE", "README.md", "tree-sitter.json", "package.json"]:
         source = grammar / name
         if source.exists():
@@ -138,6 +147,11 @@ def package_extension(args: argparse.Namespace) -> Path:
     manifest = json.loads((package_dir / "manifest.json").read_text(encoding="utf-8"))
     manifest["version"] = args.version
     manifest["platforms"] = [rid]
+    manifest["grammarIntrospection"] = {
+        "path": "grammar/introspection.json",
+        "schemaVersion": descriptor["schemaVersion"],
+        "grammarSha256": descriptor["grammar"]["sha256"],
+    }
     (package_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
     if platform_name == "windows":

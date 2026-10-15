@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import platform
 import shutil
@@ -549,11 +550,37 @@ def smoke_framework(env: dict[str, str]) -> str:
     return "net9.0"
 
 
+def prepend_introspection_check(program: str, language: str) -> str:
+    return f'''var grammarIntrospectionPath = Path.Combine(
+    AppContext.BaseDirectory,
+    "fastparse",
+    "languages",
+    "{language}",
+    "grammar",
+    "introspection.json");
+if (!File.Exists(grammarIntrospectionPath))
+{{
+    throw new InvalidOperationException($"Grammar introspection was not copied to output: {{grammarIntrospectionPath}}");
+}}
+using (var grammarIntrospection = System.Text.Json.JsonDocument.Parse(File.ReadAllText(grammarIntrospectionPath)))
+{{
+    var root = grammarIntrospection.RootElement;
+    if (root.GetProperty("format").GetString() != "fastparse-grammar-introspection" ||
+        root.GetProperty("extension").GetProperty("language").GetString() != "{language}")
+    {{
+        throw new InvalidOperationException("Grammar introspection identity is invalid");
+    }}
+}}
+
+''' + program
+
+
 def validate_package_layout(language_package: Path, language: str, require_all_rids: bool) -> None:
     package_name = package_language_name(language)
     required = {
         "README.md",
         f"contentFiles/any/any/fastparse/languages/{language}/manifest.json",
+        f"contentFiles/any/any/fastparse/languages/{language}/grammar/introspection.json",
         f"buildTransitive/FastParser.Language.{package_name}.targets",
     }
     rids = ("linux-x64", "osx-arm64", "osx-x64", "win-x64") if require_all_rids else (current_rid(),)
@@ -563,11 +590,17 @@ def validate_package_layout(language_package: Path, language: str, require_all_r
         required.add(f"contentFiles/any/any/fastparse/languages/{language}/queries/frameworks.scm")
     if language == "javaswing":
         required.add(f"contentFiles/any/any/fastparse/languages/{language}/queries/swing.scm")
+    introspection_name = f"contentFiles/any/any/fastparse/languages/{language}/grammar/introspection.json"
     with zipfile.ZipFile(language_package) as zf:
         names = set(zf.namelist())
+        descriptor = json.loads(zf.read(introspection_name)) if introspection_name in names else None
     missing = sorted(required - names)
     if missing:
         raise AssertionError(f"language NuGet package missing entries: {', '.join(missing)}")
+    if not isinstance(descriptor, dict) or descriptor.get("format") != "fastparse-grammar-introspection":
+        raise AssertionError("language NuGet package has an invalid grammar introspection descriptor")
+    if descriptor.get("extension", {}).get("language") != language:
+        raise AssertionError("language NuGet package grammar descriptor has the wrong language")
 
 
 def main() -> int:
@@ -634,7 +667,9 @@ def main() -> int:
             program = PLSQL_PROGRAM
         else:
             program = PYTHON_PROGRAM
-        (project_dir / "Program.cs").write_text(program, encoding="utf-8")
+        (project_dir / "Program.cs").write_text(
+            prepend_introspection_check(program, args.language), encoding="utf-8"
+        )
         completed = run_command(["dotnet", "run", "--project", project], env=env)
         if "FastParser language NuGet smoke OK" not in completed.stdout:
             raise AssertionError(f"language NuGet smoke failed:\n{completed.stdout}")
