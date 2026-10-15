@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import importlib.util
 import json
 import tempfile
@@ -28,8 +27,10 @@ class GrammarIntrospectionTests(unittest.TestCase):
         second = MODULE.generate_descriptor("cobol", "0.1.2-test", self.grammar_dir, self.manifest)
         self.assertEqual(first, second)
 
-        grammar_bytes = (self.grammar_dir / "src" / "grammar.json").read_bytes()
-        self.assertEqual(first["grammar"]["sha256"], hashlib.sha256(grammar_bytes).hexdigest())
+        grammar = json.loads((self.grammar_dir / "src" / "grammar.json").read_text(encoding="utf-8"))
+        self.assertEqual(first["grammar"]["sha256"], MODULE.grammar_hash(grammar))
+        crlf_grammar = json.loads(json.dumps(grammar, indent=2).replace("\n", "\r\n"))
+        self.assertEqual(first["grammar"]["sha256"], MODULE.grammar_hash(crlf_grammar))
         self.assertEqual(first["extension"]["language"], "cobol")
         self.assertEqual(first["extension"]["version"], "0.1.2-test")
 

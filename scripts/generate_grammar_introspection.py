@@ -45,8 +45,16 @@ def default_manifest(language: str) -> Path:
     return ROOT / "extensions" / canonical_language(language) / "manifest.json"
 
 
-def grammar_hash(grammar_bytes: bytes) -> str:
-    return hashlib.sha256(grammar_bytes).hexdigest()
+def grammar_hash(grammar: dict[str, Any]) -> str:
+    """Hash grammar JSON semantically, independent of checkout line endings."""
+
+    canonical = json.dumps(
+        grammar,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
 
 
 def regex_case_policy(pattern: str) -> tuple[str, str | None]:
@@ -144,8 +152,7 @@ def generate_descriptor(
             f"{grammar_dir.name!r}"
         )
 
-    grammar_bytes = grammar_path.read_bytes()
-    grammar = json.loads(grammar_bytes)
+    grammar = json.loads(grammar_path.read_text(encoding="utf-8"))
     rules = grammar.get("rules")
     if not isinstance(rules, dict) or not rules:
         raise ValueError(f"Tree-sitter grammar has no rules: {grammar_path}")
@@ -167,7 +174,7 @@ def generate_descriptor(
             "revision": grammar_identity.get("revision"),
             "license": grammar_identity.get("license"),
             "sourceFile": "src/grammar.json",
-            "sha256": grammar_hash(grammar_bytes),
+            "sha256": grammar_hash(grammar),
             "word": grammar.get("word"),
             "ruleCount": len(rules),
         },

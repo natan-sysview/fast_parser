@@ -347,7 +347,9 @@ library. Schema version `1` preserves the grammar graph rather than expanding it
 - A regex gets `ascii-case-insensitive` only when that can be proven from an
   explicit ASCII case-pair pattern such as `[mM][oO][vV][eE]`; otherwise its
   case policy is `unknown`.
-- `grammar.sha256` is the SHA-256 of the exact generated `src/grammar.json`.
+- `grammar.sha256` is the SHA-256 of canonicalized generated `src/grammar.json`.
+  This intentionally ignores checkout-only JSON formatting and line-ending changes
+  while detecting any structural grammar change.
 
 The package manifest points to the sidecar and repeats the grammar hash:
 
